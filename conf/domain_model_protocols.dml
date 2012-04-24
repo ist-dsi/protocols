@@ -1,0 +1,136 @@
+package module.protocols.domain;
+
+enum module.protocols.domain.util.ProtocolResponsibleType as ProtocolResponsibleType;
+
+valueType module.protocols.domain.util.ProtocolAction as ProtocolAction {
+    externalizeWith {
+        String toString();
+    }
+
+    internalizeWith fromString();
+}
+
+class ProtocolManager {
+}
+
+class Protocol {
+    Boolean active;
+    String observations;
+    ProtocolAction protocolAction;
+    String protocolNumber;
+    Boolean renewable;
+    String scientificAreas;
+    LocalDate signedDate;
+    Boolean national;
+}
+
+class ProtocolHistory {
+	DateTime timestamp;
+	LocalDate beginDate;
+	LocalDate endDate;
+}
+
+class ProtocolFile {
+}
+
+class ProtocolResponsible {
+	ProtocolResponsibleType type;
+}
+
+/* Relations */
+
+relation ProtocolManagerMyOrg {
+	.myorg.domain.MyOrg playsRole myOrg;
+	ProtocolManager playsRole protocolManager;
+}
+
+relation ProtocolManagerProtocols {
+	ProtocolManager playsRole protocolManager {
+		multiplicity 1..1;
+	}
+	Protocol playsRole protocols {
+		multiplicity *;
+	}
+}
+
+relation ProtocolManagerInternalOrganizationModel {
+	ProtocolManager playsRole internalProtocolManager;
+	.module.organization.domain.OrganizationalModel playsRole internalOrganizationalModel;
+}
+
+relation ProtocolManagerExternalOrganizationModel {
+	ProtocolManager playsRole externalProtocolManager;
+	.module.organization.domain.OrganizationalModel playsRole externalOrganizationalModel;
+}
+
+relation ProtocolResponsibleProtocol {
+	Protocol playsRole protocol;
+	ProtocolResponsible playsRole protocolResponsible {
+		multiplicity *;
+	}
+}
+
+relation ProtocolResponsiblePerson {
+	ProtocolResponsible playsRole protocolResponsible {
+		multiplicity *;
+	}
+	.module.organization.domain.Person playsRole people {
+		multiplicity *;
+	}
+}
+
+relation ProtocolResponsibleUnit {
+	ProtocolResponsible playsRole protocolResponsible {
+		multiplicity *;
+	}
+	.module.organization.domain.Unit playsRole unit {
+		multiplicity 1..1;
+	}
+}
+
+
+relation ProtocolFileProtocol {
+	Protocol playsRole protocol;
+	ProtocolFile playsRole protocolFiles {
+		multiplicity *;
+	}
+}
+
+relation ProtocolHistoryProtocol {
+	Protocol playsRole protocol {
+		multiplicity 1..1;
+	}
+	ProtocolHistory playsRole protocolHistories {
+		multiplicity *;
+	}
+}
+
+relation ProtocolCreator {
+	Protocol playsRole createdProtocols {
+		multiplicity *;
+	}
+	
+	.module.organization.domain.Person playsRole creator {
+		multiplicity 1..1;
+	}
+}
+
+relation ProtocolAllowedToViewGroups {
+	Protocol playsRole allowedToViewProtocols {
+		multiplicity *;
+	}
+	
+	.myorg.domain.groups.PersistentGroup playsRole allowedToView {
+		multiplicity *;
+	}
+}
+
+relation ProtocolAllowedToEditGroups {
+	Protocol playsRole allowedToEditProtocols {
+		multiplicity *;
+	}
+	
+	.myorg.domain.groups.PersistentGroup playsRole allowedToEdit {
+		multiplicity *;
+	}
+}
