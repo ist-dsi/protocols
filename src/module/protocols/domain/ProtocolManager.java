@@ -1,9 +1,15 @@
 package module.protocols.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jvstm.cps.ConsistencyPredicate;
-import module.organization.domain.OrganizationalModel;
+import module.protocols.dto.ProtocolSystemConfigurationBean;
 import myorg.domain.ModuleInitializer;
 import myorg.domain.MyOrg;
+import myorg.domain.groups.AnyoneGroup;
+import myorg.domain.groups.PersistentGroup;
+import myorg.domain.groups.UnionGroup;
 import pt.ist.fenixWebFramework.services.Service;
 
 /**
@@ -27,7 +33,11 @@ public class ProtocolManager extends ProtocolManager_Base implements ModuleIniti
 
     @Service
     private static ProtocolManager createInstance() {
-	return new ProtocolManager();
+
+	ProtocolManager manager = new ProtocolManager();
+	manager.setAdministrativeGroup(AnyoneGroup.getInstance());
+
+	return manager;
     }
 
     private ProtocolManager() {
@@ -35,17 +45,22 @@ public class ProtocolManager extends ProtocolManager_Base implements ModuleIniti
 	setMyOrg(MyOrg.getInstance());
     }
 
-    @Service
-    public void setOrganizationalModels(OrganizationalModel internalOrganizationalModel,
-	    OrganizationalModel externalOrganizationalModel) {
-	setInternalOrganizationalModel(internalOrganizationalModel);
-	setExternalOrganizationalModel(externalOrganizationalModel);
-    }
-
     @ConsistencyPredicate
     protected final boolean checkForDifferentOrganizationalModels() {
 	return getInternalOrganizationalModel() == null ? true
 		: getInternalOrganizationalModel() != getExternalOrganizationalModel();
+    }
+
+    public static PersistentGroup createGroupFor(List<PersistentGroup> groups) {
+
+	PersistentGroup administrativeGroup = getInstance().getAdministrativeGroup();
+
+	if (administrativeGroup != null) {
+	    groups = new ArrayList<PersistentGroup>(groups);
+	    groups.add(administrativeGroup);
+	}
+
+	return new UnionGroup(groups);
     }
 
     /*
@@ -55,8 +70,16 @@ public class ProtocolManager extends ProtocolManager_Base implements ModuleIniti
      */
     @Override
     public void init(MyOrg root) {
-	throw new RuntimeException("ERROR: This module is still under development, should not be used in"
-		+ " production environments. If you are sure about what you are doing, remove"
-		+ " the ModuleInitializer from ProtocolManager");
+
+    }
+
+    /**
+     * @param bean
+     */
+    @Service
+    public void updateFromBean(ProtocolSystemConfigurationBean bean) {
+	setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
+	setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
+	setAdministrativeGroup(bean.getAdministrativeGroup());
     }
 }

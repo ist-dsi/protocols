@@ -7,13 +7,23 @@
 
 <p class="mtop2 mbottom0" align="center">
 <h2>
-<bean:message key="label.organizationalModel.define" bundle="PROTOCOLS_RESOURCES" />
+<bean:message key="label.protocolSystem.configure" bundle="PROTOCOLS_RESOURCES" />
 </h2>
 </p>
 
-<fr:form action="/protocols.do?method=defineOrganizationalModel">
+<logic:present name="configurationBean">
+
+<fr:form action="/protocols.do?method=protocolSystemConfiguration">
 
 <table width="100%">
+
+<tr>
+<td colspan="2" width="100%">
+<div class="infobox" align="center">
+	<p class="dinline"><strong><bean:message key="label.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+</td>
+</tr>
 
 
 <tr>
@@ -25,8 +35,8 @@
 	<p class="dinline"><strong><bean:message key="label.organizationalModel.internal" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<fr:edit name="organizationalModelBean">
-	<fr:schema type="module.protocols.dto.OrganizationalModelBean" bundle="PROTOCOLS_RESOURCES">
+<fr:edit name="configurationBean">
+	<fr:schema type="module.protocols.dto.ProtocolSystemConfigurationBean" bundle="PROTOCOLS_RESOURCES">
 		<fr:slot name="internalOrganizationalModel" layout="menu-select" key="label.organizationalModel.internal">
 			<fr:property name="providerClass" value="module.organization.presentationTier.renderers.providers.OrganizationalModelProvider"/>
 			<fr:property name="format" value="${name}" />
@@ -46,8 +56,8 @@
 	<p class="dinline"><strong><bean:message key="label.organizationalModel.external" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<fr:edit name="organizationalModelBean">
-	<fr:schema type="module.protocols.dto.OrganizationalModelBean" bundle="PROTOCOLS_RESOURCES">
+<fr:edit name="configurationBean">
+	<fr:schema type="module.protocols.dto.ProtocolSystemConfigurationBean" bundle="PROTOCOLS_RESOURCES">
 		<fr:slot name="externalOrganizationalModel" layout="menu-select" key="label.organizationalModel.external">
 			<fr:property name="providerClass" value="module.organization.presentationTier.renderers.providers.OrganizationalModelProvider"/>
 			<fr:property name="format" value="${name}" />
@@ -59,12 +69,42 @@
 	</fr:layout>
 </fr:edit>
 
+
+
 </td>
 
 
 
 
 </tr>
+</table>
+
+<table width="100%">
+
+<tr>
+<td>
+
+<div class="infobox" align="center">
+	<p class="dinline"><strong><bean:message key="label.groups.administrator.define" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+
+<fr:edit name="configurationBean">
+	<fr:schema type="module.protocols.dto.ProtocolSystemConfigurationBean" bundle="PROTOCOLS_RESOURCES">
+		<fr:slot name="administrativeGroup" layout="menu-select" key="label.groups.administrator">
+			<fr:property name="providerClass" value="myorg.presentationTier.renderers.providers.AccessibilityGroupsProvider"/>
+			<fr:property name="format" value="${name}" />
+		</fr:slot>
+	</fr:schema>
+	<fr:layout name="tabular">
+		<fr:property name="classes" value="form listInsideClear" />
+		<fr:property name="columnClasses" value="width100px,,tderror" />
+	</fr:layout>
+</fr:edit>
+
+
+</td>
+</tr>
+
 </table>
 
 <p align="center">
@@ -74,3 +114,5 @@
 </p>
 
 </fr:form>
+
+</logic:present>

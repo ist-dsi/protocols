@@ -10,7 +10,6 @@ import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import myorg.domain.User;
-import myorg.domain.groups.PersistentGroup;
 
 import org.joda.time.LocalDate;
 
@@ -142,13 +141,9 @@ public class Protocol extends Protocol_Base {
 	    protocol.addProtocolResponsible(responsible);
 	}
 
-	for (PersistentGroup group : protocolBean.getAllowedToView()) {
-	    protocol.addAllowedToView(group);
-	}
+	protocol.setAllowedToView(ProtocolManager.createGroupFor(protocolBean.getAllowedToView()));
 
-	for (PersistentGroup group : protocolBean.getAllowedToEdit()) {
-	    protocol.addAllowedToEdit(group);
-	}
+	protocol.setAllowedToEdit(ProtocolManager.createGroupFor(protocolBean.getAllowedToEdit()));
 
 	new ProtocolHistory(protocol, protocolBean.getBeginDate(), protocolBean.getEndDate());
 
@@ -157,24 +152,12 @@ public class Protocol extends Protocol_Base {
 
     public boolean canBeViewedByUser(final User user) {
 
-	return CollectionUtils.anyMatches(getAllowedToView(), new Predicate<PersistentGroup>() {
-
-	    @Override
-	    public boolean evaluate(PersistentGroup group) {
-		return group.isMember(user);
-	    }
-	});
+	return getAllowedToView().isMember(user);
     }
 
     public boolean canBeEditedByUser(final User user) {
 
-	return CollectionUtils.anyMatches(getAllowedToEdit(), new Predicate<PersistentGroup>() {
-
-	    @Override
-	    public boolean evaluate(PersistentGroup group) {
-		return group.isMember(user);
-	    }
-	});
+	return getAllowedToEdit().isMember(user);
     }
 
 }

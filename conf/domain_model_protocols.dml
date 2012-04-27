@@ -1,6 +1,7 @@
 package module.protocols.domain;
 
 enum module.protocols.domain.util.ProtocolResponsibleType as ProtocolResponsibleType;
+enum module.protocols.domain.ProtocolVisibilityType as ProtocolVisibilityType;
 
 valueType module.protocols.domain.util.ProtocolAction as ProtocolAction {
     externalizeWith {
@@ -22,6 +23,8 @@ class Protocol {
     String scientificAreas;
     LocalDate signedDate;
     Boolean national;
+    
+    ProtocolVisibilityType visibilityType;
 }
 
 class ProtocolHistory {
@@ -35,6 +38,9 @@ class ProtocolFile {
 
 class ProtocolResponsible {
 	ProtocolResponsibleType type;
+}
+
+class ProtocolAuthorizationCluster {
 }
 
 /* Relations */
@@ -64,7 +70,9 @@ relation ProtocolManagerExternalOrganizationModel {
 }
 
 relation ProtocolResponsibleProtocol {
+
 	Protocol playsRole protocol;
+	
 	ProtocolResponsible playsRole protocolResponsible {
 		multiplicity *;
 	}
@@ -105,32 +113,44 @@ relation ProtocolHistoryProtocol {
 	}
 }
 
-relation ProtocolCreator {
-	Protocol playsRole createdProtocols {
-		multiplicity *;
-	}
-	
-	.module.organization.domain.Person playsRole creator {
-		multiplicity 1..1;
-	}
-}
+// Access control
 
 relation ProtocolAllowedToViewGroups {
 	Protocol playsRole allowedToViewProtocols {
 		multiplicity *;
 	}
-	
-	.myorg.domain.groups.PersistentGroup playsRole allowedToView {
-		multiplicity *;
-	}
+	.myorg.domain.groups.PersistentGroup playsRole allowedToView;
 }
 
 relation ProtocolAllowedToEditGroups {
 	Protocol playsRole allowedToEditProtocols {
 		multiplicity *;
 	}
-	
-	.myorg.domain.groups.PersistentGroup playsRole allowedToEdit {
+	.myorg.domain.groups.PersistentGroup playsRole allowedToEdit;
+}
+
+relation ProtocolManagerAdministrativeGroup {
+	ProtocolManager playsRole protocolManager;
+	.myorg.domain.groups.PersistentGroup playsRole administrativeGroup;
+}
+
+relation ProtocolAuthorizationClusterProtocolManager {
+	ProtocolManager playsRole protocolManager {
+		multiplicity 1..1;
+	}
+	ProtocolAuthorizationCluster playsRole protocolAuthorizationClusters {
+		multiplicity *;
+	}
+}
+
+relation ProtocolAuthorizationClusterCreatorGroups {
+	ProtocolAuthorizationCluster playsRole protocolAuthorizationClusterAllowedToCreate;
+	.myorg.domain.groups.PersistentGroup playsRole authorizedCreatorGroup;
+}
+
+relation ProtocolAuthorizationClusterReaderGroups {
+	ProtocolAuthorizationCluster playsRole protocolAuthorizationClusterAllowedToRead;
+	.myorg.domain.groups.PersistentGroup playsRole authorizedReaderGroups {
 		multiplicity *;
 	}
 }

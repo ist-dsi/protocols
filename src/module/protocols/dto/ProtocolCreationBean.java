@@ -41,6 +41,8 @@ public class ProtocolCreationBean implements Serializable {
 
 	private final List<Person> responsibles;
 
+	private Person personToRemove;
+
 	public ProtocolResponsibleBean(ProtocolResponsible responsible) {
 	    this.unit = responsible.getUnit();
 	    this.responsibles = new ArrayList<Person>(responsible.getPeople());
@@ -61,12 +63,27 @@ public class ProtocolCreationBean implements Serializable {
 	}
 
 	public void addResponsible(Person responsible) {
-	    if (responsible != null)
+	    if (responsible != null && !responsibles.contains(responsible))
 		responsibles.add(responsible);
 	}
 
 	public boolean check() {
 	    return unit != null && responsibles.size() > 0;
+	}
+
+	/**
+	 * @param newPerson
+	 */
+	public void removeResponsible(Person newPerson) {
+	    responsibles.remove(newPerson);
+	}
+
+	public Person getPersonToRemove() {
+	    return personToRemove;
+	}
+
+	public void setPersonToRemove(Person personToRemove) {
+	    this.personToRemove = personToRemove;
 	}
     }
 
@@ -106,7 +123,7 @@ public class ProtocolCreationBean implements Serializable {
 
     private Unit newUnit;
 
-    private String newPersonName;
+    private Person newPerson;
 
     /*
      * Step 3
@@ -315,12 +332,12 @@ public class ProtocolCreationBean implements Serializable {
 	this.newUnit = newUnit;
     }
 
-    public String getNewPersonName() {
-	return newPersonName;
+    public Person getNewPerson() {
+	return newPerson;
     }
 
-    public void setNewPersonName(String newPersonName) {
-	this.newPersonName = newPersonName;
+    public void setNewPerson(Person newPerson) {
+	this.newPerson = newPerson;
     }
 
     public Person getCreator() {
@@ -376,6 +393,16 @@ public class ProtocolCreationBean implements Serializable {
 	    }
 	}
 	return true;
+    }
+
+    public ProtocolResponsibleBean getBeanForUnit(Unit unit) {
+
+	for (ProtocolResponsibleBean bean : getInternalResponsibles()) {
+	    if (unit.equals(bean.getUnit())) {
+		return bean;
+	    }
+	}
+	return null;
     }
 
 }

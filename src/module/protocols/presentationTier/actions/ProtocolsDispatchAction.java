@@ -8,16 +8,17 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
 import module.protocols.domain.ProtocolHistory;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
 import module.protocols.domain.util.ProtocolResponsibleType;
-import module.protocols.dto.OrganizationalModelBean;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import module.protocols.dto.ProtocolHistoryBean;
 import module.protocols.dto.ProtocolSearchBean;
+import module.protocols.dto.ProtocolSystemConfigurationBean;
 import myorg.domain.RoleType;
 import myorg.domain.VirtualHost;
 import myorg.domain.contents.ActionNode;
@@ -68,8 +69,11 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareCreateProtocolData",
 		"resources.ProtocolsResources", "label.protocols.create", Role.getRole(RoleType.MANAGER));
 
-	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareToDefineOrganizationalModel",
-		"resources.ProtocolsResources", "label.organizationalModel.define", Role.getRole(RoleType.MANAGER));
+	// System configuration. Should only be accessed by the administrative
+	// group
+	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "protocolSystemConfiguration",
+		"resources.ProtocolsResources", "label.protocolSystem.configure", ProtocolManager.getInstance()
+			.getAdministrativeGroup());
 
 	return forwardToMuneConfiguration(request, virtualHost, topActionNode);
     }
@@ -121,38 +125,19 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	return forward(request, "/protocols/showAlerts.jsp");
     }
 
-    public ActionForward prepareToDefineOrganizationalModel(final ActionMapping mapping, final ActionForm form,
+    public ActionForward protocolSystemConfiguration(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
 
-	OrganizationalModelBean bean = getRenderedObject();
+	ProtocolSystemConfigurationBean bean = getRenderedObject();
 
 	if (bean == null)
-	    bean = new OrganizationalModelBean();
+	    bean = new ProtocolSystemConfigurationBean();
+	else
+	    ProtocolManager.getInstance().updateFromBean(bean);
 
-	request.setAttribute("organizationalModelBean", bean);
+	request.setAttribute("configurationBean", bean);
 
-	return forward(request, "/protocols/defineOrganizationalModel.jsp");
-    }
-
-    public ActionForward defineOrganizationalModel(final ActionMapping mapping, final ActionForm form,
-	    final HttpServletRequest request, final HttpServletResponse response) {
-
-	OrganizationalModelBean bean = getRenderedObject();
-
-	if (bean != null) {
-
-	    if (bean.getInternalOrganizationalModel() != null
-		    && bean.getInternalOrganizationalModel().equals(bean.getExternalOrganizationalModel())) {
-		setError(request, "errorMessage", new ActionMessage("label.organizationalModel.equalModels"));
-		return prepareToDefineOrganizationalModel(mapping, form, request, response);
-	    } else {
-
-		ProtocolManager.getInstance().setOrganizationalModels(bean.getInternalOrganizationalModel(),
-			bean.getExternalOrganizationalModel());
-	    }
-	}
-
-	return showAlerts(mapping, form, request, response);
+	return forward(request, "/protocols/protocolSystemConfiguration.jsp");
     }
 
     public ActionForward viewProtocolDetails(final ActionMapping mapping, final ActionForm form,
@@ -339,11 +324,31 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	boolean internal = true;
 
-	if (request.getParameter("insertInternalUnit") != null) {
-	    System.out.println("Inserting unit...");
+	if (request.getParameter("insertInternalUnit") != null && protocolBean.getNewUnit() != null) {
+
+	    // TODO Check if unit already in bean
 
 	    protocolBean.addInternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));
 	    protocolBean.setNewUnit(null);
+
+	    internal = true;
+	} else if (request.getParameter("insertPersonInUnit") != null && protocolBean.getNewPerson() != null) {
+
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+
+	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
+
+	    protocolBean.setNewPerson(null);
+
+	    internal = true;
+
+	} else if (request.getParameter("removePersonInUnit") != null && protocolBean.getNewPerson() != null) {
+
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+
+	    protocolBean.getBeanForUnit(unit).removeResponsible(protocolBean.getNewPerson());
+
+	    protocolBean.setNewPerson(null);
 
 	    internal = true;
 	}

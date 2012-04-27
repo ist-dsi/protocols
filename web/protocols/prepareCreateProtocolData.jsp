@@ -11,7 +11,7 @@
 
 
 <p class="breadcumbs">
-	<span class="actual"><bean:message key="label.protocol.create.step1" bundle="PROTOCOLS_RESOURCES"/></span> > 
+	<span><strong><bean:message key="label.protocol.create.step1" bundle="PROTOCOLS_RESOURCES"/></strong></span> > 
 	<span><bean:message key="label.protocol.create.step2" bundle="PROTOCOLS_RESOURCES"/></span> > 
 	<span><bean:message key="label.protocol.create.step3" bundle="PROTOCOLS_RESOURCES"/></span> >
 	<span><bean:message key="label.protocol.create.step4" bundle="PROTOCOLS_RESOURCES"/></span>
