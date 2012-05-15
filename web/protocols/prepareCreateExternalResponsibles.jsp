@@ -9,8 +9,8 @@
 
 <p class="breadcumbs">
 	<span><bean:message key="label.protocol.create.step1" bundle="PROTOCOLS_RESOURCES"/></span> > 
-	<span><strong><bean:message key="label.protocol.create.step2" bundle="PROTOCOLS_RESOURCES"/></strong></span> > 
-	<span><bean:message key="label.protocol.create.step3" bundle="PROTOCOLS_RESOURCES"/></span> >
+	<span><bean:message key="label.protocol.create.step2" bundle="PROTOCOLS_RESOURCES"/></span> > 
+	<span><strong><bean:message key="label.protocol.create.step3" bundle="PROTOCOLS_RESOURCES"/></strong></span> >
 	<span><bean:message key="label.protocol.create.step4" bundle="PROTOCOLS_RESOURCES"/></span>
 </p>
 <p></p>
@@ -28,7 +28,7 @@
 <br />
 
 <div align="center">
-	<h3><bean:message key="label.protocols.internalUnits" bundle="PROTOCOLS_RESOURCES"/></h3>
+	<h3><bean:message key="label.protocols.externalUnits" bundle="PROTOCOLS_RESOURCES"/></h3>
 </div>
 
 
@@ -40,9 +40,9 @@
 
 <p>
 
-<logic:present name="protocolBean" property="internalResponsibles">
+<logic:present name="protocolBean" property="externalResponsibles">
 
-<logic:iterate id="responsible" name="protocolBean" property="internalResponsibles">
+<logic:iterate id="responsible" name="protocolBean" property="externalResponsibles">
 
 <fr:form action="/protocols.do?method=updateBean">
 
@@ -83,7 +83,7 @@
 	</fr:layout>
 </fr:edit>
 
-<html:submit bundle="PROPERTIES_RESOURCES" property="insertPersonInUnit">
+<html:submit bundle="PROPERTIES_RESOURCES" property="insertPersonInExternalUnit">
 	<bean:message key="button.insertPerson" bundle="PROTOCOLS_RESOURCES" />
 </html:submit>
 
@@ -145,7 +145,7 @@
         <fr:property name="labelField" value="presentationName"/>
 		<fr:property name="format" value="${presentationName}"/>
 		<fr:property name="minChars" value="2"/>
-		<fr:property name="args" value="provider=module.protocols.presentationTier.providers.UnitPerModelAutoCompleteProvider,model=internal"/>
+		<fr:property name="args" value="provider=module.protocols.presentationTier.providers.UnitPerModelAutoCompleteProvider,model=external"/>
 		<fr:property name="size" value="40"/>
 	</fr:slot>
 </fr:schema>	
@@ -154,7 +154,7 @@
 	</fr:layout>
 </fr:edit>
 
-<html:submit bundle="PROPERTIES_RESOURCES" property="insertInternalUnit">
+<html:submit bundle="PROPERTIES_RESOURCES" property="insertExternalUnit">
 	<bean:message key="button.insertUnit" bundle="PROTOCOLS_RESOURCES" />
 </html:submit>
 
@@ -164,7 +164,7 @@
 
 
 
-<fr:form action="/protocols.do?method=prepareCreateExternalResponsibles">
+<fr:form action="/protocols.do?method=prepareDefineProtocolPermissions">
 
 <fr:edit id="protocolBean" name="protocolBean" visible="false" />
 

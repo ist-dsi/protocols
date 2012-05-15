@@ -14,10 +14,10 @@ import module.organization.presentationTier.renderers.providers.PersonAutoComple
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
  * 
  */
-public class PeoplePerUnitAutoCompletProvider extends PersonAutoCompleteProvider {
+public class PeoplePerUnitAutoCompleteProvider extends PersonAutoCompleteProvider {
 
     @Override
-    protected Collection<Person> getPeople(Map<String, String> argsMap, String value) {
+    protected Collection<Person> getPersons(Map<String, String> argsMap, String value) {
 
 	try {
 
@@ -28,8 +28,7 @@ public class PeoplePerUnitAutoCompletProvider extends PersonAutoCompleteProvider
 	    return unit.getChildPersons();
 
 	} catch (Exception e) {
-	    return super.getPeople(argsMap, value);
-
+	    return super.getPersons(argsMap, value);
 	}
     }
 

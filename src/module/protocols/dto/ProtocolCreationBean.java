@@ -8,6 +8,9 @@ package module.protocols.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import module.organization.domain.Person;
 import module.organization.domain.Unit;
@@ -30,7 +33,7 @@ public class ProtocolCreationBean implements Serializable {
      */
     private static final long serialVersionUID = 3819698830239113842L;
 
-    public static class ProtocolResponsibleBean implements Serializable {
+    public static class ProtocolResponsibleBean implements Serializable, Comparable<ProtocolResponsibleBean> {
 
 	/**
 	 * 
@@ -85,6 +88,11 @@ public class ProtocolCreationBean implements Serializable {
 	public void setPersonToRemove(Person personToRemove) {
 	    this.personToRemove = personToRemove;
 	}
+
+	@Override
+	public int compareTo(ProtocolResponsibleBean o) {
+	    return Unit.COMPARATOR_BY_PRESENTATION_NAME.compare(this.unit, o.getUnit());
+	}
     }
 
     private Protocol protocol;
@@ -119,7 +127,7 @@ public class ProtocolCreationBean implements Serializable {
      * Step 2
      */
 
-    private List<ProtocolResponsibleBean> internalResponsibles;
+    private SortedSet<ProtocolResponsibleBean> internalResponsibles;
 
     private Unit newUnit;
 
@@ -129,7 +137,7 @@ public class ProtocolCreationBean implements Serializable {
      * Step 3
      */
 
-    private List<ProtocolResponsibleBean> externalResponsibles;
+    private SortedSet<ProtocolResponsibleBean> externalResponsibles;
 
     /*
      * Step 4
@@ -262,19 +270,19 @@ public class ProtocolCreationBean implements Serializable {
 	this.observations = observations;
     }
 
-    public List<ProtocolResponsibleBean> getInternalResponsibles() {
+    public Set<ProtocolResponsibleBean> getInternalResponsibles() {
 	return internalResponsibles;
     }
 
-    public void setInternalResponsibles(List<ProtocolResponsibleBean> internalResponsibles) {
+    public void setInternalResponsibles(SortedSet<ProtocolResponsibleBean> internalResponsibles) {
 	this.internalResponsibles = internalResponsibles;
     }
 
-    public List<ProtocolResponsibleBean> getExternalResponsibles() {
+    public SortedSet<ProtocolResponsibleBean> getExternalResponsibles() {
 	return externalResponsibles;
     }
 
-    public void setExternalResponsibles(List<ProtocolResponsibleBean> externalResponsibles) {
+    public void setExternalResponsibles(SortedSet<ProtocolResponsibleBean> externalResponsibles) {
 	this.externalResponsibles = externalResponsibles;
     }
 
@@ -312,14 +320,14 @@ public class ProtocolCreationBean implements Serializable {
 
     public void addInternalResponsible(ProtocolResponsibleBean bean) {
 	if (internalResponsibles == null)
-	    internalResponsibles = new ArrayList<ProtocolResponsibleBean>();
+	    internalResponsibles = new TreeSet<ProtocolResponsibleBean>();
 
 	internalResponsibles.add(bean);
     }
 
     public void addExternalResponsible(ProtocolResponsibleBean bean) {
 	if (externalResponsibles == null)
-	    externalResponsibles = new ArrayList<ProtocolResponsibleBean>();
+	    externalResponsibles = new TreeSet<ProtocolResponsibleBean>();
 
 	externalResponsibles.add(bean);
     }
@@ -342,8 +350,6 @@ public class ProtocolCreationBean implements Serializable {
 
     public Person getCreator() {
 
-	// TODO Check this
-
 	return Authenticate.getCurrentUser().getPerson();
     }
 
@@ -354,14 +360,16 @@ public class ProtocolCreationBean implements Serializable {
      */
     public boolean internalResponsiblesCorrect() {
 
-	if (internalResponsibles != null || internalResponsibles.size() > 0) {
-	    for (ProtocolResponsibleBean bean : internalResponsibles) {
-		if (!bean.check())
-		    return false;
-	    }
+	if (internalResponsibles == null || internalResponsibles.size() == 0)
+	    return false;
+
+	for (ProtocolResponsibleBean bean : internalResponsibles) {
+	    if (!bean.check())
+		return false;
 	}
 
 	return true;
+
     }
 
     /**
@@ -371,11 +379,12 @@ public class ProtocolCreationBean implements Serializable {
      */
     public boolean externalResponsiblesCorrect() {
 
-	if (externalResponsibles != null || externalResponsibles.size() > 0) {
-	    for (ProtocolResponsibleBean bean : externalResponsibles) {
-		if (!bean.check())
-		    return false;
-	    }
+	if (externalResponsibles == null || externalResponsibles.size() == 0)
+	    return false;
+
+	for (ProtocolResponsibleBean bean : externalResponsibles) {
+	    if (!bean.check())
+		return false;
 	}
 
 	return true;
@@ -402,7 +411,20 @@ public class ProtocolCreationBean implements Serializable {
 		return bean;
 	    }
 	}
+	for (ProtocolResponsibleBean bean : getExternalResponsibles()) {
+	    if (unit.equals(bean.getUnit())) {
+		return bean;
+	    }
+	}
 	return null;
+    }
+
+    public void removeUnit(Unit unit) {
+	ProtocolResponsibleBean bean = getBeanForUnit(unit);
+	if (internalResponsibles != null)
+	    internalResponsibles.remove(bean);
+	if (externalResponsibles != null)
+	    externalResponsibles.remove(bean);
     }
 
 }
