@@ -5,7 +5,6 @@ import java.util.List;
 
 import jvstm.cps.ConsistencyPredicate;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
-import myorg.domain.ModuleInitializer;
 import myorg.domain.MyOrg;
 import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
@@ -17,7 +16,7 @@ import pt.ist.fenixWebFramework.services.Service;
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
  * 
  */
-public class ProtocolManager extends ProtocolManager_Base implements ModuleInitializer {
+public class ProtocolManager extends ProtocolManager_Base {
 
     public static ProtocolManager getInstance() {
 
@@ -61,16 +60,6 @@ public class ProtocolManager extends ProtocolManager_Base implements ModuleIniti
 	}
 
 	return new UnionGroup(groups);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see myorg.domain.ModuleInitializer#init(myorg.domain.MyOrg)
-     */
-    @Override
-    public void init(MyOrg root) {
-
     }
 
     /**

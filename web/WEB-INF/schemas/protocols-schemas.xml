@@ -36,11 +36,12 @@
 	</slot>
 	<slot name="people" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES">
 		<property name="eachSchema" value="show.protocol.peopleList"/>
+		<property name="eachLayout" value="flow"/>
 	</slot>
 </schema>
 
 <schema name="show.protocol.peopleList" type="module.organization.domain.Person">
-	<slot name="partyName" key="label.protocols.begin" bundle="PROTOCOLS_RESOURCES" layout="slot-as-label"/>
+	<slot name="name" />
 </schema>
 
 <schema name="edit.protocolHistory" type="module.protocols.domain.ProtocolHistory">
@@ -151,6 +152,7 @@
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.DateValidator">
 			<property name="dateFormat" value="dd/MM/yyyy"/>
 		</validator>
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
 	</slot>
 	<slot name="endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
 		<property name="size" value="10"/>

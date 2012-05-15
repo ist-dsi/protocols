@@ -12,6 +12,8 @@ import module.protocols.domain.Protocol;
 import module.protocols.domain.Protocol.RenewTime;
 import module.protocols.domain.ProtocolHistory;
 
+import org.joda.time.LocalDate;
+
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
  * 
@@ -26,13 +28,25 @@ public class ProtocolHistoryBean implements Serializable {
 
     private Protocol protocol;
 
-    public ProtocolHistoryBean(Protocol protocol) {
-	setProtocol(protocol);
-    }
+    private LocalDate beginDate;
+
+    private LocalDate endDate;
 
     private Integer duration;
 
     private RenewTime renewTime;
+
+    private ProtocolHistory protocolHistory;
+
+    public ProtocolHistoryBean(Protocol protocol) {
+	setProtocol(protocol);
+    }
+
+    public ProtocolHistoryBean(ProtocolHistory history) {
+	this.protocolHistory = history;
+	this.beginDate = history.getBeginDate();
+	this.endDate = history.getEndDate();
+    }
 
     public Integer getDuration() {
 	return duration;
@@ -60,6 +74,26 @@ public class ProtocolHistoryBean implements Serializable {
 	} else {
 	    this.protocol = null;
 	}
+    }
+
+    public LocalDate getBeginDate() {
+	return beginDate;
+    }
+
+    public void setBeginDate(LocalDate beginDate) {
+	this.beginDate = beginDate;
+    }
+
+    public LocalDate getEndDate() {
+	return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+	this.endDate = endDate;
+    }
+
+    public ProtocolHistory getProtocolHistory() {
+	return protocolHistory;
     }
 
     public List<ProtocolHistory> getProtocolHistories() {

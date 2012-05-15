@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
-import module.protocols.domain.ProtocolHistory;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
 import module.protocols.domain.util.ProtocolResponsibleType;
@@ -106,7 +105,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	    public boolean evaluate(Protocol protocol) {
 		if (!protocol.isActive())
 		    return false;
-		LocalDate endDate = protocol.getCurrentProtocolHistory().getEndDate();
+		LocalDate endDate = protocol.getLastProtocolHistory().getEndDate();
 		return endDate == null ? false : endDate.minusMonths(1).isBefore(new LocalDate());
 	    }
 	});
@@ -215,7 +214,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	Protocol protocol = Protocol.fromExternalId(request.getParameter("OID"));
 
-	request.setAttribute("protocolHistory", protocol.getCurrentProtocolHistory());
+	request.setAttribute("protocolHistory", new ProtocolHistoryBean(protocol.getCurrentProtocolHistory()));
 
 	return forward(request, "/protocols/editProtocolHistory.jsp");
     }
@@ -223,25 +222,17 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     public ActionForward editProtocolHistory(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
 
-	ProtocolHistory protocolHistory = getRenderedObject();
-	LocalDate beginDate = protocolHistory.getBeginDate(), endDate = protocolHistory.getEndDate();
+	ProtocolHistoryBean bean = getRenderedObject();
 
-	if (endDate != null && beginDate.isAfter(endDate)) {
-	    return invalidProtocolHistoryDates(mapping, form, request, response);
+	if (!validateDates(bean.getBeginDate(), bean.getEndDate(), request)) {
+	    return forward(request, "/protocols/editProtocolHistory.jsp");
 	}
 
-	protocolHistory.editProtocolHistory(beginDate, endDate);
-	addMessage(request, "label.protocolHistory.editSuccessful");
+	bean.getProtocolHistory().editProtocolHistory(bean.getBeginDate(), bean.getEndDate());
+
+	setMessage(request, "success", new ActionMessage("label.protocolHistory.editSuccessful"));
 
 	return showAlerts(mapping, form, request, response);
-    }
-
-    public ActionForward invalidProtocolHistoryDates(final ActionMapping mapping, final ActionForm form,
-	    final HttpServletRequest request, final HttpServletResponse response) {
-
-	addMessage(request, "label.protocolHistory.invalidDates");
-
-	return prepareEditProtocolHistory(mapping, form, request, response);
     }
 
     /*
@@ -251,7 +242,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     public ActionForward prepareRenewProtocol(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
 
-	String protocolOID = request.getParameter("OID");
+	String protocolOID = request.getParameter("protocolOID");
 
 	Protocol protocol = Protocol.fromExternalId(protocolOID);
 
@@ -268,6 +259,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	ProtocolHistoryBean bean = getRenderedObject();
 
 	bean.getProtocol().renewFor(bean.getDuration(), bean.getRenewTime());
+
+	setMessage(request, "success", new ActionMessage("label.procotols.renew.success"));
 
 	return showAlerts(mapping, form, request, response);
     }
@@ -303,15 +296,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	}
 
 	if (protocolBean.isProtocolNumberValid()) {
-	    if (validateDates(protocolBean, request)) {
+	    if (validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request)) {
 		return forward(request, "/protocols/prepareCreateInternalResponsibles.jsp");
 	    } else {
 		return forward(request, "/protocols/prepareCreateProtocolData.jsp");
 	    }
 	} else {
-	    validateDates(protocolBean, request);
-	    setError(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
-	    return forward(request, "/protocols/prepareCreateInternalResponsibles.jsp");
+	    validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request);
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
+	    return forward(request, "/protocols/prepareCreateProtocolData.jsp");
 	}
     }
 
@@ -329,7 +322,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	}
 
 	if (!protocolBean.internalResponsiblesCorrect()) {
-	    setError(request, "errorMessage", new ActionMessage("error.protocols.invalidInternalResponsibles"));
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidInternalResponsibles"));
 	    return forward(request, "/protocols/prepareCreateInternalResponsibles.jsp");
 	}
 
@@ -350,7 +343,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	}
 
 	if (!protocolBean.externalResponsiblesCorrect()) {
-	    setError(request, "errorMessage", new ActionMessage("error.protocols.invalidExternalResponsibles"));
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidExternalResponsibles"));
 	    return forward(request, "/protocols/prepareCreateExternalResponsibles.jsp");
 	}
 
@@ -366,18 +359,18 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	request.setAttribute("protocolBean", protocolBean);
 
-	if (isCancelled(request)) {
-	    return showProtocols(mapping, form, request, response);
+	if (request.getParameter("back") != null) {
+	    return forward(request, "/protocols/prepareCreateExternalResponsibles.jsp");
 	}
 
 	if (!protocolBean.permissionsCorrectlyDefined()) {
-	    setError(request, "errorMessage", new ActionMessage("error.protocols.invalidProtocolPermissions"));
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidProtocolPermissions"));
 	    return forward(request, "/protocols/prepareDefineProtocolPermissions.jsp");
 	}
 
 	Protocol protocol = Protocol.createProtocol(protocolBean);
 
-	addMessage(request, "label.protocols.successCreate");
+	setMessage(request, "success", new ActionMessage("label.protocols.successCreate"));
 
 	return viewProtocolDetailsFromOID(request, protocol.getExternalId());
     }
@@ -445,17 +438,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
      * Helper methods
      */
 
-    private boolean validateDates(ProtocolCreationBean protocolFactory, HttpServletRequest request) {
-	if (protocolFactory.getBeginDate() != null && protocolFactory.getEndDate() != null) {
-	    if (!protocolFactory.getBeginDate().isBefore(protocolFactory.getEndDate())) {
-		setError(request, "errorMessage", new ActionMessage("error.protocols.dates.notContinuous"));
-		return false;
-	    }
+    private boolean validateDates(LocalDate beginDate, LocalDate endDate, HttpServletRequest request) {
+	if (beginDate != null && endDate != null && endDate.isBefore(beginDate)) {
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.dates.notContinuous"));
+	    return false;
 	}
 	return true;
     }
 
-    private void setError(HttpServletRequest request, String error, ActionMessage actionMessage) {
+    private void setMessage(HttpServletRequest request, String error, ActionMessage actionMessage) {
 	ActionMessages actionMessages = getMessages(request);
 	actionMessages.add(error, actionMessage);
 	saveMessages(request, actionMessages);

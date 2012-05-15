@@ -6,6 +6,13 @@
 
 <!-- Check for organizational models. Without those, the application cannot work! -->
 
+<div align="center" style="font-weight:bold;">
+	<html:errors bundle="PROTOCOLS_RESOURCES"/>
+	<html:messages id="message" name="success" message="true" bundle="PROTOCOLS_RESOURCES">
+		<bean:write name="message" />
+	</html:messages>
+</div>
+
 <logic:notPresent name="internalOrganizationalModel">
 
 	<div class="error1">

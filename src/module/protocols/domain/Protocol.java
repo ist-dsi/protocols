@@ -68,7 +68,7 @@ public class Protocol extends Protocol_Base {
 	return null;
     }
 
-    private ProtocolHistory getLastProtocolHistory() {
+    public ProtocolHistory getLastProtocolHistory() {
 	List<ProtocolHistory> histories = new ArrayList<ProtocolHistory>(getProtocolHistories());
 
 	Collections.sort(histories, ProtocolHistory.COMPARATOR_BY_END_DATE);

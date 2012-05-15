@@ -7,6 +7,14 @@
 <br />
 <h2><bean:message key="label.protocols.details" bundle="PROTOCOLS_RESOURCES"/></h2>
 
+<div align="center" style="font-weight:bold;">
+	<html:errors bundle="PROTOCOLS_RESOURCES"/>
+	<html:messages id="message" name="success" message="true" bundle="PROTOCOLS_RESOURCES">
+		<bean:write name="message" />
+	</html:messages>
+</div>
+
+
 <p>
 <logic:present name="protocol">
 

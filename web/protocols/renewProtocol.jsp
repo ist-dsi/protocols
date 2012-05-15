@@ -37,11 +37,8 @@
 </table>
 
 <p>
-	<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit">
+	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit">
 		<bean:message key="button.submit" bundle="PROTOCOLS_RESOURCES"/>
 	</html:submit>
-	<html:cancel bundle="HTMLALT_RESOURCES" altKey="submit.back">
-		<bean:message key="button.back" bundle="PROTOCOLS_RESOURCES"/>
-	</html:cancel>
 </p>
 </fr:form>
