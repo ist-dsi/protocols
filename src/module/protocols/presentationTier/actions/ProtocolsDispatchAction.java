@@ -3,6 +3,7 @@
  */
 package module.protocols.presentationTier.actions;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
+import module.protocols.domain.ProtocolAuthorizationGroup;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
 import module.protocols.domain.util.ProtocolResponsibleType;
+import module.protocols.dto.AuthorizationGroupBean;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import module.protocols.dto.ProtocolHistoryBean;
@@ -22,8 +25,10 @@ import myorg.domain.RoleType;
 import myorg.domain.VirtualHost;
 import myorg.domain.contents.ActionNode;
 import myorg.domain.contents.Node;
+import myorg.domain.groups.PersistentGroup;
 import myorg.domain.groups.Role;
 import myorg.presentationTier.actions.ContextBaseAction;
+import myorg.util.VariantBean;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -73,6 +78,10 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "protocolSystemConfiguration",
 		"resources.ProtocolsResources", "label.protocolSystem.configure", ProtocolManager.getInstance()
 			.getAdministrativeGroup());
+
+	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "authorizationGroupsConfiguration",
+		"resources.ProtocolsResources", "label.protocolSystem.configureAuthorizationGroups", ProtocolManager
+			.getInstance().getAdministrativeGroup());
 
 	return forwardToMuneConfiguration(request, virtualHost, topActionNode);
     }
@@ -137,6 +146,65 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	request.setAttribute("configurationBean", bean);
 
 	return forward(request, "/protocols/protocolSystemConfiguration.jsp");
+    }
+
+    public ActionForward authorizationGroupsConfiguration(final ActionMapping mapping, final ActionForm form,
+	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	Collection<ProtocolAuthorizationGroup> groups = ProtocolManager.getInstance().getProtocolAuthorizationGroups();
+
+	request.setAttribute("authorizationGroups", groups);
+
+	VariantBean newGroupBean = new VariantBean();
+
+	request.setAttribute("newGroupBean", newGroupBean);
+
+	return forward(request, "/protocols/authorizationGroupsConfiguration.jsp");
+
+    }
+
+    public ActionForward createNewAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
+	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	VariantBean bean = getRenderedObject();
+
+	PersistentGroup group = bean.getDomainObject();
+
+	if (group != null)
+	    if (!ProtocolAuthorizationGroup.createGroupWithWriter(group))
+		setMessage(request, "errorMessage", new ActionMessage("label.protocolSystem.group.alredy.exists"));
+
+	bean.setDomainObject(null);
+	RenderUtils.invalidateViewState();
+
+	return authorizationGroupsConfiguration(mapping, form, request, response);
+    }
+
+    public ActionForward removeAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
+	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	ProtocolAuthorizationGroup group = ProtocolAuthorizationGroup.fromExternalId(request.getParameter("OID"));
+
+	group.delete();
+
+	return authorizationGroupsConfiguration(mapping, form, request, response);
+    }
+
+    public ActionForward configureAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
+	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	AuthorizationGroupBean bean = getRenderedObject();
+
+	if (bean == null) {
+	    ProtocolAuthorizationGroup group = ProtocolAuthorizationGroup.fromExternalId(request.getParameter("OID"));
+	    bean = new AuthorizationGroupBean(group);
+	    request.setAttribute("bean", bean);
+	    return forward(request, "/protocols/configureAuthorizationGroup.jsp");
+	} else {
+	    bean.getGroup().updateReaders(bean.getAuthorizedGroups());
+	    return authorizationGroupsConfiguration(mapping, form, request, response);
+	}
+
     }
 
     public ActionForward viewProtocolDetails(final ActionMapping mapping, final ActionForm form,

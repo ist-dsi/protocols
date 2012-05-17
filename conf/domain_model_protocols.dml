@@ -40,7 +40,7 @@ class ProtocolResponsible {
 	ProtocolResponsibleType type;
 }
 
-class ProtocolAuthorizationCluster {
+class ProtocolAuthorizationGroup {
 }
 
 /* Relations */
@@ -115,18 +115,18 @@ relation ProtocolHistoryProtocol {
 
 // Access control
 
-relation ProtocolAllowedToViewGroups {
-	Protocol playsRole allowedToViewProtocols {
+relation ProtocolAllowedToReadGroups {
+	Protocol playsRole allowedToReadProtocols {
 		multiplicity *;
 	}
-	.myorg.domain.groups.PersistentGroup playsRole allowedToView;
+	.myorg.domain.groups.PersistentGroup playsRole allowedToRead;
 }
 
-relation ProtocolAllowedToEditGroups {
-	Protocol playsRole allowedToEditProtocols {
+relation ProtocolAllowedToWriteGroups {
+	Protocol playsRole allowedToWriteProtocols {
 		multiplicity *;
 	}
-	.myorg.domain.groups.PersistentGroup playsRole allowedToEdit;
+	.myorg.domain.groups.PersistentGroup playsRole allowedToWrite;
 }
 
 relation ProtocolManagerAdministrativeGroup {
@@ -134,22 +134,22 @@ relation ProtocolManagerAdministrativeGroup {
 	.myorg.domain.groups.PersistentGroup playsRole administrativeGroup;
 }
 
-relation ProtocolAuthorizationClusterProtocolManager {
+relation ProtocolAuthorizationGroupProtocolManager {
 	ProtocolManager playsRole protocolManager {
 		multiplicity 1..1;
 	}
-	ProtocolAuthorizationCluster playsRole protocolAuthorizationClusters {
+	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroups {
 		multiplicity *;
 	}
 }
 
-relation ProtocolAuthorizationClusterCreatorGroups {
-	ProtocolAuthorizationCluster playsRole protocolAuthorizationClusterAllowedToCreate;
-	.myorg.domain.groups.PersistentGroup playsRole authorizedCreatorGroup;
+relation ProtocolAuthorizationGroupWriterGroups {
+	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroupAllowedToWrite;
+	.myorg.domain.groups.PersistentGroup playsRole authorizedWriterGroup;
 }
 
-relation ProtocolAuthorizationClusterReaderGroups {
-	ProtocolAuthorizationCluster playsRole protocolAuthorizationClusterAllowedToRead;
+relation ProtocolAuthorizationGroupReaderGroups {
+	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroupAllowedToRead;
 	.myorg.domain.groups.PersistentGroup playsRole authorizedReaderGroups {
 		multiplicity *;
 	}

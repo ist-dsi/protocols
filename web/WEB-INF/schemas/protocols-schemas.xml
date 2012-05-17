@@ -36,7 +36,8 @@
 	</slot>
 	<slot name="people" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES">
 		<property name="eachSchema" value="show.protocol.peopleList"/>
-		<property name="eachLayout" value="flow"/>
+		<property name="eachLayout" value="values"/>
+		<property name="classes" value="no-bullets"/>
 	</slot>
 </schema>
 
@@ -192,4 +193,8 @@
 	<slot name="unit" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES">
 		<property name="format" value="${presentationName}"/>
 	</slot>
+</schema>
+
+<schema name="show.persistentGroup.name" type="myorg.domain.groups.PersistentGroup">
+	<slot name="name"/>
 </schema>

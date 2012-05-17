@@ -55,6 +55,12 @@
 	-->
 	</td></tr>
 </logic:iterate>
+<logic:empty name="protocol" property="protocolFiles">
+<div align="center">
+	<br />
+	<strong><bean:message key="label.protocols.noFiles" bundle="PROTOCOLS_RESOURCES"/></strong>
+</div>
+</logic:empty>
 </table>
 
 </td>

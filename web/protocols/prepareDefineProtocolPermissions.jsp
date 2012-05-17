@@ -35,14 +35,90 @@
 
 <br />
 
+<table width="100%">
+<tr>
+
+<td width="50%" valign="top">
+
+<div class="infobox">
+	<p class="dinline"><strong><bean:message key="label.protocols.writers" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+
+<fr:form action="/protocols.do?method=prepareDefineProtocolPermissions">
+
+<fr:edit name="protocolBean">
+<fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
+	<fr:slot name="writers" layout="menu-select-postback" key="label.user.groups" bundle="MYORG_RESOURCES">
+			<fr:property name="providerClass" value="module.protocols.presentationTier.providers.UserGroupsProvider"/>
+			<fr:property name="format" value="${authorizedWriterGroup.name}" />
+	</fr:slot>
+	</fr:schema>
+	<fr:layout name="tabular">
+		<fr:property name="classes" value="tview1"/>
+	</fr:layout>
+</fr:edit>
+
+</fr:form>
+
+</td>
+
+<td width="50%" valign="top">
+
+<fr:form action="/protocols.do?method=createProtocol">
+
+<logic:present name="protocolBean" property="writers">
+
+<div class="infobox">
+	<p class="dinline"><strong><bean:message key="label.protocols.readers" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+
+<fr:edit name="protocolBean">
+<fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
+	<fr:slot name="readers" key="label.user.groups" layout="option-select" bundle="MYORG_RESOURCES">
+		<fr:property name="providerClass" value="module.protocols.presentationTier.providers.AuthorizationGroupReadersProvider" />
+		<fr:property name="eachSchema" value="show.persistentGroup.name"/>
+		<fr:property name="eachLayout" value="values"/>
+		<fr:property name="classes" value="no-bullets"/>
+	</fr:slot>
+	</fr:schema>
+	<fr:layout name="tabular">
+		<fr:property name="classes" value="tview1"/>
+	</fr:layout>
+</fr:edit>
 
 
+
+</logic:present>
+
+</td>
+</tr>
+</table>
 
 <p>
 
+<div align="center">
+
+<div class="infobox">
+	<p class="dinline"><strong><bean:message key="label.protocols.visibility" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+
+<fr:edit name="protocolBean">
+<fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
+	<fr:slot name="visibilityType" key="label.protocols.visibility" layout="radio" bundle="PROTOCOLS_RESOURCES">
+		<fr:property name="providerClass" value="module.protocols.presentationTier.providers.ProtocolVisibilityTypeProvider" />
+		<fr:property name="eachLayout" value="this-does-not-exist"/>
+		<fr:property name="classes" value="no-bullets"/>
+	</fr:slot>
+</fr:schema>
+	<fr:layout name="tabular">
+		<fr:property name="classes" value="tstyle3,tview1"/>
+	</fr:layout>
+</fr:edit>
+
+</div>
+
 <hr />
 
-<fr:form action="/protocols.do?method=createProtocol">
 
 <fr:edit id="protocolBean" name="protocolBean" visible="false" />
 

@@ -19,7 +19,7 @@
 		<br />
 		<bean:message key="label.organizationalModel.internal.undefined" bundle="PROTOCOLS_RESOURCES"/>
 		<br />
-		<p><html:link href="protocols.do?method=prepareToDefineOrganizationalModel"><bean:message key="link.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></html:link></p>
+		<p><html:link href="protocols.do?method=protocolSystemConfiguration"><bean:message key="link.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></html:link></p>
 	</div>
 	
 </logic:notPresent>
@@ -31,7 +31,7 @@
 		<br />
 		<bean:message key="label.organizationalModel.external.undefined" bundle="PROTOCOLS_RESOURCES"/>
 		<br />
-		<p><html:link href="protocols.do?method=prepareToDefineOrganizationalModel"><bean:message key="link.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></html:link></p>
+		<p><html:link href="protocols.do?method=protocolSystemConfiguration"><bean:message key="link.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></html:link></p>
 	</div>
 	
 </logic:notPresent>

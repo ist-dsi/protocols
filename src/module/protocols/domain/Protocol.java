@@ -141,23 +141,23 @@ public class Protocol extends Protocol_Base {
 	    protocol.addProtocolResponsible(responsible);
 	}
 
-	protocol.setAllowedToView(ProtocolManager.createGroupFor(protocolBean.getAllowedToView()));
+	// protocol.setAllowedToRead(ProtocolManager.createGroupFor(protocolBean.getAllowedToView()));
 
-	protocol.setAllowedToEdit(ProtocolManager.createGroupFor(protocolBean.getAllowedToEdit()));
+	// protocol.setAllowedToWrite(ProtocolManager.createGroupFor(protocolBean.getAllowedToEdit()));
 
 	new ProtocolHistory(protocol, protocolBean.getBeginDate(), protocolBean.getEndDate());
 
 	return protocol;
     }
 
-    public boolean canBeViewedByUser(final User user) {
+    public boolean canBeReadByUser(final User user) {
 
-	return getAllowedToView().isMember(user);
+	return getAllowedToRead().isMember(user);
     }
 
-    public boolean canBeEditedByUser(final User user) {
+    public boolean canBeWrittenByUser(final User user) {
 
-	return getAllowedToEdit().isMember(user);
+	return getAllowedToWrite().isMember(user);
     }
 
 }

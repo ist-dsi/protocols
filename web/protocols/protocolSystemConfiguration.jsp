@@ -9,7 +9,6 @@
 <h2>
 <bean:message key="label.protocolSystem.configure" bundle="PROTOCOLS_RESOURCES" />
 </h2>
-</p>
 
 <logic:present name="configurationBean">
 

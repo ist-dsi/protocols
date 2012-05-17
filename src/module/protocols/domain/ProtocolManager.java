@@ -6,8 +6,9 @@ import java.util.List;
 import jvstm.cps.ConsistencyPredicate;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
 import myorg.domain.MyOrg;
-import myorg.domain.groups.AnyoneGroup;
+import myorg.domain.RoleType;
 import myorg.domain.groups.PersistentGroup;
+import myorg.domain.groups.Role;
 import myorg.domain.groups.UnionGroup;
 import pt.ist.fenixWebFramework.services.Service;
 
@@ -34,7 +35,7 @@ public class ProtocolManager extends ProtocolManager_Base {
     private static ProtocolManager createInstance() {
 
 	ProtocolManager manager = new ProtocolManager();
-	manager.setAdministrativeGroup(AnyoneGroup.getInstance());
+	manager.setAdministrativeGroup(Role.getRole(RoleType.MANAGER));
 
 	return manager;
     }

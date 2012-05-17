@@ -15,9 +15,11 @@ import java.util.TreeSet;
 import module.organization.domain.Person;
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
+import module.protocols.domain.ProtocolAuthorizationGroup;
 import module.protocols.domain.ProtocolHistory;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
+import module.protocols.domain.ProtocolVisibilityType;
 import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolActionType;
 import module.protocols.domain.util.ProtocolResponsibleType;
@@ -107,11 +109,11 @@ public class ProtocolCreationBean implements Serializable {
 
     // TODO Remove default initializations, for testing purposes only!
 
-    private String protocolNumber = "protocol";
+    private String protocolNumber = "protocol" + System.currentTimeMillis();
 
     private LocalDate signedDate = new LocalDate();
 
-    private LocalDate beginDate;
+    private LocalDate beginDate = new LocalDate();
 
     private LocalDate endDate;
 
@@ -143,9 +145,11 @@ public class ProtocolCreationBean implements Serializable {
      * Step 4
      */
 
-    private List<PersistentGroup> allowedToView;
+    private ProtocolAuthorizationGroup writers;
 
-    private List<PersistentGroup> allowedToEdit;
+    private List<PersistentGroup> readers;
+
+    private ProtocolVisibilityType visibilityType = ProtocolVisibilityType.NONE;
 
     /*
      * Extra stuff
@@ -302,20 +306,28 @@ public class ProtocolCreationBean implements Serializable {
 	this.active = active;
     }
 
-    public List<PersistentGroup> getAllowedToView() {
-	return allowedToView;
+    public ProtocolAuthorizationGroup getWriters() {
+	return writers;
     }
 
-    public void setAllowedToView(List<PersistentGroup> allowedToView) {
-	this.allowedToView = allowedToView;
+    public void setWriters(ProtocolAuthorizationGroup writers) {
+	this.writers = writers;
     }
 
-    public List<PersistentGroup> getAllowedToEdit() {
-	return allowedToEdit;
+    public List<PersistentGroup> getReaders() {
+	return readers;
     }
 
-    public void setAllowedToEdit(List<PersistentGroup> allowedToEdit) {
-	this.allowedToEdit = allowedToEdit;
+    public void setReaders(List<PersistentGroup> readers) {
+	this.readers = readers;
+    }
+
+    public ProtocolVisibilityType getVisibilityType() {
+	return visibilityType;
+    }
+
+    public void setVisibilityType(ProtocolVisibilityType visibilityType) {
+	this.visibilityType = visibilityType;
     }
 
     public void addInternalResponsible(ProtocolResponsibleBean bean) {
@@ -392,7 +404,7 @@ public class ProtocolCreationBean implements Serializable {
 
     public boolean permissionsCorrectlyDefined() {
 
-	return allowedToEdit != null && allowedToEdit.size() > 0 && allowedToView != null && allowedToView.size() > 0;
+	return writers != null && readers != null && readers.size() > 0 && visibilityType != null;
     }
 
     public boolean isProtocolNumberValid() {
