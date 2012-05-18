@@ -8,6 +8,8 @@
 <h2><bean:message key="label.protocols.show" bundle="PROTOCOLS_RESOURCES"/></h2>
 
 <p>
+<p>
+<div align="center">
 <logic:present name="protocols">
 
 	<fr:view name="protocols" schema="show.protocol.toList" >
@@ -22,4 +24,5 @@
 	</fr:view>
 
 </logic:present>
+</div>
 </p>

@@ -141,23 +141,64 @@ public class Protocol extends Protocol_Base {
 	    protocol.addProtocolResponsible(responsible);
 	}
 
-	// protocol.setAllowedToRead(ProtocolManager.createGroupFor(protocolBean.getAllowedToView()));
+	protocol.setAllowedToRead(ProtocolManager.createReaderGroup(protocolBean.getReaders()));
 
-	// protocol.setAllowedToWrite(ProtocolManager.createGroupFor(protocolBean.getAllowedToEdit()));
+	protocol.setAllowedToWrite(ProtocolManager.createWriterGroup(protocolBean.getWriters()));
+
+	protocol.setVisibilityType(protocolBean.getVisibilityType());
 
 	new ProtocolHistory(protocol, protocolBean.getBeginDate(), protocolBean.getEndDate());
+
+	protocol.addProtocolFiles(new ProtocolFile());
 
 	return protocol;
     }
 
     public boolean canBeReadByUser(final User user) {
 
-	return getAllowedToRead().isMember(user);
+	return getAllowedToRead().isMember(user) || getVisibilityType() != ProtocolVisibilityType.RESTRICTED;
+    }
+
+    public boolean canFilesBeReadByUser(User currentUser) {
+
+	return getAllowedToRead().isMember(currentUser) || getVisibilityType() == ProtocolVisibilityType.TOTAL;
+
     }
 
     public boolean canBeWrittenByUser(final User user) {
 
 	return getAllowedToWrite().isMember(user);
+    }
+
+    public String getPartners() {
+	StringBuilder builder = new StringBuilder();
+	boolean first = true;
+	for (ProtocolResponsible responsible : getProtocolResponsible()) {
+	    if (responsible.getType() == ProtocolResponsibleType.INTERNAL)
+		continue;
+
+	    if (first)
+		first = false;
+	    else
+		builder.append(", ");
+
+	    builder.append(responsible.getUnit().getPartyName().getContent());
+	}
+	return builder.toString();
+    }
+
+    public String getAllResponsibles() {
+	StringBuilder builder = new StringBuilder();
+	for (ProtocolResponsible responsible : getProtocolResponsible()) {
+
+	    for (Person person : responsible.getPeople()) {
+		if (builder.length() > 0)
+		    builder.append(", ");
+		builder.append(person.getName());
+	    }
+
+	}
+	return builder.toString();
     }
 
 }

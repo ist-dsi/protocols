@@ -108,7 +108,7 @@
 <br />
 <br />
 
-<html:submit bundle="PROPERTIES_RESOURCES" property="removeUnit">
+<html:submit bundle="PROPERTIES_RESOURCES" property="removeExternalUnit">
 	<bean:message key="button.removeUnit" bundle="PROTOCOLS_RESOURCES" />
 </html:submit>
 

@@ -33,7 +33,7 @@ public class ProtocolSystemConfigurationBean implements Serializable {
 	this.internalOrganizationalModel = manager.getInternalOrganizationalModel();
 	this.externalOrganizationalModel = manager.getExternalOrganizationalModel();
 
-	this.administrativeGroup = manager.getAdministrativeGroup();
+	this.administrativeGroup = manager.getAdministrativeGroup().getDelegateGroup();
     }
 
     public OrganizationalModel getInternalOrganizationalModel() {

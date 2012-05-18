@@ -43,6 +43,9 @@ class ProtocolResponsible {
 class ProtocolAuthorizationGroup {
 }
 
+class ProtocolAdministrativeGroup extends .myorg.domain.groups.PersistentGroup {
+}
+
 /* Relations */
 
 relation ProtocolManagerMyOrg {
@@ -68,6 +71,22 @@ relation ProtocolManagerExternalOrganizationModel {
 	ProtocolManager playsRole externalProtocolManager;
 	.module.organization.domain.OrganizationalModel playsRole externalOrganizationalModel;
 }
+
+relation ProtocolManagerAdministrativeGroup {
+	ProtocolManager playsRole protocolManager {
+		multiplicity 1..1;
+	}
+	ProtocolAdministrativeGroup playsRole administrativeGroup {
+		multiplicity 1..1;
+	}
+}
+
+relation ProtocolAdministrativeGroupPersistentGroup {
+	ProtocolAdministrativeGroup playsRole administrativeGroup;
+	.myorg.domain.groups.PersistentGroup playsRole delegateGroup;
+}
+
+// Protocols
 
 relation ProtocolResponsibleProtocol {
 
@@ -127,11 +146,6 @@ relation ProtocolAllowedToWriteGroups {
 		multiplicity *;
 	}
 	.myorg.domain.groups.PersistentGroup playsRole allowedToWrite;
-}
-
-relation ProtocolManagerAdministrativeGroup {
-	ProtocolManager playsRole protocolManager;
-	.myorg.domain.groups.PersistentGroup playsRole administrativeGroup;
 }
 
 relation ProtocolAuthorizationGroupProtocolManager {

@@ -24,7 +24,7 @@
 <fr:edit name="bean">
 <fr:schema type="module.protocols.dto.AuthorizationGroupBean" bundle="PROTOCOLS_RESOURCES">
 	<fr:slot name="authorizedGroups" key="label.user.groups" layout="option-select" bundle="MYORG_RESOURCES">
-		<fr:property name="providerClass" value="myorg.presentationTier.renderers.providers.AccessibilityGroupsProvider" />
+		<fr:property name="providerClass" value="module.protocols.presentationTier.providers.PersistentGroupsProvider" />
 		<fr:property name="eachSchema" value="show.persistentGroup.name"/>
 		<fr:property name="eachLayout" value="values"/>
 		<fr:property name="classes" value="no-bullets"/>

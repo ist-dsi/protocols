@@ -149,7 +149,7 @@ public class ProtocolCreationBean implements Serializable {
 
     private List<PersistentGroup> readers;
 
-    private ProtocolVisibilityType visibilityType = ProtocolVisibilityType.NONE;
+    private ProtocolVisibilityType visibilityType = ProtocolVisibilityType.TOTAL;
 
     /*
      * Extra stuff

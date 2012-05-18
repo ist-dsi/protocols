@@ -48,7 +48,7 @@
 <fr:edit id="newGroupBean" name="newGroupBean">
 <fr:schema type="myorg.util.VariantBean" bundle="PROTOCOLS_RESOURCES">
 		<fr:slot name="domainObject" layout="menu-select" key="label.user.groups" bundle="MYORG_RESOURCES">
-			<fr:property name="providerClass" value="myorg.presentationTier.renderers.providers.AccessibilityGroupsProvider"/>
+			<fr:property name="providerClass" value="module.protocols.presentationTier.providers.PersistentGroupsProvider"/>
 			<fr:property name="format" value="${name}" />
 	</fr:slot>
 	</fr:schema>

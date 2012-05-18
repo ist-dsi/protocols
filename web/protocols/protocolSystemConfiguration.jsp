@@ -90,7 +90,7 @@
 <fr:edit name="configurationBean">
 	<fr:schema type="module.protocols.dto.ProtocolSystemConfigurationBean" bundle="PROTOCOLS_RESOURCES">
 		<fr:slot name="administrativeGroup" layout="menu-select" key="label.groups.administrator">
-			<fr:property name="providerClass" value="myorg.presentationTier.renderers.providers.AccessibilityGroupsProvider"/>
+			<fr:property name="providerClass" value="module.protocols.presentationTier.providers.PersistentGroupsProvider"/>
 			<fr:property name="format" value="${name}" />
 		</fr:slot>
 	</fr:schema>

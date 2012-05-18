@@ -21,12 +21,13 @@ import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import module.protocols.dto.ProtocolHistoryBean;
 import module.protocols.dto.ProtocolSearchBean;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
-import myorg.domain.RoleType;
+import myorg.applicationTier.Authenticate;
+import myorg.domain.User;
 import myorg.domain.VirtualHost;
 import myorg.domain.contents.ActionNode;
 import myorg.domain.contents.Node;
+import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
-import myorg.domain.groups.Role;
 import myorg.presentationTier.actions.ContextBaseAction;
 import myorg.util.VariantBean;
 
@@ -59,19 +60,19 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	final Node parentOfNodes = getDomainObject(request, "parentOfNodesToManageId");
 
 	final ActionNode topActionNode = ActionNode.createActionNode(virtualHost, parentOfNodes, "/protocols", "firstPage",
-		"resources.ProtocolsResources", "label.module.protocols", Role.getRole(RoleType.MANAGER));
+		"resources.ProtocolsResources", "label.module.protocols", AnyoneGroup.getInstance());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showProtocols", "resources.ProtocolsResources",
-		"label.protocols.show", Role.getRole(RoleType.MANAGER));
+		"label.protocols.show", AnyoneGroup.getInstance());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "searchProtocols", "resources.ProtocolsResources",
-		"label.protocols.search", Role.getRole(RoleType.MANAGER));
+		"label.protocols.search", AnyoneGroup.getInstance());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showAlerts", "resources.ProtocolsResources",
-		"label.protocols.alerts", Role.getRole(RoleType.MANAGER));
+		"label.protocols.alerts", ProtocolManager.getInstance().getAdministrativeGroup());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareCreateProtocolData",
-		"resources.ProtocolsResources", "label.protocols.create", Role.getRole(RoleType.MANAGER));
+		"resources.ProtocolsResources", "label.protocols.create", ProtocolManager.getInstance().getAdministrativeGroup());
 
 	// System configuration. Should only be accessed by the administrative
 	// group
@@ -94,7 +95,16 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     public ActionForward showProtocols(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
 	    final HttpServletResponse response) {
 
-	List<Protocol> protocols = ProtocolManager.getInstance().getProtocols();
+	final User currentUser = Authenticate.getCurrentUser();
+
+	List<Protocol> protocols = CollectionUtils.filter(ProtocolManager.getInstance().getProtocols(),
+		new Predicate<Protocol>() {
+
+		    @Override
+		    public boolean evaluate(Protocol protocol) {
+			return protocol.canBeReadByUser(currentUser);
+		    }
+		});
 
 	request.setAttribute("protocols", protocols);
 
@@ -217,7 +227,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
     private ActionForward viewProtocolDetailsFromOID(final HttpServletRequest request, String OID) {
 
-	Protocol protocol = Protocol.fromExternalId(OID);
+	User currentUser = Authenticate.getCurrentUser();
+
+	Protocol protocol = getDomainObject(OID);
+
+	if (!protocol.canBeReadByUser(currentUser))
+	    return showProtocols(null, null, request, null);
 
 	request.setAttribute("protocol", protocol);
 
@@ -245,6 +260,11 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	request.setAttribute("internalResponsibles", internalResponsibles);
 	request.setAttribute("externalResponsibles", externalResponsibles);
+
+	if (protocol.canFilesBeReadByUser(currentUser))
+	    request.setAttribute("protocolFiles", protocol.getProtocolFiles());
+
+	request.setAttribute("canBeWritten", protocol.canBeWrittenByUser(currentUser));
 
 	return forward(request, "/protocols/viewProtocolDetails.jsp");
     }
@@ -337,6 +357,10 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	request.setAttribute("internalOrganizationalModel", ProtocolManager.getInstance().getInternalOrganizationalModel());
 	request.setAttribute("externalOrganizationalModel", ProtocolManager.getInstance().getExternalOrganizationalModel());
     }
+
+    /*
+     * Protocol Edition
+     */
 
     /*
      * Protocol Creation
@@ -479,6 +503,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	    protocolBean.removeUnit(unit);
 
+	} else if (request.getParameter("removeExternalUnit") != null) {
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+
+	    protocolBean.removeUnit(unit);
+
+	    internal = false;
 	} else if (request.getParameter("insertExternalUnit") != null) {
 
 	    protocolBean.addExternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));

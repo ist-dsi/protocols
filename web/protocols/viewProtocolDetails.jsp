@@ -18,6 +18,8 @@
 <p>
 <logic:present name="protocol">
 
+<bean:define id="OID" type="java.lang.Long" name="protocol" property="OID"/>
+
 <table width="100%">
 <tr>
 <td width="50%" valign="top">
@@ -41,27 +43,30 @@
 	<p class="dinline"><strong><bean:message key="label.protocols.files" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<table class="tstyle2">
-<logic:iterate id="file" name="protocol" property="protocolFiles">
-	<tr><td>
-	<!-- 
-	<logic:equal name="file" property="visibleToUser" value="true">
-		<bean:define id="url"><bean:write name="file" property="downloadUrl"/></bean:define>
-			<html:link href="<%= url %>" target="_blank"><bean:write name="file" property="filename"/></html:link>
-	</logic:equal>
-	<logic:notEqual name="file" property="visibleToUser" value="true">
-		<bean:write name="file" property="filename"/>
-	</logic:notEqual>
-	-->
-	</td></tr>
+<logic:present name="protocolFiles">
+<logic:iterate id="file" name="protocolFiles">
+	<bean:write name="file" property="name"/>
+	<br />
 </logic:iterate>
-<logic:empty name="protocol" property="protocolFiles">
+<logic:empty name="protocolFiles">
 <div align="center">
 	<br />
 	<strong><bean:message key="label.protocols.noFiles" bundle="PROTOCOLS_RESOURCES"/></strong>
 </div>
 </logic:empty>
-</table>
+
+<logic:equal value="true" name="canBeWritten">
+<html:link href="<%="/protocols.do?method=manageFilesForProtocol&OID=" + OID %>"><bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/></html:link>
+</logic:equal>
+
+</logic:present>
+
+<logic:notPresent name="protocolFiles">
+<div align="center">
+	<br />
+	<strong><bean:message key="label.protocols.noFiles" bundle="PROTOCOLS_RESOURCES"/></strong>
+</div>
+</logic:notPresent>
 
 </td>
 </tr>

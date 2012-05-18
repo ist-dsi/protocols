@@ -6,9 +6,7 @@ import java.util.List;
 import jvstm.cps.ConsistencyPredicate;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
 import myorg.domain.MyOrg;
-import myorg.domain.RoleType;
 import myorg.domain.groups.PersistentGroup;
-import myorg.domain.groups.Role;
 import myorg.domain.groups.UnionGroup;
 import pt.ist.fenixWebFramework.services.Service;
 
@@ -35,7 +33,7 @@ public class ProtocolManager extends ProtocolManager_Base {
     private static ProtocolManager createInstance() {
 
 	ProtocolManager manager = new ProtocolManager();
-	manager.setAdministrativeGroup(Role.getRole(RoleType.MANAGER));
+	manager.setAdministrativeGroup(new ProtocolAdministrativeGroup());
 
 	return manager;
     }
@@ -51,16 +49,22 @@ public class ProtocolManager extends ProtocolManager_Base {
 		: getInternalOrganizationalModel() != getExternalOrganizationalModel();
     }
 
-    public static PersistentGroup createGroupFor(List<PersistentGroup> groups) {
+    public static PersistentGroup createReaderGroup(List<PersistentGroup> groups) {
 
 	PersistentGroup administrativeGroup = getInstance().getAdministrativeGroup();
 
-	if (administrativeGroup != null) {
-	    groups = new ArrayList<PersistentGroup>(groups);
-	    groups.add(administrativeGroup);
-	}
+	List<PersistentGroup> actualGroups = new ArrayList<PersistentGroup>(groups);
+	actualGroups.add(administrativeGroup);
 
-	return new UnionGroup(groups);
+	return UnionGroup.getOrCreateUnionGroup(actualGroups.toArray(new PersistentGroup[0]));
+    }
+
+    public static PersistentGroup createWriterGroup(ProtocolAuthorizationGroup group) {
+
+	ProtocolAdministrativeGroup adminGroup = getInstance().getAdministrativeGroup();
+
+	return UnionGroup.getOrCreateUnionGroup(adminGroup, group.getAuthorizedWriterGroup());
+
     }
 
     /**
@@ -70,6 +74,6 @@ public class ProtocolManager extends ProtocolManager_Base {
     public void updateFromBean(ProtocolSystemConfigurationBean bean) {
 	setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
 	setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
-	setAdministrativeGroup(bean.getAdministrativeGroup());
+	getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
     }
 }
