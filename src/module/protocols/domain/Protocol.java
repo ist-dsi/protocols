@@ -10,9 +10,13 @@ import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import myorg.domain.User;
+import myorg.domain.exceptions.DomainException;
+import myorg.domain.groups.PersistentGroup;
+import myorg.util.BundleUtil;
 
 import org.joda.time.LocalDate;
 
+import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
 import pt.ist.fenixWebFramework.services.Service;
 import pt.utl.ist.fenix.tools.util.CollectionUtils;
 import pt.utl.ist.fenix.tools.util.Predicate;
@@ -25,24 +29,19 @@ import pt.utl.ist.fenix.tools.util.StringNormalizer;
  */
 public class Protocol extends Protocol_Base {
 
-    public static enum RenewTime {
+    public static enum RenewTime implements IPresentableEnum {
 	YEARS, MONTHS;
+
+	@Override
+	public String getLocalizedName() {
+	    return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.renewTime." + name());
+	}
     }
 
     public Protocol() {
 	super();
 	setProtocolManager(ProtocolManager.getInstance());
 	setActive(Boolean.TRUE);
-    }
-
-    public Protocol(String protocolNumber, ProtocolAction protocolAction, LocalDate signedDate, String observations,
-	    String scientificAreas) {
-	this();
-	setProtocolNumber(protocolNumber);
-	setProtocolAction(protocolAction);
-	setSignedDate(signedDate);
-	setObservations(observations);
-	setScientificAreas(scientificAreas);
     }
 
     public void delete() {
@@ -112,51 +111,91 @@ public class Protocol extends Protocol_Base {
     @Service
     public static Protocol createProtocol(ProtocolCreationBean protocolBean) {
 
-	ProtocolAction action = new ProtocolAction(protocolBean.getActionTypes(), protocolBean.getOtherActionTypes());
-
 	Protocol protocol = new Protocol();
 
-	protocol.setProtocolNumber(protocolBean.getProtocolNumber());
-	protocol.setSignedDate(protocolBean.getSignedDate());
-	protocol.setScientificAreas(protocolBean.getScientificAreas());
-	protocol.setProtocolAction(action);
-	protocol.setObservations(protocolBean.getObservations());
-	protocol.setNational(false);
-
-	for (ProtocolResponsibleBean bean : protocolBean.getInternalResponsibles()) {
-	    ProtocolResponsible responsible = new ProtocolResponsible(ProtocolResponsibleType.INTERNAL, bean.getUnit());
-	    for (Person p : bean.getResponsibles()) {
-		responsible.addPeople(p);
-	    }
-
-	    protocol.addProtocolResponsible(responsible);
-	}
-
-	for (ProtocolResponsibleBean bean : protocolBean.getExternalResponsibles()) {
-	    ProtocolResponsible responsible = new ProtocolResponsible(ProtocolResponsibleType.EXTERNAL, bean.getUnit());
-	    for (Person p : bean.getResponsibles()) {
-		responsible.addPeople(p);
-	    }
-
-	    protocol.addProtocolResponsible(responsible);
-	}
-
-	protocol.setAllowedToRead(ProtocolManager.createReaderGroup(protocolBean.getReaders()));
-
-	protocol.setAllowedToWrite(ProtocolManager.createWriterGroup(protocolBean.getWriters()));
-
-	protocol.setVisibilityType(protocolBean.getVisibilityType());
-
-	new ProtocolHistory(protocol, protocolBean.getBeginDate(), protocolBean.getEndDate());
+	protocol.updateFromBean(protocolBean);
 
 	protocol.addProtocolFiles(new ProtocolFile());
 
 	return protocol;
     }
 
+    @Service
+    public void updateFromBean(ProtocolCreationBean protocolBean) {
+
+	for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
+	    if (protocol.equals(this))
+		continue;
+	    if (protocol.getProtocolNumber().equals(protocolBean.getProtocolNumber()))
+		throw new DomainException("error.protocol.number.already.exists", protocolBean.getProtocolNumber());
+	}
+
+	this.setProtocolNumber(protocolBean.getProtocolNumber());
+	this.setSignedDate(protocolBean.getSignedDate());
+	this.setScientificAreas(protocolBean.getScientificAreas());
+	this.setProtocolAction(new ProtocolAction(protocolBean.getActionTypes(), protocolBean.getOtherActionTypes()));
+	this.setObservations(protocolBean.getObservations());
+	this.setNational(true);
+
+	if (protocolBean.getRemovedResponsibles() != null) {
+	    for (ProtocolResponsible responsible : protocolBean.getRemovedResponsibles()) {
+		if (responsible != null)
+		    this.removeProtocolResponsible(responsible);
+	    }
+	}
+
+	for (ProtocolResponsibleBean bean : protocolBean.getInternalResponsibles()) {
+	    ProtocolResponsible responsible = bean.getProtocolResponsible();
+	    if (this.hasProtocolResponsible(responsible))
+		responsible.updateFromBean(bean);
+	    else {
+		ProtocolResponsible newResponsible = new ProtocolResponsible(ProtocolResponsibleType.INTERNAL);
+		newResponsible.updateFromBean(bean);
+
+		this.addProtocolResponsible(newResponsible);
+	    }
+	}
+
+	for (ProtocolResponsibleBean bean : protocolBean.getExternalResponsibles()) {
+	    ProtocolResponsible responsible = bean.getProtocolResponsible();
+	    if (this.hasProtocolResponsible(responsible))
+		responsible.updateFromBean(bean);
+	    else {
+		ProtocolResponsible newResponsible = new ProtocolResponsible(ProtocolResponsibleType.EXTERNAL);
+		newResponsible.updateFromBean(bean);
+
+		this.addProtocolResponsible(newResponsible);
+	    }
+	}
+
+	for (PersistentGroup group : getReaderGroups())
+	    removeReaderGroups(group);
+
+	for (PersistentGroup group : protocolBean.getReaders())
+	    addReaderGroups(group);
+
+	this.setAllowedToRead(ProtocolManager.createReaderGroup(protocolBean.getReaders()));
+
+	this.setWriterGroup(protocolBean.getWriters());
+
+	this.setAllowedToWrite(ProtocolManager.createWriterGroup(protocolBean.getWriters()));
+
+	this.setVisibilityType(protocolBean.getVisibilityType());
+
+	ProtocolHistory currentProtocolHistory = getCurrentProtocolHistory();
+
+	if (currentProtocolHistory != null) {
+	    currentProtocolHistory.setBeginDate(protocolBean.getBeginDate());
+	    currentProtocolHistory.setEndDate(protocolBean.getEndDate());
+	} else {
+	    new ProtocolHistory(this, protocolBean.getBeginDate(), protocolBean.getEndDate());
+	}
+
+    }
+
     public boolean canBeReadByUser(final User user) {
 
-	return getAllowedToRead().isMember(user) || getVisibilityType() != ProtocolVisibilityType.RESTRICTED;
+	return getVisibilityType() != ProtocolVisibilityType.RESTRICTED || getAllowedToRead().isMember(user);
     }
 
     public boolean canFilesBeReadByUser(User currentUser) {

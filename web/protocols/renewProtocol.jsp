@@ -16,7 +16,7 @@
 
 <fr:view name="protocol" property="protocolHistories" schema="show.protocolHistories.toList">
 	<fr:layout name="tabular">
-		<fr:property name="classes" value="tstyle1 tdcenter" />
+		<fr:property name="classes" value="tstyle2 tdcenter" />
 	</fr:layout>
 </fr:view> 
 
@@ -38,7 +38,7 @@
 
 <p>
 	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit">
-		<bean:message key="button.submit" bundle="PROTOCOLS_RESOURCES"/>
+		<bean:message key="link.protocols.renew" bundle="PROTOCOLS_RESOURCES"/>
 	</html:submit>
 </p>
 </fr:form>

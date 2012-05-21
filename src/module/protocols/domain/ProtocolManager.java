@@ -34,6 +34,7 @@ public class ProtocolManager extends ProtocolManager_Base {
 
 	ProtocolManager manager = new ProtocolManager();
 	manager.setAdministrativeGroup(new ProtocolAdministrativeGroup());
+	manager.setCreatorsGroup(new UnionGroup(manager.getAdministrativeGroup()));
 
 	return manager;
     }

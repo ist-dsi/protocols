@@ -11,6 +11,7 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 	super();
 	this.setAuthorizedWriterGroup(writerGroup);
 	this.setProtocolManager(ProtocolManager.getInstance());
+	ProtocolManager.getInstance().getCreatorsGroup().addPersistentGroups(writerGroup);
     }
 
     @Service
@@ -33,6 +34,8 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 
     @Service
     public void delete() {
+
+	ProtocolManager.getInstance().getCreatorsGroup().removePersistentGroups(getAuthorizedWriterGroup());
 
 	this.removeReaders();
 	this.removeProtocolManager();

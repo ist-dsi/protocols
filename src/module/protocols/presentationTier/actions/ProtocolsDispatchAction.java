@@ -26,6 +26,7 @@ import myorg.domain.User;
 import myorg.domain.VirtualHost;
 import myorg.domain.contents.ActionNode;
 import myorg.domain.contents.Node;
+import myorg.domain.exceptions.DomainException;
 import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
 import myorg.presentationTier.actions.ContextBaseAction;
@@ -68,11 +69,11 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "searchProtocols", "resources.ProtocolsResources",
 		"label.protocols.search", AnyoneGroup.getInstance());
 
+	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareCreateProtocolData",
+		"resources.ProtocolsResources", "label.protocols.create", ProtocolManager.getInstance().getCreatorsGroup());
+
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showAlerts", "resources.ProtocolsResources",
 		"label.protocols.alerts", ProtocolManager.getInstance().getAdministrativeGroup());
-
-	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareCreateProtocolData",
-		"resources.ProtocolsResources", "label.protocols.create", ProtocolManager.getInstance().getAdministrativeGroup());
 
 	// System configuration. Should only be accessed by the administrative
 	// group
@@ -362,6 +363,121 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
      * Protocol Edition
      */
 
+    public ActionForward prepareEditProtocolData(final ActionMapping mapping, final ActionForm form,
+	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	Protocol protocol = getDomainObject(request, "OID");
+
+	request.setAttribute("protocolBean", new ProtocolCreationBean(protocol));
+
+	return forward(request, "/protocols/prepareEditProtocolData.jsp");
+    }
+
+    public ActionForward prepareEditInternalResponsibles(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	ProtocolCreationBean protocolBean = getRenderedObject();
+	RenderUtils.invalidateViewState();
+
+	request.setAttribute("protocolBean", protocolBean);
+
+	if (protocolBean.isProtocolNumberValid()) {
+	    if (validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request)) {
+		return forward(request, "/protocols/prepareEditInternalResponsibles.jsp");
+	    } else {
+		return forward(request, "/protocols/prepareEditProtocolData.jsp");
+	    }
+	} else {
+	    validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request);
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
+	    return forward(request, "/protocols/prepareEditProtocolData.jsp");
+	}
+    }
+
+    public ActionForward prepareEditExternalResponsibles(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	ProtocolCreationBean protocolBean = getRenderedObject();
+	RenderUtils.invalidateViewState();
+
+	request.setAttribute("protocolBean", protocolBean);
+
+	if (request.getParameter("back") != null) {
+	    return forward(request, "/protocols/prepareEditProtocolData.jsp");
+	}
+
+	if (!protocolBean.internalResponsiblesCorrect()) {
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidInternalResponsibles"));
+	    return forward(request, "/protocols/prepareEditInternalResponsibles.jsp");
+	}
+
+	return forward(request, "/protocols/prepareEditExternalResponsibles.jsp");
+    }
+
+    public ActionForward prepareEditProtocolPermissions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	ProtocolCreationBean protocolBean = getRenderedObject();
+	RenderUtils.invalidateViewState();
+
+	request.setAttribute("protocolBean", protocolBean);
+
+	if (request.getParameter("back") != null) {
+	    return forward(request, "/protocols/prepareEditInternalResponsibles.jsp");
+	}
+
+	if (!protocolBean.externalResponsiblesCorrect()) {
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidExternalResponsibles"));
+	    return forward(request, "/protocols/prepareEditExternalResponsibles.jsp");
+	}
+
+	return forward(request, "/protocols/prepareEditProtocolPermissions.jsp");
+    }
+
+    public ActionForward editProtocol(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	ProtocolCreationBean protocolBean = getRenderedObject();
+	RenderUtils.invalidateViewState();
+
+	request.setAttribute("protocolBean", protocolBean);
+
+	if (request.getParameter("back") != null) {
+	    return forward(request, "/protocols/prepareEditExternalResponsibles.jsp");
+	}
+
+	if (!protocolBean.permissionsCorrectlyDefined()) {
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidProtocolPermissions"));
+	    return forward(request, "/protocols/prepareEditProtocolPermissions.jsp");
+	}
+
+	try {
+	    protocolBean.getProtocol().updateFromBean(protocolBean);
+
+	    setMessage(request, "success", new ActionMessage("label.protocols.successEdit"));
+
+	    return viewProtocolDetailsFromOID(request, protocolBean.getProtocol().getExternalId());
+	} catch (DomainException e) {
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
+	    return forward(request, "/protocols/prepareEditProtocolPermissions.jsp");
+	}
+    }
+
+    public ActionForward updateEditionBean(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
+	    final HttpServletResponse response) {
+
+	ProtocolCreationBean protocolBean = getRenderedObject();
+	RenderUtils.invalidateViewState();
+	request.setAttribute("protocolBean", protocolBean);
+
+	boolean internal = true;
+
+	internal = beanUpdateLogic(request, protocolBean, internal);
+
+	return forward(request, internal ? "/protocols/prepareEditInternalResponsibles.jsp"
+		: "/protocols/prepareEditExternalResponsibles.jsp");
+    }
+
     /*
      * Protocol Creation
      */
@@ -460,11 +576,16 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	    return forward(request, "/protocols/prepareDefineProtocolPermissions.jsp");
 	}
 
-	Protocol protocol = Protocol.createProtocol(protocolBean);
+	try {
+	    Protocol protocol = Protocol.createProtocol(protocolBean);
 
-	setMessage(request, "success", new ActionMessage("label.protocols.successCreate"));
+	    setMessage(request, "success", new ActionMessage("label.protocols.successCreate"));
 
-	return viewProtocolDetailsFromOID(request, protocol.getExternalId());
+	    return viewProtocolDetailsFromOID(request, protocol.getExternalId());
+	} catch (DomainException e) {
+	    setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
+	    return forward(request, "/protocols/prepareDefineProtocolPermissions.jsp");
+	}
     }
 
     public ActionForward updateBean(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
@@ -476,57 +597,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	boolean internal = true;
 
-	if (request.getParameter("insertInternalUnit") != null && protocolBean.getNewUnit() != null) {
-
-	    protocolBean.addInternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));
-	    protocolBean.setNewUnit(null);
-
-	} else if (request.getParameter("insertPersonInUnit") != null && protocolBean.getNewPerson() != null) {
-
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
-
-	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
-
-	    protocolBean.setNewPerson(null);
-
-	} else if (request.getParameter("removePersonInUnit") != null && protocolBean.getNewPerson() != null) {
-
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
-
-	    protocolBean.getBeanForUnit(unit).removeResponsible(protocolBean.getNewPerson());
-
-	    protocolBean.setNewPerson(null);
-
-	} else if (request.getParameter("removeUnit") != null) {
-
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
-
-	    protocolBean.removeUnit(unit);
-
-	} else if (request.getParameter("removeExternalUnit") != null) {
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
-
-	    protocolBean.removeUnit(unit);
-
-	    internal = false;
-	} else if (request.getParameter("insertExternalUnit") != null) {
-
-	    protocolBean.addExternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));
-	    protocolBean.setNewUnit(null);
-
-	    internal = false;
-
-	} else if (request.getParameter("insertPersonInExternalUnit") != null && protocolBean.getNewPerson() != null) {
-
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
-
-	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
-
-	    protocolBean.setNewPerson(null);
-
-	    internal = false;
-
-	}
+	internal = beanUpdateLogic(request, protocolBean, internal);
 
 	return forward(request, internal ? "/protocols/prepareCreateInternalResponsibles.jsp"
 		: "/protocols/prepareCreateExternalResponsibles.jsp");
@@ -535,6 +606,38 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     /*
      * Helper methods
      */
+
+    private boolean beanUpdateLogic(final HttpServletRequest request, ProtocolCreationBean protocolBean, boolean internal) {
+	if (request.getParameter("insertInternalUnit") != null && protocolBean.getNewUnit() != null) {
+	    protocolBean.addInternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));
+	    protocolBean.setNewUnit(null);
+	} else if (request.getParameter("insertPersonInUnit") != null && protocolBean.getNewPerson() != null) {
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
+	    protocolBean.setNewPerson(null);
+	} else if (request.getParameter("removePersonInUnit") != null && protocolBean.getNewPerson() != null) {
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+	    protocolBean.getBeanForUnit(unit).removeResponsible(protocolBean.getNewPerson());
+	    protocolBean.setNewPerson(null);
+	} else if (request.getParameter("removeUnit") != null) {
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+	    protocolBean.removeUnit(unit);
+	} else if (request.getParameter("removeExternalUnit") != null) {
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+	    protocolBean.removeUnit(unit);
+	    internal = false;
+	} else if (request.getParameter("insertExternalUnit") != null) {
+	    protocolBean.addExternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));
+	    protocolBean.setNewUnit(null);
+	    internal = false;
+	} else if (request.getParameter("insertPersonInExternalUnit") != null && protocolBean.getNewPerson() != null) {
+	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
+	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
+	    protocolBean.setNewPerson(null);
+	    internal = false;
+	}
+	return internal;
+    }
 
     private boolean validateDates(LocalDate beginDate, LocalDate endDate, HttpServletRequest request) {
 	if (beginDate != null && endDate != null && endDate.isBefore(beginDate)) {

@@ -5,13 +5,13 @@
 <%@ taglib uri="/WEB-INF/fenix-renderers.tld" prefix="fr"%>
 <html:xhtml/>
 
-<h2><bean:message key="label.protocols.create" bundle="PROTOCOLS_RESOURCES"/></h2>
+<h2><bean:message key="label.protocols.edit" bundle="PROTOCOLS_RESOURCES"/></h2>
 
 <p class="breadcumbs">
-	<span><bean:message key="label.protocol.create.step1" bundle="PROTOCOLS_RESOURCES"/></span> > 
-	<span><bean:message key="label.protocol.create.step2" bundle="PROTOCOLS_RESOURCES"/></span> > 
-	<span><bean:message key="label.protocol.create.step3" bundle="PROTOCOLS_RESOURCES"/></span> >
-	<span><strong><bean:message key="label.protocol.create.step4" bundle="PROTOCOLS_RESOURCES"/></strong></span>
+	<span><bean:message key="label.protocol.edit.step1" bundle="PROTOCOLS_RESOURCES"/></span> > 
+	<span><bean:message key="label.protocol.edit.step2" bundle="PROTOCOLS_RESOURCES"/></span> > 
+	<span><bean:message key="label.protocol.edit.step3" bundle="PROTOCOLS_RESOURCES"/></span> >
+	<span><strong><bean:message key="label.protocol.edit.step4" bundle="PROTOCOLS_RESOURCES"/></strong></span>
 </p>
 <p></p>
 
@@ -28,7 +28,7 @@
 <br />
 
 <div align="center">
-	<h3><bean:message key="label.protocol.create.step4" bundle="PROTOCOLS_RESOURCES"/></h3>
+	<h3><bean:message key="label.protocol.edit.permissions" bundle="PROTOCOLS_RESOURCES"/></h3>
 </div>
 
 
@@ -44,7 +44,7 @@
 	<p class="dinline"><strong><bean:message key="label.protocols.writers" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<fr:form action="/protocols.do?method=prepareDefineProtocolPermissions">
+<fr:form action="/protocols.do?method=prepareEditProtocolPermissions">
 
 <fr:edit name="protocolBean">
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
@@ -64,7 +64,7 @@
 
 <td width="50%" valign="top">
 
-<fr:form action="/protocols.do?method=createProtocol">
+<fr:form action="/protocols.do?method=editProtocol">
 
 <logic:present name="protocolBean" property="writers">
 
@@ -127,7 +127,7 @@
 		<bean:message key="submit.back" bundle="PROTOCOLS_RESOURCES" />
 	</html:submit>
 	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit">
-		<bean:message key="label.protocols.create" bundle="PROTOCOLS_RESOURCES" />
+		<bean:message key="label.protocols.edit" bundle="PROTOCOLS_RESOURCES" />
 	</html:submit>
 </p>
 

@@ -20,7 +20,6 @@ import module.protocols.domain.ProtocolHistory;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
 import module.protocols.domain.ProtocolVisibilityType;
-import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolActionType;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import myorg.applicationTier.Authenticate;
@@ -46,9 +45,12 @@ public class ProtocolCreationBean implements Serializable {
 
 	private final List<Person> responsibles;
 
+	private final ProtocolResponsible protocolResponsible;
+
 	private Person personToRemove;
 
 	public ProtocolResponsibleBean(ProtocolResponsible responsible) {
+	    this.protocolResponsible = responsible;
 	    this.unit = responsible.getUnit();
 	    this.responsibles = new ArrayList<Person>(responsible.getPeople());
 	}
@@ -57,6 +59,7 @@ public class ProtocolCreationBean implements Serializable {
 	    super();
 	    this.unit = unit;
 	    this.responsibles = new ArrayList<Person>();
+	    this.protocolResponsible = null;
 	}
 
 	public Unit getUnit() {
@@ -91,6 +94,10 @@ public class ProtocolCreationBean implements Serializable {
 	    this.personToRemove = personToRemove;
 	}
 
+	public ProtocolResponsible getProtocolResponsible() {
+	    return protocolResponsible;
+	}
+
 	@Override
 	public int compareTo(ProtocolResponsibleBean o) {
 	    return Unit.COMPARATOR_BY_PRESENTATION_NAME.compare(this.unit, o.getUnit());
@@ -98,10 +105,6 @@ public class ProtocolCreationBean implements Serializable {
     }
 
     private Protocol protocol;
-
-    private ProtocolAction protocolAction;
-
-    private List<ProtocolHistory> protocolHistories;
 
     /*
      * Step 1
@@ -155,26 +158,39 @@ public class ProtocolCreationBean implements Serializable {
      * Extra stuff
      */
 
-    private Boolean renewable;
-
-    private Boolean active;
+    private List<ProtocolResponsible> removedResponsibles;
 
     public ProtocolCreationBean() {
 
     }
 
     public ProtocolCreationBean(Protocol protocol) {
+
+	// Step 1
+
 	setProtocol(protocol);
+
 	setProtocolNumber(protocol.getProtocolNumber());
+
 	setSignedDate(protocol.getSignedDate());
-	setObservations(protocol.getObservations());
-	setRenewable(protocol.getRenewable());
-	setActive(protocol.getActive());
-	setProtocolHistories(new ArrayList<ProtocolHistory>(protocol.getProtocolHistories()));
-	setProtocolAction(protocol.getProtocolAction());
-	setActionTypes(new ArrayList<ProtocolActionType>(protocol.getProtocolAction().getProtocolActionTypes()));
-	setOtherActionTypes(protocol.getProtocolAction().getOtherTypes());
+
+	ProtocolHistory history = protocol.getCurrentProtocolHistory(); // TODO
+									// Check
+
+	if (history != null) {
+	    setBeginDate(history.getBeginDate());
+	    setEndDate(history.getEndDate());
+	}
+
 	setScientificAreas(protocol.getScientificAreas());
+
+	setActionTypes(new ArrayList<ProtocolActionType>(protocol.getProtocolAction().getProtocolActionTypes()));
+
+	setOtherActionTypes(protocol.getProtocolAction().getOtherTypes());
+
+	setObservations(protocol.getObservations());
+
+	// Steps 2 and 3
 
 	for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
 	    ProtocolResponsibleBean bean = new ProtocolResponsibleBean(responsible);
@@ -184,6 +200,13 @@ public class ProtocolCreationBean implements Serializable {
 		addExternalResponsible(bean);
 	    }
 	}
+
+	setWriters(protocol.getWriterGroup());
+
+	setReaders(new ArrayList<PersistentGroup>(protocol.getReaderGroups()));
+
+	setVisibilityType(protocol.getVisibilityType());
+
     }
 
     public Protocol getProtocol() {
@@ -192,22 +215,6 @@ public class ProtocolCreationBean implements Serializable {
 
     public void setProtocol(Protocol protocol) {
 	this.protocol = protocol;
-    }
-
-    public ProtocolAction getProtocolAction() {
-	return protocolAction;
-    }
-
-    public void setProtocolAction(ProtocolAction protocolAction) {
-	this.protocolAction = protocolAction;
-    }
-
-    public List<ProtocolHistory> getProtocolHistories() {
-	return protocolHistories;
-    }
-
-    public void setProtocolHistories(List<ProtocolHistory> protocolHistories) {
-	this.protocolHistories = protocolHistories;
     }
 
     public String getProtocolNumber() {
@@ -290,28 +297,13 @@ public class ProtocolCreationBean implements Serializable {
 	this.externalResponsibles = externalResponsibles;
     }
 
-    public Boolean getRenewable() {
-	return renewable;
-    }
-
-    public void setRenewable(Boolean renewable) {
-	this.renewable = renewable;
-    }
-
-    public Boolean getActive() {
-	return active;
-    }
-
-    public void setActive(Boolean active) {
-	this.active = active;
-    }
-
     public ProtocolAuthorizationGroup getWriters() {
 	return writers;
     }
 
     public void setWriters(ProtocolAuthorizationGroup writers) {
 	this.writers = writers;
+	this.readers = null;
     }
 
     public List<PersistentGroup> getReaders() {
@@ -361,8 +353,18 @@ public class ProtocolCreationBean implements Serializable {
     }
 
     public Person getCreator() {
-
 	return Authenticate.getCurrentUser().getPerson();
+    }
+
+    public List<ProtocolResponsible> getRemovedResponsibles() {
+	return removedResponsibles;
+    }
+
+    public void removeResponsible(ProtocolResponsibleBean bean) {
+	if (removedResponsibles == null)
+	    removedResponsibles = new ArrayList<ProtocolResponsible>();
+
+	removedResponsibles.add(bean.getProtocolResponsible());
     }
 
     /**
@@ -409,6 +411,8 @@ public class ProtocolCreationBean implements Serializable {
 
     public boolean isProtocolNumberValid() {
 	for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
+	    if (protocol.equals(this.getProtocol()))
+		continue;
 	    if (protocol.getProtocolNumber().equals(getProtocolNumber())) {
 		return false;
 	    }
@@ -433,6 +437,7 @@ public class ProtocolCreationBean implements Serializable {
 
     public void removeUnit(Unit unit) {
 	ProtocolResponsibleBean bean = getBeanForUnit(unit);
+	removeResponsible(bean);
 	if (internalResponsibles != null)
 	    internalResponsibles.remove(bean);
 	if (externalResponsibles != null)

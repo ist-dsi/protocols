@@ -1,7 +1,8 @@
 package module.protocols.domain;
 
-import module.organization.domain.Unit;
+import module.organization.domain.Person;
 import module.protocols.domain.util.ProtocolResponsibleType;
+import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 
 /**
  * 
@@ -14,10 +15,21 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 	super();
     }
 
-    public ProtocolResponsible(ProtocolResponsibleType type, Unit unit) {
+    public ProtocolResponsible(ProtocolResponsibleType type) {
 	this();
 	setType(type);
-	setUnit(unit);
+    }
+
+    /**
+     * @param bean
+     */
+    public void updateFromBean(ProtocolResponsibleBean bean) {
+	this.setUnit(bean.getUnit());
+	for (Person person : getPeople())
+	    removePeople(person);
+
+	for (Person person : bean.getResponsibles())
+	    addPeople(person);
     }
 
 }

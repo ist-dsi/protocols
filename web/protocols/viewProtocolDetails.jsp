@@ -5,7 +5,8 @@
 <%@ taglib uri="/WEB-INF/fenix-renderers.tld" prefix="fr" %>
 
 <br />
-<h2><bean:message key="label.protocols.details" bundle="PROTOCOLS_RESOURCES"/></h2>
+<h2><bean:message key="label.protocols.details" bundle="PROTOCOLS_RESOURCES"/>
+</h2>
 
 <div align="center" style="font-weight:bold;">
 	<html:errors bundle="PROTOCOLS_RESOURCES"/>
@@ -19,6 +20,11 @@
 <logic:present name="protocol">
 
 <bean:define id="OID" type="java.lang.Long" name="protocol" property="OID"/>
+
+<logic:equal value="true" name="canBeWritten">
+<html:link href="<%="protocols.do?method=prepareEditProtocolData&OID=" + OID %>"><bean:message key="link.edit" bundle="MYORG_RESOURCES"/></html:link>
+</logic:equal>
+
 
 <table width="100%">
 <tr>
@@ -56,7 +62,7 @@
 </logic:empty>
 
 <logic:equal value="true" name="canBeWritten">
-<html:link href="<%="/protocols.do?method=manageFilesForProtocol&OID=" + OID %>"><bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/></html:link>
+<html:link href="<%="protocols.do?method=manageFilesForProtocol&OID=" + OID %>"><bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/></html:link>
 </logic:equal>
 
 </logic:present>

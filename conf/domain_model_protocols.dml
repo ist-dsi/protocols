@@ -81,6 +81,11 @@ relation ProtocolManagerAdministrativeGroup {
 	}
 }
 
+relation ProtocolManagerCreatorsGroup {
+	ProtocolManager playsRole protocolManager;
+	.myorg.domain.groups.UnionGroup playsRole creatorsGroup;
+}
+
 relation ProtocolAdministrativeGroupPersistentGroup {
 	ProtocolAdministrativeGroup playsRole administrativeGroup;
 	.myorg.domain.groups.PersistentGroup playsRole delegateGroup;
@@ -148,6 +153,22 @@ relation ProtocolAllowedToWriteGroups {
 	.myorg.domain.groups.PersistentGroup playsRole allowedToWrite;
 }
 
+relation ProtocolAuthorizationGroupProtocol {
+	Protocol playsRole writerProtocols {
+		multiplicity *;
+	}
+	ProtocolAuthorizationGroup playsRole writerGroup;
+}
+
+relation ProtocolReaders {
+	Protocol playsRole readerProtocols {
+		multiplicity *;
+	}
+	.myorg.domain.groups.PersistentGroup playsRole readerGroups {
+		multiplicity *;
+	}
+}
+
 relation ProtocolAuthorizationGroupProtocolManager {
 	ProtocolManager playsRole protocolManager {
 		multiplicity 1..1;
@@ -163,7 +184,9 @@ relation ProtocolAuthorizationGroupWriterGroups {
 }
 
 relation ProtocolAuthorizationGroupReaderGroups {
-	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroupAllowedToRead;
+	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroupAllowedToRead {
+		multiplicity *;
+	}
 	.myorg.domain.groups.PersistentGroup playsRole authorizedReaderGroups {
 		multiplicity *;
 	}
