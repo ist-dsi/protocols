@@ -4,8 +4,6 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/fenix-renderers.tld" prefix="fr" %>
 
-
-<p class="mtop2 mbottom0" align="center">
 <h2>
 <bean:message key="label.protocolSystem.configure" bundle="PROTOCOLS_RESOURCES" />
 </h2>

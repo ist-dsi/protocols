@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import module.fileManagement.domain.FileNode;
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
 import module.protocols.domain.ProtocolAuthorizationGroup;
@@ -18,6 +19,8 @@ import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.AuthorizationGroupBean;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
+import module.protocols.dto.ProtocolFileBean;
+import module.protocols.dto.ProtocolFileUploadBean;
 import module.protocols.dto.ProtocolHistoryBean;
 import module.protocols.dto.ProtocolSearchBean;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
@@ -30,6 +33,7 @@ import myorg.domain.exceptions.DomainException;
 import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
 import myorg.presentationTier.actions.ContextBaseAction;
+import myorg.util.InputStreamUtil;
 import myorg.util.VariantBean;
 
 import org.apache.struts.action.ActionForm;
@@ -42,8 +46,10 @@ import org.joda.time.LocalDate;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.servlets.functionalities.CreateNodeAction;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
-import pt.utl.ist.fenix.tools.util.CollectionUtils;
-import pt.utl.ist.fenix.tools.util.Predicate;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -98,12 +104,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	final User currentUser = Authenticate.getCurrentUser();
 
-	List<Protocol> protocols = CollectionUtils.filter(ProtocolManager.getInstance().getProtocols(),
+	Collection<Protocol> protocols = Collections2.filter(ProtocolManager.getInstance().getProtocols(),
 		new Predicate<Protocol>() {
 
 		    @Override
-		    public boolean evaluate(Protocol protocol) {
-			return protocol.canBeReadByUser(currentUser);
+		    public boolean apply(Protocol protocol) {
+			return protocol.canBeReadByUser(currentUser) && protocol.isActive();
 		    }
 		});
 
@@ -119,10 +125,10 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	List<Protocol> allProtocols = ProtocolManager.getInstance().getProtocols();
 
-	List<Protocol> almostExpiredProtocols = CollectionUtils.filter(allProtocols, new Predicate<Protocol>() {
+	Collection<Protocol> almostExpiredProtocols = Collections2.filter(allProtocols, new Predicate<Protocol>() {
 
 	    @Override
-	    public boolean evaluate(Protocol protocol) {
+	    public boolean apply(Protocol protocol) {
 		if (!protocol.isActive())
 		    return false;
 		LocalDate endDate = protocol.getLastProtocolHistory().getEndDate();
@@ -130,10 +136,10 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	    }
 	});
 
-	List<Protocol> nullEndDateProtocols = CollectionUtils.filter(allProtocols, new Predicate<Protocol>() {
+	Collection<Protocol> nullEndDateProtocols = Collections2.filter(allProtocols, new Predicate<Protocol>() {
 
 	    @Override
-	    public boolean evaluate(Protocol protocol) {
+	    public boolean apply(Protocol protocol) {
 		return protocol.isActive() && protocol.getCurrentProtocolHistory().getEndDate() == null;
 	    }
 	});
@@ -146,6 +152,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
     public ActionForward protocolSystemConfiguration(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	checkAdministrative();
 
 	ProtocolSystemConfigurationBean bean = getRenderedObject();
 
@@ -161,6 +169,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
     public ActionForward authorizationGroupsConfiguration(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	checkAdministrative();
 
 	Collection<ProtocolAuthorizationGroup> groups = ProtocolManager.getInstance().getProtocolAuthorizationGroups();
 
@@ -194,6 +204,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     public ActionForward removeAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
 
+	checkAdministrative();
+
 	ProtocolAuthorizationGroup group = ProtocolAuthorizationGroup.fromExternalId(request.getParameter("OID"));
 
 	group.delete();
@@ -203,6 +215,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
     public ActionForward configureAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
+
+	checkAdministrative();
 
 	AuthorizationGroupBean bean = getRenderedObject();
 
@@ -239,21 +253,21 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	List<ProtocolResponsible> responsibles = protocol.getProtocolResponsible();
 
-	List<ProtocolResponsible> internalResponsibles = CollectionUtils.filter(responsibles,
+	Collection<ProtocolResponsible> internalResponsibles = Collections2.filter(responsibles,
 		new Predicate<ProtocolResponsible>() {
 
 		    @Override
-		    public boolean evaluate(ProtocolResponsible responsible) {
+		    public boolean apply(ProtocolResponsible responsible) {
 			return responsible.getType() == ProtocolResponsibleType.INTERNAL;
 		    }
 
 		});
 
-	List<ProtocolResponsible> externalResponsibles = CollectionUtils.filter(responsibles,
+	Collection<ProtocolResponsible> externalResponsibles = Collections2.filter(responsibles,
 		new Predicate<ProtocolResponsible>() {
 
 		    @Override
-		    public boolean evaluate(ProtocolResponsible responsible) {
+		    public boolean apply(ProtocolResponsible responsible) {
 			return responsible.getType() == ProtocolResponsibleType.EXTERNAL;
 		    }
 
@@ -263,7 +277,14 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	request.setAttribute("externalResponsibles", externalResponsibles);
 
 	if (protocol.canFilesBeReadByUser(currentUser))
-	    request.setAttribute("protocolFiles", protocol.getProtocolFiles());
+	    request.setAttribute("protocolFiles",
+		    Collections2.transform(protocol.getFiles(), new Function<FileNode, ProtocolFileBean>() {
+
+			@Override
+			public ProtocolFileBean apply(FileNode file) {
+			    return new ProtocolFileBean(file, request);
+			}
+		    }));
 
 	request.setAttribute("canBeWritten", protocol.canBeWrittenByUser(currentUser));
 
@@ -281,7 +302,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	if (bean != null) {
 
-	    List<Protocol> filteredProtocols = CollectionUtils.filter(ProtocolManager.getInstance().getProtocols(), bean);
+	    Collection<Protocol> filteredProtocols = Collections2.filter(ProtocolManager.getInstance().getProtocols(), bean);
 
 	    request.setAttribute("searchResults", filteredProtocols);
 
@@ -354,19 +375,63 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	return showAlerts(mapping, form, request, response);
     }
 
-    private void setOrganizationalModels(HttpServletRequest request) {
-	request.setAttribute("internalOrganizationalModel", ProtocolManager.getInstance().getInternalOrganizationalModel());
-	request.setAttribute("externalOrganizationalModel", ProtocolManager.getInstance().getExternalOrganizationalModel());
-    }
-
     /*
      * Protocol Edition
      */
+
+    public ActionForward uploadProtocolFile(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
+	    final HttpServletResponse response) {
+
+	ProtocolFileUploadBean bean = getRenderedObject();
+
+	if (bean == null) {
+
+	    Protocol protocol = getDomainObject(request, "OID");
+
+	    if (!protocol.getWriterGroup().getAuthorizedWriterGroup().isMember(Authenticate.getCurrentUser()))
+		throw new DomainException("error.unauthorized");
+
+	    bean = new ProtocolFileUploadBean(protocol);
+
+	    request.setAttribute("file", bean);
+
+	    return forward(request, "/protocols/uploadProtocolFile.jsp");
+
+	} else {
+	    if (bean.getInputStream() != null) {
+		bean.getProtocol().uploadFile(bean.getFilename(), InputStreamUtil.consumeInputStream(bean.getInputStream()));
+		setMessage(request, "success", new ActionMessage("label.protocols.fileUpload.success"));
+	    }
+	    return viewProtocolDetailsFromOID(request, bean.getProtocol().getExternalId());
+	}
+
+    }
+
+    public ActionForward removeProtocolFile(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
+	    final HttpServletResponse response) {
+
+	Protocol protocol = getDomainObject(request, "protocol");
+
+	if (!protocol.getWriterGroup().getAuthorizedWriterGroup().isMember(Authenticate.getCurrentUser()))
+	    throw new DomainException("error.unauthorized");
+
+	FileNode file = getDomainObject(request, "file");
+
+	file.delete();
+
+	setMessage(request, "success", new ActionMessage("label.protocols.fileRemoval.success"));
+
+	return viewProtocolDetailsFromOID(request, protocol.getExternalId());
+
+    }
 
     public ActionForward prepareEditProtocolData(final ActionMapping mapping, final ActionForm form,
 	    final HttpServletRequest request, final HttpServletResponse response) {
 
 	Protocol protocol = getDomainObject(request, "OID");
+
+	if (!protocol.getWriterGroup().getAuthorizedWriterGroup().isMember(Authenticate.getCurrentUser()))
+	    throw new DomainException("error.unauthorized");
 
 	request.setAttribute("protocolBean", new ProtocolCreationBean(protocol));
 
@@ -484,6 +549,9 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
     public ActionForward prepareCreateProtocolData(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+
+	if (!ProtocolManager.getInstance().getCreatorsGroup().isMember(Authenticate.getCurrentUser()))
+	    throw new DomainException("error.unauthorized");
 
 	request.setAttribute("protocolBean", new ProtocolCreationBean());
 
@@ -651,6 +719,16 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	ActionMessages actionMessages = getMessages(request);
 	actionMessages.add(error, actionMessage);
 	saveMessages(request, actionMessages);
+    }
+
+    private void setOrganizationalModels(HttpServletRequest request) {
+	request.setAttribute("internalOrganizationalModel", ProtocolManager.getInstance().getInternalOrganizationalModel());
+	request.setAttribute("externalOrganizationalModel", ProtocolManager.getInstance().getExternalOrganizationalModel());
+    }
+
+    private void checkAdministrative() {
+	if (!ProtocolManager.getInstance().getAdministrativeGroup().isMember(Authenticate.getCurrentUser()))
+	    throw new DomainException("error.unauthorized");
     }
 
 }

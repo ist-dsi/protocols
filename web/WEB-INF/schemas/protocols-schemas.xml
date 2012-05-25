@@ -66,7 +66,10 @@
 <schema name="show.protocol.data" type="module.protocols.domain.Protocol">
 	<slot name="protocolNumber"	key="label.protocols.number" bundle="PROTOCOLS_RESOURCES"/>
 	<slot name="signedDate" key="label.protocols.signedDate" bundle="PROTOCOLS_RESOURCES"/>
-	<slot name="currentProtocolHistory" key="label.protocols.actualDates" bundle="PROTOCOLS_RESOURCES" schema="show.protocolHistories.toList" layout="flow"/>
+	<slot name="currentAndFutureProtocolHistories" key="label.protocols.actualDates" bundle="PROTOCOLS_RESOURCES">
+		<property name="eachSchema" value="show.protocolHistories.toList"/>
+		<property name="eachLayout" value="flow"/>
+	</slot>
 	<slot name="scientificAreas" key="label.protocols.scientificAreas" bundle="PROTOCOLS_RESOURCES"/>
  	<slot name="protocolAction.protocolActionTypes" key="label.protocol.actionTypes" layout="option-select" bundle="PROTOCOLS_RESOURCES">
 		<property name="providerClass"	value="module.protocols.presentationTier.providers.ProtocolActionTypeProvider" />
@@ -113,7 +116,7 @@
 		<property name="rawSlotName" value="partnerNameString"/>		
 		<property name="format" value="${unit.presentationName}"/>
 		<property name="indicatorShown" value="true"/>		
-		<property name="args" value="provider=module.protocols.presentationTier.providers.PartnerNameProvider"/>
+		<property name="args" value="provider=module.protocols.presentationTier.providers.UnitPerModelAutoCompleteProvider,model=external"/>
 		<property name="minChars" value="2"/>
 		<property name="errorStyleClass" value="error0"/>
 	</slot>

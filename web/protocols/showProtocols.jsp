@@ -4,7 +4,6 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/fenix-renderers.tld" prefix="fr" %>
 
-<br />
 <h2><bean:message key="label.protocols.show" bundle="PROTOCOLS_RESOURCES"/></h2>
 
 <p>
@@ -22,7 +21,20 @@
 			<fr:property name="bundle(show)" value="PROTOCOLS_RESOURCES" />
 		</fr:layout>
 	</fr:view>
+	
+	<logic:empty name="protocols">
+		<em style="text-align:center">
+		<bean:message key="label.protocols.noResults"  bundle="PROTOCOLS_RESOURCES"/>
+		</em>
+	</logic:empty>
 
 </logic:present>
+
+<logic:notPresent name="protocols">
+<em style="text-align:center">
+<bean:message key="label.protocols.noResults"  bundle="PROTOCOLS_RESOURCES"/>
+</em>
+</logic:notPresent>
+
 </div>
 </p>

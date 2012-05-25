@@ -6,6 +6,10 @@
 
 <!-- Check for organizational models. Without those, the application cannot work! -->
 
+<h2>
+<bean:message key="label.protocols.alerts" bundle="PROTOCOLS_RESOURCES" />
+</h2>
+
 <div align="center" style="font-weight:bold;">
 	<html:errors bundle="PROTOCOLS_RESOURCES"/>
 	<html:messages id="message" name="success" message="true" bundle="PROTOCOLS_RESOURCES">

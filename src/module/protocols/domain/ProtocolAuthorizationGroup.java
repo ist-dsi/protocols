@@ -12,6 +12,7 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 	this.setAuthorizedWriterGroup(writerGroup);
 	this.setProtocolManager(ProtocolManager.getInstance());
 	ProtocolManager.getInstance().getCreatorsGroup().addPersistentGroups(writerGroup);
+	this.setGroupDir(new ProtocolDirNode(this));
     }
 
     @Service
@@ -37,9 +38,15 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 
 	ProtocolManager.getInstance().getCreatorsGroup().removePersistentGroups(getAuthorizedWriterGroup());
 
+	this.getGroupDir().delete();
 	this.removeReaders();
 	this.removeProtocolManager();
 	this.removeAuthorizedWriterGroup();
+
+	// TODO What to do if there are protocols with this group?
+
+	for (Protocol protocol : getWriterProtocols())
+	    removeWriterProtocols(protocol);
 
 	this.deleteDomainObject();
     }

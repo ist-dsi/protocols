@@ -110,13 +110,11 @@ public class ProtocolCreationBean implements Serializable {
      * Step 1
      */
 
-    // TODO Remove default initializations, for testing purposes only!
+    private String protocolNumber;
 
-    private String protocolNumber = "protocol" + System.currentTimeMillis();
+    private LocalDate signedDate;
 
-    private LocalDate signedDate = new LocalDate();
-
-    private LocalDate beginDate = new LocalDate();
+    private LocalDate beginDate;
 
     private LocalDate endDate;
 

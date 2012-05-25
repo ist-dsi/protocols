@@ -4,8 +4,6 @@
 package module.protocols.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import module.protocols.domain.Protocol;
@@ -13,6 +11,8 @@ import module.protocols.domain.Protocol.RenewTime;
 import module.protocols.domain.ProtocolHistory;
 
 import org.joda.time.LocalDate;
+
+import com.google.common.collect.Ordering;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -97,11 +97,9 @@ public class ProtocolHistoryBean implements Serializable {
     }
 
     public List<ProtocolHistory> getProtocolHistories() {
-	List<ProtocolHistory> histories = new ArrayList<ProtocolHistory>(protocol.getProtocolHistories());
 
-	Collections.sort(histories, ProtocolHistory.COMPARATOR_BY_BEGIN_DATE);
+	return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(protocol.getProtocolHistories());
 
-	return histories;
     }
 
 }

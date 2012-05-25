@@ -1,3 +1,5 @@
+<%@page import="pt.ist.vaadinframework.fragment.FragmentQuery"%>
+<%@page import="module.fileManagement.presentationTier.pages.DocumentHome"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -43,17 +45,32 @@
 
 </td>
 
-<td width="50%" valign="top">
+<td width="50%" valign="top" align="center"> 
 
 <div class="infobox">
 	<p class="dinline"><strong><bean:message key="label.protocols.files" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
 <logic:present name="protocolFiles">
+<table width="100%">
 <logic:iterate id="file" name="protocolFiles">
-	<bean:write name="file" property="name"/>
+	<tr>
+	<td width="70%">
+	<bean:define id="url" type="java.lang.String" name="file" property="fileURL"/>
+	<a href="<%= url %>"><bean:write name="file" property="file.document.lastVersionedFile.filename"/></a>
 	<br />
+	</td>
+	<td>
+	<logic:equal value="true" name="canBeWritten">
+		<bean:define id="fileOID" type="java.lang.Long" name="file" property="file.OID"/>
+		<html:link page="<%= "/protocols.do?method=removeProtocolFile&protocol=" + OID + "&file=" + fileOID %>">
+		<bean:message key="label.remove" bundle="MYORG_RESOURCES" />
+		</html:link>
+	</logic:equal>
+	</td>
+	</tr>
 </logic:iterate>
+</table>
 <logic:empty name="protocolFiles">
 <div align="center">
 	<br />
@@ -62,7 +79,27 @@
 </logic:empty>
 
 <logic:equal value="true" name="canBeWritten">
-<html:link href="<%="protocols.do?method=manageFilesForProtocol&OID=" + OID %>"><bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/></html:link>
+
+<br />
+<hr />
+<br />
+
+<html:link page="<%= "/protocols.do?method=uploadProtocolFile&OID=" + OID %>">
+<bean:message key="link.protocols.uploadFile" bundle="PROTOCOLS_RESOURCES"/>
+</html:link>
+
+<br />
+<br />
+
+<bean:define id="dirOID" name="protocol" property="protocolDir.OID"/>
+<html:link page="<%="/vaadinContext.do?method=forwardToVaadin#" + new pt.ist.vaadinframework.fragment.FragmentQuery(DocumentHome.class).getQueryString() + "?contextPath=" + dirOID %>">
+<bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/>
+</html:link>
+
+
+
+
+
 </logic:equal>
 
 </logic:present>

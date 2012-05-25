@@ -46,6 +46,9 @@ class ProtocolAuthorizationGroup {
 class ProtocolAdministrativeGroup extends .myorg.domain.groups.PersistentGroup {
 }
 
+class ProtocolDirNode extends .module.fileManagement.domain.DirNode {
+}
+
 /* Relations */
 
 relation ProtocolManagerMyOrg {
@@ -190,4 +193,14 @@ relation ProtocolAuthorizationGroupReaderGroups {
 	.myorg.domain.groups.PersistentGroup playsRole authorizedReaderGroups {
 		multiplicity *;
 	}
+}
+
+relation ProtocolAuthorizationGroupDirNode {
+	ProtocolAuthorizationGroup playsRole ownerGroup;
+	ProtocolDirNode playsRole groupDir;
+}
+
+relation ProtocolFilesNode {
+	Protocol playsRole protocol;
+	ProtocolDirNode playsRole protocolDir;
 }

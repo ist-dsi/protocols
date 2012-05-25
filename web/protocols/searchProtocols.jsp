@@ -111,8 +111,10 @@
 	$(function() {
 		$( "#accordion" ).accordion({
 			<logic:present name="searchResults">
-			active: false,
-			collapsible: true
+				<logic:notEmpty name="searchResults">
+					active: false,
+					collapsible: true
+				</logic:notEmpty>
 			</logic:present>
 		});
 	});

@@ -9,8 +9,9 @@ import myorg.applicationTier.Authenticate;
 import myorg.domain.User;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
-import pt.utl.ist.fenix.tools.util.CollectionUtils;
-import pt.utl.ist.fenix.tools.util.Predicate;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -28,11 +29,11 @@ public class UserGroupsProvider implements DataProvider {
 
 	final User user = Authenticate.getCurrentUser();
 
-	return CollectionUtils.filter(ProtocolManager.getInstance().getProtocolAuthorizationGroups(),
+	return Collections2.filter(ProtocolManager.getInstance().getProtocolAuthorizationGroups(),
 		new Predicate<ProtocolAuthorizationGroup>() {
 
 		    @Override
-		    public boolean evaluate(ProtocolAuthorizationGroup group) {
+		    public boolean apply(ProtocolAuthorizationGroup group) {
 
 			return group.getAuthorizedWriterGroup().isMember(user);
 		    }

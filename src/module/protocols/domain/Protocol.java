@@ -1,9 +1,12 @@
 package module.protocols.domain;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import module.fileManagement.domain.AbstractFileNode;
+import module.fileManagement.domain.DirNode;
+import module.fileManagement.domain.Document;
+import module.fileManagement.domain.FileNode;
 import module.organization.domain.Person;
 import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolResponsibleType;
@@ -11,6 +14,7 @@ import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import myorg.domain.User;
 import myorg.domain.exceptions.DomainException;
+import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
 import myorg.util.BundleUtil;
 
@@ -18,9 +22,11 @@ import org.joda.time.LocalDate;
 
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
 import pt.ist.fenixWebFramework.services.Service;
-import pt.utl.ist.fenix.tools.util.CollectionUtils;
-import pt.utl.ist.fenix.tools.util.Predicate;
 import pt.utl.ist.fenix.tools.util.StringNormalizer;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 
 /**
  * 
@@ -68,21 +74,33 @@ public class Protocol extends Protocol_Base {
     }
 
     public ProtocolHistory getLastProtocolHistory() {
-	List<ProtocolHistory> histories = new ArrayList<ProtocolHistory>(getProtocolHistories());
 
-	Collections.sort(histories, ProtocolHistory.COMPARATOR_BY_END_DATE);
+	return Ordering.from(ProtocolHistory.COMPARATOR_BY_END_DATE).max(getProtocolHistories());
 
-	return histories.get(histories.size() - 1);
+    }
+
+    public List<ProtocolHistory> getCurrentAndFutureProtocolHistories() {
+
+	return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(
+		Iterables.filter(getProtocolHistories(), new Predicate<ProtocolHistory>() {
+
+		    @Override
+		    public boolean apply(ProtocolHistory history) {
+			return !history.isPast();
+		    }
+
+		}));
+
     }
 
     public boolean hasExternalPartner(final String partnerName) {
 
 	final String name = StringNormalizer.normalize(partnerName);
 
-	return CollectionUtils.anyMatches(getProtocolResponsible(), new Predicate<ProtocolResponsible>() {
+	return Iterables.any(getProtocolResponsible(), new Predicate<ProtocolResponsible>() {
 
 	    @Override
-	    public boolean evaluate(ProtocolResponsible responsible) {
+	    public boolean apply(ProtocolResponsible responsible) {
 
 		if (responsible.getType() != ProtocolResponsibleType.EXTERNAL)
 		    return false;
@@ -114,8 +132,6 @@ public class Protocol extends Protocol_Base {
 	Protocol protocol = new Protocol();
 
 	protocol.updateFromBean(protocolBean);
-
-	protocol.addProtocolFiles(new ProtocolFile());
 
 	return protocol;
     }
@@ -191,6 +207,19 @@ public class Protocol extends Protocol_Base {
 	    new ProtocolHistory(this, protocolBean.getBeginDate(), protocolBean.getEndDate());
 	}
 
+	PersistentGroup fileReaderGroup = protocolBean.getVisibilityType() == ProtocolVisibilityType.TOTAL ? AnyoneGroup
+		.getInstance() : getAllowedToRead();
+
+	ProtocolDirNode dir = getProtocolDir();
+
+	if (dir != null) {
+	    dir.setName(protocolBean.getProtocolNumber());
+	    dir.setReadGroup(fileReaderGroup);
+	    dir.setWriters(protocolBean.getWriters());
+	} else {
+	    this.setProtocolDir(new ProtocolDirNode(protocolBean.getWriters(), protocolBean.getProtocolNumber(), fileReaderGroup));
+	}
+
     }
 
     public boolean canBeReadByUser(final User user) {
@@ -238,6 +267,36 @@ public class Protocol extends Protocol_Base {
 
 	}
 	return builder.toString();
+    }
+
+    public List<FileNode> getFiles() {
+
+	return getFilesFromDir(getProtocolDir());
+
+    }
+
+    private List<FileNode> getFilesFromDir(DirNode node) {
+	List<FileNode> files = new ArrayList<FileNode>();
+
+	for (AbstractFileNode file : node.getChild()) {
+	    if (file instanceof FileNode) {
+		FileNode fileNode = (FileNode) file;
+		files.add(fileNode);
+	    } else if (file instanceof DirNode) {
+		files.addAll(getFilesFromDir((DirNode) file));
+	    }
+	}
+
+	return files;
+    }
+
+    @Service
+    public void uploadFile(String filename, byte[] contents) {
+
+	Document document = new Document(filename, filename, contents);
+
+	new FileNode(getProtocolDir(), document);
+
     }
 
 }

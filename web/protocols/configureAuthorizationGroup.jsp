@@ -6,8 +6,6 @@
 
 <div align="center">
 
-<br />
-
 <p class="mtop2 mbottom0" align="center">
 <h2>
 <bean:message key="label.protocolSystem.configureAuthorizationGroup" bundle="PROTOCOLS_RESOURCES" />
