@@ -2,6 +2,7 @@ package module.protocols.domain;
 
 import java.util.List;
 
+import module.fileManagement.domain.ContextPath;
 import myorg.domain.groups.PersistentGroup;
 import pt.ist.fenixWebFramework.services.Service;
 
@@ -38,7 +39,11 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 
 	ProtocolManager.getInstance().getCreatorsGroup().removePersistentGroups(getAuthorizedWriterGroup());
 
-	this.getGroupDir().delete();
+	ProtocolDirNode groupDir = this.getGroupDir();
+
+	groupDir.trash(new ContextPath(groupDir));
+
+	this.removeGroupDir();
 	this.removeReaders();
 	this.removeProtocolManager();
 	this.removeAuthorizedWriterGroup();

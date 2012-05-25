@@ -11,6 +11,7 @@ public class ProtocolDirNode extends ProtocolDirNode_Base {
 	setWriters(group);
 	setName(name);
 	setReadGroup(readers);
+	createTrashFolder();
     }
 
     public ProtocolDirNode(ProtocolAuthorizationGroup group) {
@@ -18,6 +19,7 @@ public class ProtocolDirNode extends ProtocolDirNode_Base {
 	setOwnerGroup(group);
 	setWriteGroup(group.getAuthorizedWriterGroup());
 	setQuota(Long.MAX_VALUE);
+	createTrashFolder();
     }
 
     @Service
@@ -39,6 +41,7 @@ public class ProtocolDirNode extends ProtocolDirNode_Base {
     public void delete() {
 	removeWriteGroup();
 	removeOwnerGroup();
+	removeTrash();
 	super.delete();
     }
 

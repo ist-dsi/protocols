@@ -77,4 +77,5 @@ public class ProtocolManager extends ProtocolManager_Base {
 	setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
 	getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
     }
+
 }

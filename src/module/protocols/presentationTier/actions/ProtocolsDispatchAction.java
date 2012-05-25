@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import module.fileManagement.domain.ContextPath;
 import module.fileManagement.domain.FileNode;
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
@@ -388,7 +389,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	    Protocol protocol = getDomainObject(request, "OID");
 
-	    if (!protocol.getWriterGroup().getAuthorizedWriterGroup().isMember(Authenticate.getCurrentUser()))
+	    if (!protocol.canBeWrittenByUser(Authenticate.getCurrentUser()))
 		throw new DomainException("error.unauthorized");
 
 	    bean = new ProtocolFileUploadBean(protocol);
@@ -412,12 +413,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	Protocol protocol = getDomainObject(request, "protocol");
 
-	if (!protocol.getWriterGroup().getAuthorizedWriterGroup().isMember(Authenticate.getCurrentUser()))
+	if (!protocol.canBeWrittenByUser(Authenticate.getCurrentUser()))
 	    throw new DomainException("error.unauthorized");
 
 	FileNode file = getDomainObject(request, "file");
 
-	file.delete();
+	file.trash(new ContextPath(file.getParent()));
 
 	setMessage(request, "success", new ActionMessage("label.protocols.fileRemoval.success"));
 
@@ -430,7 +431,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	Protocol protocol = getDomainObject(request, "OID");
 
-	if (!protocol.getWriterGroup().getAuthorizedWriterGroup().isMember(Authenticate.getCurrentUser()))
+	if (!protocol.canBeWrittenByUser(Authenticate.getCurrentUser()))
 	    throw new DomainException("error.unauthorized");
 
 	request.setAttribute("protocolBean", new ProtocolCreationBean(protocol));
