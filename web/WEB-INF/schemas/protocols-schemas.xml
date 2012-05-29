@@ -86,7 +86,7 @@
 		<property name="maxLength" value="2"/>
 		<property name="size" value="3"/>
 	</slot>
-	<slot name="renewTime" layout="option-select" bundle="PROTOCOLS_RESOURCES" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	<slot name="renewTime" layout="option-select" bundle="PROTOCOLS_RESOURCES" required="true"/>
 </schema>
 
 <!-- Search Schemas -->
@@ -146,7 +146,7 @@
 <!-- Protocol Creation -->
 
 <schema name="create.protocol" type="module.protocols.dto.ProtocolCreationBean">
-	<slot name="protocolNumber"	key="label.protocol.number" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"
+	<slot name="protocolNumber"	key="label.protocol.number" required="true"
 		 bundle="PROTOCOLS_RESOURCES"/>
 	<slot name="beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
 		<property name="size" value="10"/>
