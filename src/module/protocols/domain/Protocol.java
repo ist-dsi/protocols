@@ -7,7 +7,6 @@ import module.fileManagement.domain.AbstractFileNode;
 import module.fileManagement.domain.DirNode;
 import module.fileManagement.domain.Document;
 import module.fileManagement.domain.FileNode;
-import module.organization.domain.Person;
 import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean;
@@ -223,7 +222,6 @@ public class Protocol extends Protocol_Base {
     }
 
     public boolean canBeReadByUser(final User user) {
-
 	return getVisibilityType() != ProtocolVisibilityType.RESTRICTED || getAllowedToRead().isMember(user);
     }
 
@@ -259,20 +257,17 @@ public class Protocol extends Protocol_Base {
 	StringBuilder builder = new StringBuilder();
 	for (ProtocolResponsible responsible : getProtocolResponsible()) {
 
-	    for (Person person : responsible.getPeople()) {
-		if (builder.length() > 0)
-		    builder.append(", ");
-		builder.append(person.getName());
-	    }
+	    if (builder.length() > 0)
+		builder.append(", ");
+
+	    builder.append(responsible.getPresentationString());
 
 	}
 	return builder.toString();
     }
 
     public List<FileNode> getFiles() {
-
 	return getFilesFromDir(getProtocolDir());
-
     }
 
     private List<FileNode> getFilesFromDir(DirNode node) {

@@ -38,6 +38,7 @@ class ProtocolFile {
 
 class ProtocolResponsible {
 	ProtocolResponsibleType type;
+	Strings positionList;
 }
 
 class ProtocolAuthorizationGroup {

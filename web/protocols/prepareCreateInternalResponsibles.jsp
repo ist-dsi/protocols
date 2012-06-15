@@ -89,6 +89,29 @@
 
 </div>
 
+<br />
+
+<div class="infobox" align="center">
+	<p class="dinline"><strong><bean:message key="label.protocols.addPosition" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+
+<div align="center">
+<fr:edit name="protocolBean">
+<fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
+	<fr:slot name="newPosition" key="label.position" bundle="PROTOCOLS_RESOURCES"/>
+</fr:schema>
+	<fr:layout name="tabular">
+		<fr:property name="classes" value="tstyle2"/>
+	</fr:layout>
+</fr:edit>
+
+<html:submit bundle="PROPERTIES_RESOURCES" property="insertPosition">
+	<bean:message key="button.addPosition" bundle="PROTOCOLS_RESOURCES" />
+</html:submit>
+
+</div>
+
+
 </td>
 
 <td width="50%" valign="top">
@@ -104,6 +127,32 @@
         <fr:property name="columnClasses" value="width10em,,tderror1"/>
 	</fr:layout>
 </fr:view>
+
+<br />
+<br />
+
+<logic:equal name="responsible" property="positions.empty" value="false">
+
+<table>
+	<tr>
+		<th>
+			<bean:message key="label.protocols.positions" bundle="PROTOCOLS_RESOURCES"/>
+		</th>
+	</tr>
+	<logic:iterate id="value" name="responsible" property="positions.unmodifiableList">
+		<tr>
+			<td>
+				<bean:write name="value" bundle="PROTOCOLS_RESOURCES"/>
+			</td>
+		</tr>
+	</logic:iterate>
+</table>
+
+<html:submit bundle="PROPERTIES_RESOURCES" property="removePositions">
+	<bean:message key="button.removePositions" bundle="PROTOCOLS_RESOURCES" />
+</html:submit>
+
+</logic:equal>
 
 <br />
 <br />

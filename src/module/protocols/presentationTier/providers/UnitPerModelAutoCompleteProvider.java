@@ -17,26 +17,20 @@ import module.protocols.domain.ProtocolManager;
 public class UnitPerModelAutoCompleteProvider extends UnitAutoCompleteProvider {
 
     @Override
-    protected Set<Party> getParties(Map<String, String> argsMap, String value) {
+    protected Set<? extends Party> getParties(Map<String, String> argsMap, String value) {
 
 	try {
-
 	    String model = argsMap.get("model");
 
 	    if (model.equals("internal")) {
-
-		return ProtocolManager.getInstance().getInternalOrganizationalModel().getPartiesSet();
-
-	    } else if (model.equals("external")) {
-
-		return ProtocolManager.getInstance().getExternalOrganizationalModel().getPartiesSet();
-
-	    } else {
+		return ProtocolManager.getInstance().getInternalOrganizationalModel().getAllUnits();
+	    } else if (model.equals("external"))
+		return ProtocolManager.getInstance().getExternalOrganizationalModel().getAllUnits();
+	    else
 		return super.getParties(argsMap, value);
-	    }
+
 	} catch (Exception e) {
 	    return super.getParties(argsMap, value);
-
 	}
 
     }

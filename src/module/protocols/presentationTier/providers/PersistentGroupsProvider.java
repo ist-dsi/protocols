@@ -5,7 +5,9 @@ package module.protocols.presentationTier.providers;
 
 import module.protocols.domain.ProtocolAdministrativeGroup;
 import myorg.domain.MyOrg;
+import myorg.domain.groups.IntersectionGroup;
 import myorg.domain.groups.PersistentGroup;
+import myorg.domain.groups.SingleUserGroup;
 import myorg.domain.groups.UnionGroup;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -30,13 +32,8 @@ public class PersistentGroupsProvider implements DataProvider {
 
 	    @Override
 	    public boolean apply(PersistentGroup group) {
-		if (group instanceof ProtocolAdministrativeGroup)
-		    return false;
-
-		if (group instanceof UnionGroup)
-		    return false;
-
-		return true;
+		return !(group instanceof ProtocolAdministrativeGroup || group instanceof UnionGroup
+			|| group instanceof IntersectionGroup || group instanceof SingleUserGroup);
 	    }
 	});
     }

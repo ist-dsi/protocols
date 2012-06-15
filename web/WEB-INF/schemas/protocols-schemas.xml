@@ -32,11 +32,7 @@
 	<slot name="unit.partyName" key="label.protocols.unit" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
 		<property name="label" value="-"/>
 	</slot>
-	<slot name="people" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES">
-		<property name="eachSchema" value="show.protocol.peopleList"/>
-		<property name="eachLayout" value="values"/>
-		<property name="classes" value="no-bullets"/>
-	</slot>
+	<slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" />
 </schema>
 
 <schema name="show.protocol.peopleList" type="module.organization.domain.Person">

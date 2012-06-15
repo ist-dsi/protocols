@@ -7,6 +7,7 @@ package module.protocols.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -27,6 +28,8 @@ import myorg.domain.groups.PersistentGroup;
 
 import org.joda.time.LocalDate;
 
+import pt.utl.ist.fenix.tools.util.Strings;
+
 public class ProtocolCreationBean implements Serializable {
 
     /**
@@ -43,30 +46,32 @@ public class ProtocolCreationBean implements Serializable {
 
 	private final Unit unit;
 
-	private final List<Person> responsibles;
+	private final Set<Person> responsibles;
+
+	private Strings positions;
 
 	private final ProtocolResponsible protocolResponsible;
-
-	private Person personToRemove;
 
 	public ProtocolResponsibleBean(ProtocolResponsible responsible) {
 	    this.protocolResponsible = responsible;
 	    this.unit = responsible.getUnit();
-	    this.responsibles = new ArrayList<Person>(responsible.getPeople());
+	    this.responsibles = new HashSet<Person>(responsible.getPeople());
+	    this.positions = responsible.getPositionList() == null ? new Strings(new String[0]) : responsible.getPositionList();
 	}
 
 	public ProtocolResponsibleBean(Unit unit) {
 	    super();
 	    this.unit = unit;
-	    this.responsibles = new ArrayList<Person>();
+	    this.responsibles = new HashSet<Person>();
 	    this.protocolResponsible = null;
+	    this.positions = new Strings(new String[0]);
 	}
 
 	public Unit getUnit() {
 	    return unit;
 	}
 
-	public List<Person> getResponsibles() {
+	public Set<Person> getResponsibles() {
 	    return responsibles;
 	}
 
@@ -75,8 +80,17 @@ public class ProtocolCreationBean implements Serializable {
 		responsibles.add(responsible);
 	}
 
+	public Strings getPositions() {
+	    return positions;
+	}
+
+	public void addPosition(String position) {
+	    if (positions != null && !positions.contains(position))
+		positions = new Strings(positions, position);
+	}
+
 	public boolean check() {
-	    return unit != null && responsibles.size() > 0;
+	    return unit != null && (!responsibles.isEmpty() || !positions.isEmpty());
 	}
 
 	/**
@@ -86,14 +100,6 @@ public class ProtocolCreationBean implements Serializable {
 	    responsibles.remove(newPerson);
 	}
 
-	public Person getPersonToRemove() {
-	    return personToRemove;
-	}
-
-	public void setPersonToRemove(Person personToRemove) {
-	    this.personToRemove = personToRemove;
-	}
-
 	public ProtocolResponsible getProtocolResponsible() {
 	    return protocolResponsible;
 	}
@@ -101,6 +107,13 @@ public class ProtocolCreationBean implements Serializable {
 	@Override
 	public int compareTo(ProtocolResponsibleBean o) {
 	    return Unit.COMPARATOR_BY_PRESENTATION_NAME.compare(this.unit, o.getUnit());
+	}
+
+	/**
+	 * 
+	 */
+	public void removePositions() {
+	    positions = new Strings(new String[0]);
 	}
     }
 
@@ -135,6 +148,8 @@ public class ProtocolCreationBean implements Serializable {
     private Unit newUnit;
 
     private Person newPerson;
+
+    private String newPosition;
 
     /*
      * Step 3
@@ -348,6 +363,14 @@ public class ProtocolCreationBean implements Serializable {
 
     public void setNewPerson(Person newPerson) {
 	this.newPerson = newPerson;
+    }
+
+    public String getNewPosition() {
+	return newPosition;
+    }
+
+    public void setNewPosition(String newPosition) {
+	this.newPosition = newPosition;
     }
 
     public Person getCreator() {

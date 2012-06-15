@@ -536,9 +536,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	RenderUtils.invalidateViewState();
 	request.setAttribute("protocolBean", protocolBean);
 
-	boolean internal = true;
-
-	internal = beanUpdateLogic(request, protocolBean, internal);
+	boolean internal = beanUpdateLogic(request, protocolBean);
 
 	return forward(request, internal ? "/protocols/prepareEditInternalResponsibles.jsp"
 		: "/protocols/prepareEditExternalResponsibles.jsp");
@@ -664,9 +662,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	RenderUtils.invalidateViewState();
 	request.setAttribute("protocolBean", protocolBean);
 
-	boolean internal = true;
-
-	internal = beanUpdateLogic(request, protocolBean, internal);
+	boolean internal = beanUpdateLogic(request, protocolBean);
 
 	return forward(request, internal ? "/protocols/prepareCreateInternalResponsibles.jsp"
 		: "/protocols/prepareCreateExternalResponsibles.jsp");
@@ -676,23 +672,28 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
      * Helper methods
      */
 
-    private boolean beanUpdateLogic(final HttpServletRequest request, ProtocolCreationBean protocolBean, boolean internal) {
+    // Terrible hack
+    private boolean beanUpdateLogic(final HttpServletRequest request, ProtocolCreationBean protocolBean) {
+
+	boolean internal = true;
+
+	Unit unit = null;
+
+	if (request.getParameter("unitOID") != null)
+	    unit = getDomainObject(request, "unitOID");
+
 	if (request.getParameter("insertInternalUnit") != null && protocolBean.getNewUnit() != null) {
 	    protocolBean.addInternalResponsible(new ProtocolResponsibleBean(protocolBean.getNewUnit()));
 	    protocolBean.setNewUnit(null);
 	} else if (request.getParameter("insertPersonInUnit") != null && protocolBean.getNewPerson() != null) {
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
 	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
 	    protocolBean.setNewPerson(null);
 	} else if (request.getParameter("removePersonInUnit") != null && protocolBean.getNewPerson() != null) {
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
 	    protocolBean.getBeanForUnit(unit).removeResponsible(protocolBean.getNewPerson());
 	    protocolBean.setNewPerson(null);
 	} else if (request.getParameter("removeUnit") != null) {
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
 	    protocolBean.removeUnit(unit);
 	} else if (request.getParameter("removeExternalUnit") != null) {
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
 	    protocolBean.removeUnit(unit);
 	    internal = false;
 	} else if (request.getParameter("insertExternalUnit") != null) {
@@ -700,9 +701,22 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	    protocolBean.setNewUnit(null);
 	    internal = false;
 	} else if (request.getParameter("insertPersonInExternalUnit") != null && protocolBean.getNewPerson() != null) {
-	    Unit unit = Unit.fromExternalId(request.getParameter("unitOID"));
 	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
 	    protocolBean.setNewPerson(null);
+	    internal = false;
+	} else if (request.getParameter("removePositions") != null) {
+	    protocolBean.getBeanForUnit(unit).removePositions();
+	} else if (request.getParameter("removePositionsExternal") != null) {
+	    protocolBean.getBeanForUnit(unit).removePositions();
+	    internal = false;
+	} else if (request.getParameter("insertPosition") != null && protocolBean.getNewPosition() != null
+		&& !protocolBean.getNewPosition().trim().isEmpty()) {
+	    protocolBean.getBeanForUnit(unit).addPosition(protocolBean.getNewPosition());
+	    protocolBean.setNewPosition(null);
+	} else if (request.getParameter("insertExternalPosition") != null && protocolBean.getNewPosition() != null
+		&& !protocolBean.getNewPosition().trim().isEmpty()) {
+	    protocolBean.getBeanForUnit(unit).addPosition(protocolBean.getNewPosition());
+	    protocolBean.setNewPosition(null);
 	    internal = false;
 	}
 	return internal;
