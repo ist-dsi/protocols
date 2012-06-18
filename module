@@ -1,2 +1,2 @@
 name=protocols
-depends=core, organization, fileManagement
+depends=core, organization, fileManagement, geography

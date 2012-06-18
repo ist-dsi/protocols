@@ -96,6 +96,9 @@
 	</slot>
 	<slot name="actives"	key="label.protocol.actives" bundle="PROTOCOLS_RESOURCES" layout="option-select"/>
 	<slot name="inactives"	key="label.protocol.inactives" bundle="PROTOCOLS_RESOURCES" layout="option-select"/>
+	<slot name="nationalityType" key="label.protocols.country" bundle="PROTOCOLS_RESOURCES" layout="radio-postback">
+		<property name="destination" value="searchProtocols"/>
+	</slot>
 </schema>
 
 <schema name="edit.protocolSearch.actionType" type="module.protocols.dto.ProtocolSearchBean">

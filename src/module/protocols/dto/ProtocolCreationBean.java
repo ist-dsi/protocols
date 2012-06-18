@@ -427,7 +427,9 @@ public class ProtocolCreationBean implements Serializable {
 
     public boolean permissionsCorrectlyDefined() {
 
-	return writers != null && readers != null && readers.size() > 0 && visibilityType != null;
+	return writers != null && visibilityType != null
+		&& (visibilityType == ProtocolVisibilityType.TOTAL || readers != null && readers.size() > 0);
+
     }
 
     public boolean isProtocolNumberValid() {

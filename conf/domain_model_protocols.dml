@@ -22,7 +22,6 @@ class Protocol {
     Boolean renewable;
     String scientificAreas;
     LocalDate signedDate;
-    Boolean national;
     
     ProtocolVisibilityType visibilityType;
 }
@@ -122,6 +121,13 @@ relation ProtocolResponsibleUnit {
 	.module.organization.domain.Unit playsRole unit {
 		multiplicity 1..1;
 	}
+}
+
+relation ProtocolResponsibleCountry {
+	ProtocolResponsible playsRole protocolResponsible {
+		multiplicity *;
+	}
+	.module.geography.domain.Country playsRole country;
 }
 
 

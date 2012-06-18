@@ -32,6 +32,21 @@
 			</fr:layout>
 		</fr:edit>
 
+		<logic:equal name="protocolSearch" property="nationalityType" 
+				value="<%= module.protocols.dto.ProtocolSearchBean.SearchNationalityType.COUNTRY.toString()%>">
+			<fr:edit name="protocolSearch">
+				<fr:schema type="module.protocols.dto.ProtocolSearchBean" bundle="PROTOCOLS_RESOURCES">
+					<fr:slot name="country" key="label.protocols.country" bundle="PROTOCOLS_RESOURCES" layout="menu-select">
+						<fr:property name="providerClass" value="module.geography.presentationTier.provider.CountryProvider"/>
+						<fr:property name="format" value="${name.content}" />
+					</fr:slot>
+				</fr:schema>
+				<fr:layout name="tabular">
+					<fr:property name="classes" value="tstyle5 thlight thright thmiddle mbottom05"/>
+					<fr:property name="columnClasses" value="width100px,width500px,tdclear tderror1"/>
+				</fr:layout>
+			</fr:edit>
+		</logic:equal>
 
 		<fr:edit name="protocolSearch" id="protocolSearch" schema="edit.protocolSearch.actionType">
 			<fr:layout name="tabular">
@@ -74,7 +89,7 @@
 		</table>
 
 		<p class="mbottom15">
-		<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit">
+		<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit" property="search">
 			<bean:message key="button.search" bundle="PROTOCOLS_RESOURCES"/>
 		</html:submit>
 		</p>

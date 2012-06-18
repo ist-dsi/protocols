@@ -7,6 +7,7 @@ import module.fileManagement.domain.AbstractFileNode;
 import module.fileManagement.domain.DirNode;
 import module.fileManagement.domain.Document;
 import module.fileManagement.domain.FileNode;
+import module.geography.domain.Country;
 import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean;
@@ -150,7 +151,6 @@ public class Protocol extends Protocol_Base {
 	this.setScientificAreas(protocolBean.getScientificAreas());
 	this.setProtocolAction(new ProtocolAction(protocolBean.getActionTypes(), protocolBean.getOtherActionTypes()));
 	this.setObservations(protocolBean.getObservations());
-	this.setNational(true);
 
 	if (protocolBean.getRemovedResponsibles() != null) {
 	    for (ProtocolResponsible responsible : protocolBean.getRemovedResponsibles()) {
@@ -292,6 +292,44 @@ public class Protocol extends Protocol_Base {
 
 	new FileNode(getProtocolDir(), document);
 
+    }
+
+    public boolean isNational() {
+	for (ProtocolResponsible responsible : getProtocolResponsible()) {
+	    if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && responsible.getCountry() != null
+		    && responsible.getCountry().equals(Country.getPortugal()))
+		return true;
+	}
+	return false;
+    }
+
+    public boolean isInternational() {
+	for (ProtocolResponsible responsible : getProtocolResponsible()) {
+	    if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && responsible.getCountry() != null
+		    && !responsible.getCountry().equals(Country.getPortugal()))
+		return true;
+	}
+	return false;
+    }
+
+    public boolean hasNationality() {
+	for (ProtocolResponsible responsible : getProtocolResponsible()) {
+	    if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && responsible.getCountry() != null)
+		return true;
+	}
+	return false;
+    }
+
+    public boolean hasPartnerInCountry(Country country) {
+
+	if (country == null)
+	    return true;
+
+	for (ProtocolResponsible responsible : getProtocolResponsible()) {
+	    if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && country.equals(responsible.getCountry()))
+		return true;
+	}
+	return false;
     }
 
 }

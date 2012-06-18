@@ -301,13 +301,13 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	ProtocolSearchBean bean = getRenderedObject();
 
-	if (bean != null) {
+	if (bean != null && request.getParameter("search") != null) {
 
 	    Collection<Protocol> filteredProtocols = Collections2.filter(ProtocolManager.getInstance().getProtocols(), bean);
 
 	    request.setAttribute("searchResults", filteredProtocols);
 
-	} else {
+	} else if (bean == null) {
 	    bean = new ProtocolSearchBean();
 	}
 

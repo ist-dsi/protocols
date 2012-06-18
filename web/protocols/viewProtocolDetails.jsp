@@ -124,7 +124,13 @@
 	<p class="dinline"><strong><bean:message key="label.protocols.internalResponsibles" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 <logic:present name="internalResponsibles">
-<fr:view name="internalResponsibles" schema="show.protocol.responsibles">
+<fr:view name="internalResponsibles">
+	<fr:schema type="module.protocols.domain.ProtocolResponsible" bundle="PROTOCOLS_RESOURCES">
+		<fr:slot name="unit.partyName" key="label.protocols.unit" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+			<fr:property name="label" value="-"/>
+		</fr:slot>
+		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" />
+	</fr:schema>
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2 thlight thright"/>
 		<fr:property name="columnClasses" value="aleft,aleft,,"/>
@@ -141,7 +147,14 @@
 </div>
 
 <logic:present name="externalResponsibles">
-<fr:view name="externalResponsibles" schema="show.protocol.responsibles">
+<fr:view name="externalResponsibles">
+	<fr:schema type="module.protocols.domain.ProtocolResponsible" bundle="PROTOCOLS_RESOURCES">
+		<fr:slot name="unit.partyName" key="label.protocols.unit" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+			<fr:property name="label" value="-"/>
+		</fr:slot>
+		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" />
+		<fr:slot name="countryDescription" key="label.protocols.country" bundle="PROTOCOLS_RESOURCES" />
+	</fr:schema>
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2 thlight thright"/>
 		<fr:property name="columnClasses" value="aleft,aleft,,"/>

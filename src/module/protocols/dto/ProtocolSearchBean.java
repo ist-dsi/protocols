@@ -3,16 +3,19 @@ package module.protocols.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import module.geography.domain.Country;
 import module.protocols.domain.Protocol;
 import module.protocols.domain.ProtocolHistory;
 import module.protocols.domain.util.ProtocolActionType;
 import myorg.applicationTier.Authenticate;
+import myorg.util.BundleUtil;
 import myorg.util.IntervalTools;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
 import pt.utl.ist.fenix.tools.util.StringNormalizer;
 
 import com.google.common.base.Predicate;
@@ -24,6 +27,16 @@ import com.google.common.base.Predicate;
 public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 
     private static final long serialVersionUID = 2466817555993209410L;
+
+    public static enum SearchNationalityType implements IPresentableEnum {
+	NATIONAL, INTERNATIONAL, WITHOUT_NATIONALITY, COUNTRY;
+
+	@Override
+	public String getLocalizedName() {
+	    return BundleUtil
+		    .getStringFromResourceBundle("resources/ProtocolsResources", "label.searchNationalityType." + name());
+	}
+    }
 
     /*
      * Boring bean stuff
@@ -58,6 +71,10 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
     private boolean national = true;
 
     private boolean international;
+
+    private Country country;
+
+    private SearchNationalityType nationalityType;
 
     public ProtocolSearchBean() {
 	super();
@@ -176,6 +193,22 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 	this.national = national;
     }
 
+    public Country getCountry() {
+	return country;
+    }
+
+    public void setCountry(Country country) {
+	this.country = country;
+    }
+
+    public SearchNationalityType getNationalityType() {
+	return nationalityType;
+    }
+
+    public void setNationalityType(SearchNationalityType nationalityType) {
+	this.nationalityType = nationalityType;
+    }
+
     public boolean isInternational() {
 	return international;
     }
@@ -234,12 +267,19 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 
     private boolean satisfiedNationality(Protocol protocol) {
 
-	if (isNational()) {
-	    return protocol.getNational();
-	}
+	if (nationalityType == null)
+	    return true;
 
-	if (isInternational())
-	    return !protocol.getNational();
+	switch (nationalityType) {
+	case NATIONAL:
+	    return protocol.isNational();
+	case INTERNATIONAL:
+	    return protocol.isInternational();
+	case WITHOUT_NATIONALITY:
+	    return !protocol.hasNationality();
+	case COUNTRY:
+	    return protocol.hasPartnerInCountry(country);
+	}
 
 	return false;
     }
