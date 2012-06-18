@@ -1,5 +1,5 @@
 <%@page import="pt.ist.vaadinframework.fragment.FragmentQuery"%>
-<%@page import="module.fileManagement.presentationTier.pages.DocumentHome"%>
+<%@page import="module.fileManagement.presentationTier.pages.DocumentBrowse"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -32,11 +32,23 @@
 <tr>
 <td width="50%" valign="top">
 
-<div class="infobox">
+<div class="infobox" align="center">
 	<p class="dinline"><strong><bean:message key="label.protocols.data" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 	
-<fr:view name="protocol" schema="show.protocol.data">
+<fr:view name="protocol">
+	<fr:schema type="module.protocols.domain.Protocol" bundle="PROTOCOLS_RESOURCES">
+		<fr:slot name="protocolNumber"	key="label.protocols.number" bundle="PROTOCOLS_RESOURCES"/>
+		<fr:slot name="signedDate" key="label.protocols.signedDate" bundle="PROTOCOLS_RESOURCES"/>
+		<fr:slot name="currentAndFutureProtocolHistories" key="label.protocols.actualDates" bundle="PROTOCOLS_RESOURCES">
+			<fr:property name="eachSchema" value="show.protocolHistories.toList"/>
+			<fr:property name="eachLayout" value="flow"/>
+		</fr:slot>
+		<fr:slot name="scientificAreas" key="label.protocols.scientificAreas" bundle="PROTOCOLS_RESOURCES"/>
+	 	<fr:slot name="protocolAction.protocolActionTypes" key="label.protocol.actionTypes" layout="list" bundle="PROTOCOLS_RESOURCES"/>
+		<fr:slot name="protocolAction.otherTypes" key="label.protocol.otherActionTypes" bundle="PROTOCOLS_RESOURCES"/>
+		<fr:slot name="observations" key="label.protocols.observations" bundle="PROTOCOLS_RESOURCES"/>
+	</fr:schema>
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2 thlight thright"/>
 		<fr:property name="columnClasses" value="aleft,aleft,,"/>
@@ -55,7 +67,7 @@
 <table width="100%">
 <logic:iterate id="file" name="protocolFiles">
 	<tr>
-	<td width="70%">
+	<td width="70%" style="padding-left:20px">
 	<bean:define id="url" type="java.lang.String" name="file" property="fileURL"/>
 	<a href="<%= url %>"><bean:write name="file" property="file.document.lastVersionedFile.filename"/></a>
 	<br />
@@ -63,7 +75,7 @@
 	<td>
 	<logic:equal value="true" name="canBeWritten">
 		<bean:define id="fileOID" type="java.lang.Long" name="file" property="file.OID"/>
-		<html:link page="<%= "/protocols.do?method=removeProtocolFile&protocol=" + OID + "&file=" + fileOID %>">
+		<html:link page="<%= "/protocols.do?method=removeProtocolFile&protocol=" + OID + "&file=" + fileOID %>" target="_blank">
 		<bean:message key="label.remove" bundle="MYORG_RESOURCES" />
 		</html:link>
 	</logic:equal>
@@ -92,7 +104,7 @@
 <br />
 
 <bean:define id="dirOID" name="protocol" property="protocolDir.OID"/>
-<html:link page="<%="/vaadinContext.do?method=forwardToVaadin#" + new pt.ist.vaadinframework.fragment.FragmentQuery(DocumentHome.class).getQueryString() + "?contextPath=" + dirOID %>">
+<html:link page="<%="/vaadinContext.do?method=forwardToVaadin#" + new pt.ist.vaadinframework.fragment.FragmentQuery(DocumentBrowse.class).getQueryString() + "?contextPath=" + dirOID %>">
 <bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/>
 </html:link>
 
@@ -120,7 +132,7 @@
 
 <td width="50%" valign="top">
 
-<div class="infobox">
+<div class="infobox" align="center">
 	<p class="dinline"><strong><bean:message key="label.protocols.internalResponsibles" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 <logic:present name="internalResponsibles">
@@ -132,7 +144,7 @@
 		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" />
 	</fr:schema>
 	<fr:layout name="tabular">
-		<fr:property name="classes" value="tstyle2 thlight thright"/>
+		<fr:property name="classes" value="tstyle2"/>
 		<fr:property name="columnClasses" value="aleft,aleft,,"/>
 	</fr:layout>
 </fr:view>
@@ -142,7 +154,7 @@
 
 <td width="50%" valign="top">
 
-<div class="infobox">
+<div class="infobox" align="center">
 	<p class="dinline"><strong><bean:message key="label.protocols.externalResponsibles" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
@@ -156,7 +168,7 @@
 		<fr:slot name="countryDescription" key="label.protocols.country" bundle="PROTOCOLS_RESOURCES" />
 	</fr:schema>
 	<fr:layout name="tabular">
-		<fr:property name="classes" value="tstyle2 thlight thright"/>
+		<fr:property name="classes" value="tstyle2"/>
 		<fr:property name="columnClasses" value="aleft,aleft,,"/>
 	</fr:layout>
 </fr:view>
