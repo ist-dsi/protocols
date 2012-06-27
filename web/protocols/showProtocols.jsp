@@ -14,7 +14,7 @@
 	<fr:view name="protocols" schema="show.protocol.toList" >
 		<fr:layout name="tabular">
 			<fr:property name="classes" value="tstyle2"/>
-			<fr:property name="columnClasses" value="acenter,aleft,,aleft"/>
+			<fr:property name="columnClasses" value="acenter,width165px aleft,acenter,,,aleft"/>
 			<fr:property name="link(show)" value="/protocols.do?method=viewProtocolDetails" />
 			<fr:property name="key(show)" value="link.protocols.viewDetails" />
 			<fr:property name="param(show)" value="OID" />

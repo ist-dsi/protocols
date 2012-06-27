@@ -14,7 +14,9 @@
 
 <schema name="show.protocol.toList"	type="module.protocols.domain.Protocol">
 	<slot name="protocolNumber" key="label.protocols.number" bundle="PROTOCOLS_RESOURCES"/>
-	<slot name="currentProtocolHistory" key="label.protocols.actualDates" bundle="PROTOCOLS_RESOURCES" schema="show.protocolHistories.toList" layout="flow"/>
+	<slot name="currentProtocolHistory" key="label.protocols.actualDates" bundle="PROTOCOLS_RESOURCES" schema="show.protocolHistories.toList" layout="flow">
+		<property name="eachInline" value="false" />
+	</slot>
 	<slot name="partners" key="label.protocols.partnerUnits" bundle="PROTOCOLS_RESOURCES" />
 	<slot name="allResponsibles" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES"/>
 </schema>

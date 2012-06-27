@@ -186,9 +186,12 @@ public class Protocol extends Protocol_Base {
 	for (PersistentGroup group : getReaderGroups())
 	    removeReaderGroups(group);
 
+	// Reader groups must be stored to allow edition...
 	for (PersistentGroup group : protocolBean.getReaders())
 	    addReaderGroups(group);
 
+	// ... although this will be the actual group to be used, for
+	// performance reasons...
 	this.setAllowedToRead(ProtocolManager.createReaderGroup(protocolBean.getReaders()));
 
 	this.setWriterGroup(protocolBean.getWriters());
@@ -206,19 +209,23 @@ public class Protocol extends Protocol_Base {
 	    new ProtocolHistory(this, protocolBean.getBeginDate(), protocolBean.getEndDate());
 	}
 
-	PersistentGroup fileReaderGroup = protocolBean.getVisibilityType() == ProtocolVisibilityType.TOTAL ? AnyoneGroup
-		.getInstance() : getAllowedToRead();
+	generateProtocolDir();
 
-	ProtocolDirNode dir = getProtocolDir();
+    }
+
+    public void generateProtocolDir() {
+	PersistentGroup fileReaderGroup = this.getVisibilityType() == ProtocolVisibilityType.TOTAL ? AnyoneGroup.getInstance()
+		: this.getAllowedToRead();
+
+	ProtocolDirNode dir = this.getProtocolDir();
 
 	if (dir != null) {
-	    dir.setName(protocolBean.getProtocolNumber());
+	    dir.setName(this.getProtocolNumber());
 	    dir.setReadGroup(fileReaderGroup);
-	    dir.setWriters(protocolBean.getWriters());
+	    dir.setWriters(this.getWriterGroup());
 	} else {
-	    this.setProtocolDir(new ProtocolDirNode(protocolBean.getWriters(), protocolBean.getProtocolNumber(), fileReaderGroup));
+	    this.setProtocolDir(new ProtocolDirNode(this.getWriterGroup(), this.getProtocolNumber(), fileReaderGroup));
 	}
-
     }
 
     public boolean canBeReadByUser(final User user) {
@@ -257,7 +264,9 @@ public class Protocol extends Protocol_Base {
 	StringBuilder builder = new StringBuilder();
 	for (ProtocolResponsible responsible : getProtocolResponsible()) {
 
-	    if (builder.length() > 0)
+	    String responsibleStr = responsible.getPresentationString();
+
+	    if (builder.length() > 0 && !responsibleStr.isEmpty())
 		builder.append(", ");
 
 	    builder.append(responsible.getPresentationString());
