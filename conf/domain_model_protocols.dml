@@ -32,9 +32,6 @@ class ProtocolHistory {
 	LocalDate endDate;
 }
 
-class ProtocolFile {
-}
-
 class ProtocolResponsible {
 	ProtocolResponsibleType type;
 	Strings positionList;
@@ -128,14 +125,6 @@ relation ProtocolResponsibleCountry {
 		multiplicity *;
 	}
 	.module.geography.domain.Country playsRole country;
-}
-
-
-relation ProtocolFileProtocol {
-	Protocol playsRole protocol;
-	ProtocolFile playsRole protocolFiles {
-		multiplicity *;
-	}
 }
 
 relation ProtocolHistoryProtocol {

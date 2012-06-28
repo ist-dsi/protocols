@@ -141,8 +141,11 @@
 		<fr:slot name="unit.partyName" key="label.protocols.unit" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
 			<fr:property name="label" value="-"/>
 		</fr:slot>
-		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" />
-	</fr:schema>
+		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+			<fr:property name="label" value="label.protocols.noResponsibles" />
+			<fr:property name="key" value="true" />
+			<fr:property name="bundle" value="PROTOCOLS_RESOURCES"/>
+		</fr:slot>	</fr:schema>
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2"/>
 		<fr:property name="columnClasses" value="aleft,aleft,,"/>
@@ -164,7 +167,11 @@
 		<fr:slot name="unit.partyName" key="label.protocols.unit" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
 			<fr:property name="label" value="-"/>
 		</fr:slot>
-		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" />
+		<fr:slot name="presentationString" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+			<fr:property name="label" value="label.protocols.noResponsibles" />
+			<fr:property name="key" value="true" />
+			<fr:property name="bundle" value="PROTOCOLS_RESOURCES"/>
+		</fr:slot>
 		<fr:slot name="countryDescription" key="label.protocols.country" bundle="PROTOCOLS_RESOURCES" />
 	</fr:schema>
 	<fr:layout name="tabular">

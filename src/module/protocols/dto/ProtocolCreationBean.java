@@ -90,7 +90,7 @@ public class ProtocolCreationBean implements Serializable {
 	}
 
 	public boolean check() {
-	    return unit != null && (!responsibles.isEmpty() || !positions.isEmpty());
+	    return unit != null;
 	}
 
 	/**
