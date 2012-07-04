@@ -35,7 +35,32 @@
 
 <br />
 
+<script type="text/javascript">
 
+function removeUnitFunction(formId) {
+	if(confirm("Tem a certeza que pretende remover a unidade?")) {
+		document.forms[formId].innerHTML = document.forms[formId].innerHTML + "<input type=\"hidden\" name=\"removeUnit\" value='removeUnit'>";
+		document.forms[formId].submit();
+	}
+}
+
+function removePositionFunction(formId, position) {
+	if(confirm("Tem a certeza que pretende remover o cargo?")) {
+		document.forms[formId].innerHTML = document.forms[formId].innerHTML + "<input type=\"hidden\" name=\"removePosition\" value='removePosition'>"+
+		"<input type=\"hidden\" name=\"position\" value='" + position + "'>";
+		document.forms[formId].submit();
+	}
+}
+
+function removePersonFunction(formId, personId) {
+	if(confirm("Tem a certeza que pretende remover a pessoa seleccionada?")) {
+		document.forms[formId].innerHTML = document.forms[formId].innerHTML + "<input type=\"hidden\" name=\"removePersonInUnit\" value='removePersonInUnit'>" +
+		"<input type=\"hidden\" name=\"personOID\" value='" + personId + "'>";
+		document.forms[formId].submit();
+	}
+}
+
+</script>
 
 
 <p>
@@ -44,19 +69,20 @@
 
 <logic:iterate id="responsible" name="protocolBean" property="internalResponsibles">
 
-<fr:form action="/protocols.do?method=updateBean">
+<bean:define id="unitOID" type="java.lang.Long" name="responsible" property="unit.OID"/>
+
+<fr:form action="/protocols.do?method=updateBean" id="<%= unitOID.toString() %>">
 
 <fr:edit id="protocolBean" name="protocolBean" visible="false" />
 
-<bean:define id="unitOID" type="java.lang.Long" name="responsible" property="unit.OID"/>
-
 <html:hidden bundle="HTMLALT_RESOURCES" name="protocolsForm" property="unitOID" value="<%= unitOID.toString() %>"/>
 
-<table width="100%" class="tstyle3">
+<table width="100%" class="tstyle3" style="position:relative;">
 <tr>
 <th colspan="2">
 <bean:write name="responsible" property="unit.presentationName"/>
 
+<img src="images/delet.png" style="position:absolute; right: 5px; top: 8px" onClick="<%= "removeUnitFunction('" + unitOID.toString() + "');"%>"/>
 </th>
 </tr>
 <tr>
@@ -67,7 +93,7 @@
 	<p class="dinline"><strong><bean:message key="label.protocols.addResponsible" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<div align="center">
+<div align="left">
 <fr:edit name="protocolBean">
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
 	<fr:slot name="newPerson" layout="autoComplete" key="label.person" bundle="ORGANIZATION_RESOURCES">
@@ -75,14 +101,13 @@
 		<fr:property name="format" value="${presentationName}"/>
 		<fr:property name="minChars" value="2"/>
 		<fr:property name="args" value="<%="provider=module.protocols.presentationTier.providers.PeoplePerUnitAutoCompleteProvider,unit=" + unitOID %>"/>
-		<fr:property name="size" value="40"/>
+		<fr:property name="size" value="50"/>
 	</fr:slot>
 </fr:schema>	
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2"/>
 	</fr:layout>
 </fr:edit>
-
 <html:submit bundle="PROPERTIES_RESOURCES" property="insertPersonInUnit">
 	<bean:message key="button.insertPerson" bundle="PROTOCOLS_RESOURCES" />
 </html:submit>
@@ -91,14 +116,50 @@
 
 <br />
 
+<div align="center">
+
+<logic:notEmpty name="responsible" property="responsibles">
+
+<table width="100%">
+	<tr>
+		<th colspan="2">
+			<bean:message key="label.protocols.responsiblesInUnit" bundle="PROTOCOLS_RESOURCES"/>
+		</th>
+	</tr>
+	<logic:iterate id="value" name="responsible" property="responsibles">
+	
+		<bean:define id="oid" name="value" property="OID" />
+	
+		<tr>
+			<td style="text-align: left">
+				<bean:write name="value" property="presentationName" bundle="PROTOCOLS_RESOURCES"/> 
+			</td>
+			<td width="16px">
+				<img src="images/delet.png" style="margin-top: 3px" onClick="<%= "removePersonFunction('" + unitOID.toString() + "', '" + oid  +"');"%>"/>
+			</td>
+		</tr>
+	</logic:iterate>
+</table>
+
+</logic:notEmpty>
+
+</div>
+
+
+</td>
+
+<td width="50%" valign="top">
+
 <div class="infobox" align="center">
 	<p class="dinline"><strong><bean:message key="label.protocols.addPosition" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<div align="center">
+<div align="left">
 <fr:edit name="protocolBean">
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
-	<fr:slot name="newPosition" key="label.position" bundle="PROTOCOLS_RESOURCES"/>
+	<fr:slot name="newPosition" key="label.position" bundle="PROTOCOLS_RESOURCES">
+		<fr:property name="size" value="50"/>
+	</fr:slot>
 </fr:schema>
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2"/>
@@ -112,54 +173,37 @@
 </div>
 
 
-</td>
-
-<td width="50%" valign="top">
-
 <div align="center">
 
-<fr:view name="responsible" property="responsibles">
-	<fr:schema type="module.organization.domain.Person" bundle="PROTOCOLS_RESOURCES">
-		<fr:slot name="presentationName" key="label.protocols.responsiblesInUnit" bundle="PROTOCOLS_RESOURCES"/>
-	</fr:schema>
-	<fr:layout name="tabular">
-		<fr:property name="classes" value="tstyle3 mvert05 "/>
-        <fr:property name="columnClasses" value="width10em,,tderror1"/>
-	</fr:layout>
-</fr:view>
-
-<br />
 <br />
 
 <logic:equal name="responsible" property="positions.empty" value="false">
 
-<table>
+<table width="100%">
 	<tr>
-		<th>
+		<th colspan="2">
 			<bean:message key="label.protocols.positions" bundle="PROTOCOLS_RESOURCES"/>
 		</th>
 	</tr>
+	
 	<logic:iterate id="value" name="responsible" property="positions.unmodifiableList">
+		
 		<tr>
-			<td>
-				<bean:write name="value" bundle="PROTOCOLS_RESOURCES"/>
+			<td style="text-align: left">
+				<bean:write name="value" bundle="PROTOCOLS_RESOURCES"/> 
+			</td>
+			<td width="16px">
+				<img src="images/delet.png" style="margin-top: 3px" onClick="<%= "removePositionFunction('" + unitOID.toString() + "', '" + value  +"');"%>"/>
 			</td>
 		</tr>
 	</logic:iterate>
+	
 </table>
-
-<html:submit bundle="PROPERTIES_RESOURCES" property="removePositions">
-	<bean:message key="button.removePositions" bundle="PROTOCOLS_RESOURCES" />
-</html:submit>
 
 </logic:equal>
 
 <br />
 <br />
-
-<html:submit bundle="PROPERTIES_RESOURCES" property="removeUnit">
-	<bean:message key="button.removeUnit" bundle="PROTOCOLS_RESOURCES" />
-</html:submit>
 
 </div>
 
@@ -222,7 +266,7 @@
 	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.back" property="back">
 		<bean:message key="submit.back" bundle="PROTOCOLS_RESOURCES" />
 	</html:submit>
-	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit">
+	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit" style="align: right">
 		<bean:message key="submit.next" bundle="PROTOCOLS_RESOURCES" />
 	</html:submit>
 </p>

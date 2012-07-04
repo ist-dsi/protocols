@@ -25,7 +25,12 @@ public class PeoplePerUnitAutoCompleteProvider extends PersonAutoCompleteProvide
 
 	    Unit unit = Unit.fromExternalId(unitOID);
 
-	    return unit.getChildPersons();
+	    Collection<Person> people = unit.getChildPersons();
+
+	    if (people.size() == 0)
+		return super.getPersons(argsMap, value);
+	    else
+		return people;
 
 	} catch (Exception e) {
 	    return super.getPersons(argsMap, value);

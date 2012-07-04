@@ -30,6 +30,9 @@ import org.joda.time.LocalDate;
 
 import pt.utl.ist.fenix.tools.util.Strings;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+
 public class ProtocolCreationBean implements Serializable {
 
     /**
@@ -114,6 +117,17 @@ public class ProtocolCreationBean implements Serializable {
 	 */
 	public void removePositions() {
 	    positions = new Strings(new String[0]);
+	}
+
+	public void removePosition(final String string) {
+	    positions = new Strings(Collections2.filter(positions.getUnmodifiableList(), new Predicate<String>() {
+
+		@Override
+		public boolean apply(String str) {
+		    return !str.equals(string);
+		}
+
+	    }));
 	}
     }
 

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import module.fileManagement.domain.ContextPath;
 import module.fileManagement.domain.FileNode;
+import module.organization.domain.Person;
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
 import module.protocols.domain.ProtocolAuthorizationGroup;
@@ -688,9 +689,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	} else if (request.getParameter("insertPersonInUnit") != null && protocolBean.getNewPerson() != null) {
 	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
 	    protocolBean.setNewPerson(null);
-	} else if (request.getParameter("removePersonInUnit") != null && protocolBean.getNewPerson() != null) {
-	    protocolBean.getBeanForUnit(unit).removeResponsible(protocolBean.getNewPerson());
+	} else if (request.getParameter("removePersonInUnit") != null) {
+	    Person person = getDomainObject(request, "personOID");
+	    protocolBean.getBeanForUnit(unit).removeResponsible(person);
 	    protocolBean.setNewPerson(null);
+	} else if (request.getParameter("removePersonInExternalUnit") != null) {
+	    Person person = getDomainObject(request, "personOID");
+	    protocolBean.getBeanForUnit(unit).removeResponsible(person);
+	    protocolBean.setNewPerson(null);
+	    internal = false;
 	} else if (request.getParameter("removeUnit") != null) {
 	    protocolBean.removeUnit(unit);
 	} else if (request.getParameter("removeExternalUnit") != null) {
@@ -703,6 +710,11 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	} else if (request.getParameter("insertPersonInExternalUnit") != null && protocolBean.getNewPerson() != null) {
 	    protocolBean.getBeanForUnit(unit).addResponsible(protocolBean.getNewPerson());
 	    protocolBean.setNewPerson(null);
+	    internal = false;
+	} else if (request.getParameter("removePosition") != null) {
+	    protocolBean.getBeanForUnit(unit).removePosition(request.getParameter("position"));
+	} else if (request.getParameter("removePositionExternal") != null) {
+	    protocolBean.getBeanForUnit(unit).removePosition(request.getParameter("position"));
 	    internal = false;
 	} else if (request.getParameter("removePositions") != null) {
 	    protocolBean.getBeanForUnit(unit).removePositions();
