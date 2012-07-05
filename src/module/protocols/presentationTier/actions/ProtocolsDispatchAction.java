@@ -134,7 +134,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 		if (!protocol.isActive())
 		    return false;
 		LocalDate endDate = protocol.getLastProtocolHistory().getEndDate();
-		return endDate == null ? false : endDate.minusMonths(1).isBefore(new LocalDate());
+		return endDate == null ? false : endDate.isBefore(new LocalDate().plusMonths(2).withDayOfMonth(1).minusDays(1));
 	    }
 	});
 

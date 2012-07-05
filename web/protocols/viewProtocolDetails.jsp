@@ -75,7 +75,7 @@
 	<td>
 	<logic:equal value="true" name="canBeWritten">
 		<bean:define id="fileOID" type="java.lang.Long" name="file" property="file.OID"/>
-		<html:link page="<%= "/protocols.do?method=removeProtocolFile&protocol=" + OID + "&file=" + fileOID %>" target="_blank">
+		<html:link page="<%= "/protocols.do?method=removeProtocolFile&protocol=" + OID + "&file=" + fileOID %>">
 		<bean:message key="label.remove" bundle="MYORG_RESOURCES" />
 		</html:link>
 	</logic:equal>
@@ -104,7 +104,8 @@
 <br />
 
 <bean:define id="dirOID" name="protocol" property="protocolDir.OID"/>
-<html:link page="<%="/vaadinContext.do?method=forwardToVaadin#" + new pt.ist.vaadinframework.fragment.FragmentQuery(DocumentBrowse.class).getQueryString() + "?contextPath=" + dirOID %>">
+<html:link page="<%="/vaadinContext.do?method=forwardToVaadin#" + 
+	new pt.ist.vaadinframework.fragment.FragmentQuery(DocumentBrowse.class).getQueryString() + "?contextPath=" + dirOID + "&now=" + (new java.util.Date()).getTime() %>" target="_blank">
 <bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/>
 </html:link>
 
