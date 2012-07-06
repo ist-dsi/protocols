@@ -16,6 +16,7 @@ import myorg.domain.User;
 import myorg.domain.exceptions.DomainException;
 import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
+import myorg.domain.groups.UnionGroup;
 import myorg.util.BundleUtil;
 
 import org.joda.time.LocalDate;
@@ -46,6 +47,7 @@ public class Protocol extends Protocol_Base {
 
     public Protocol() {
 	super();
+	super.setAllowedToRead(new UnionGroup(ProtocolManager.getInstance().getAdministrativeGroup()));
 	setProtocolManager(ProtocolManager.getInstance());
 	setActive(Boolean.TRUE);
     }
@@ -56,6 +58,11 @@ public class Protocol extends Protocol_Base {
 
 	removeProtocolManager();
 	deleteDomainObject();
+    }
+
+    @Override
+    public void setAllowedToRead(UnionGroup group) {
+	throw new RuntimeException("Groups should not be set directly!");
     }
 
     public boolean isActive() {
@@ -186,17 +193,10 @@ public class Protocol extends Protocol_Base {
 	for (PersistentGroup group : getReaderGroups())
 	    removeReaderGroups(group);
 
-	// Reader groups must be stored to allow edition...
 	for (PersistentGroup group : protocolBean.getReaders())
 	    addReaderGroups(group);
 
-	// ... although this will be the actual group to be used, for
-	// performance reasons...
-	this.setAllowedToRead(ProtocolManager.createReaderGroup(protocolBean.getReaders()));
-
 	this.setWriterGroup(protocolBean.getWriters());
-
-	this.setAllowedToWrite(ProtocolManager.createWriterGroup(protocolBean.getWriters()));
 
 	this.setVisibilityType(protocolBean.getVisibilityType());
 
@@ -211,6 +211,16 @@ public class Protocol extends Protocol_Base {
 
 	generateProtocolDir();
 
+    }
+
+    @Override
+    public void addReaderGroups(PersistentGroup group) {
+	getAllowedToRead().addPersistentGroups(group);
+    }
+
+    @Override
+    public void removeReaderGroups(PersistentGroup group) {
+	getAllowedToRead().removePersistentGroups(group);
     }
 
     public void generateProtocolDir() {
@@ -229,18 +239,19 @@ public class Protocol extends Protocol_Base {
     }
 
     public boolean canBeReadByUser(final User user) {
-	return getVisibilityType() != ProtocolVisibilityType.RESTRICTED || getAllowedToRead().isMember(user);
+	return getVisibilityType() != ProtocolVisibilityType.RESTRICTED || getAllowedToRead().isMember(user)
+		|| canBeWrittenByUser(user);
     }
 
-    public boolean canFilesBeReadByUser(User currentUser) {
+    public boolean canFilesBeReadByUser(User user) {
 
-	return getAllowedToRead().isMember(currentUser) || getVisibilityType() == ProtocolVisibilityType.TOTAL;
-
+	return getVisibilityType() == ProtocolVisibilityType.TOTAL || getAllowedToRead().isMember(user)
+		|| canBeWrittenByUser(user);
     }
 
     public boolean canBeWrittenByUser(final User user) {
-
-	return getAllowedToWrite().isMember(user);
+	return getWriterGroup().getAuthorizedWriterGroup().isMember(user)
+		|| ProtocolManager.getInstance().getAdministrativeGroup().isMember(user);
     }
 
     public String getPartners() {

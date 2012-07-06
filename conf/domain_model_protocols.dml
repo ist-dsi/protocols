@@ -139,17 +139,8 @@ relation ProtocolHistoryProtocol {
 // Access control
 
 relation ProtocolAllowedToReadGroups {
-	Protocol playsRole allowedToReadProtocols {
-		multiplicity *;
-	}
-	.myorg.domain.groups.PersistentGroup playsRole allowedToRead;
-}
-
-relation ProtocolAllowedToWriteGroups {
-	Protocol playsRole allowedToWriteProtocols {
-		multiplicity *;
-	}
-	.myorg.domain.groups.PersistentGroup playsRole allowedToWrite;
+	Protocol playsRole allowedToReadProtocol;
+	.myorg.domain.groups.UnionGroup playsRole allowedToRead;
 }
 
 relation ProtocolAuthorizationGroupProtocol {

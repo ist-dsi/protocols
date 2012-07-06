@@ -1,12 +1,8 @@
 package module.protocols.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jvstm.cps.ConsistencyPredicate;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
 import myorg.domain.MyOrg;
-import myorg.domain.groups.PersistentGroup;
 import myorg.domain.groups.UnionGroup;
 import pt.ist.fenixWebFramework.services.Service;
 
@@ -48,24 +44,6 @@ public class ProtocolManager extends ProtocolManager_Base {
     protected final boolean checkForDifferentOrganizationalModels() {
 	return getInternalOrganizationalModel() == null ? true
 		: getInternalOrganizationalModel() != getExternalOrganizationalModel();
-    }
-
-    public static PersistentGroup createReaderGroup(List<PersistentGroup> groups) {
-
-	PersistentGroup administrativeGroup = getInstance().getAdministrativeGroup();
-
-	List<PersistentGroup> actualGroups = new ArrayList<PersistentGroup>(groups);
-	actualGroups.add(administrativeGroup);
-
-	return UnionGroup.getOrCreateUnionGroup(actualGroups.toArray(new PersistentGroup[0]));
-    }
-
-    public static PersistentGroup createWriterGroup(ProtocolAuthorizationGroup group) {
-
-	ProtocolAdministrativeGroup adminGroup = getInstance().getAdministrativeGroup();
-
-	return UnionGroup.getOrCreateUnionGroup(adminGroup, group.getAuthorizedWriterGroup());
-
     }
 
     /**
