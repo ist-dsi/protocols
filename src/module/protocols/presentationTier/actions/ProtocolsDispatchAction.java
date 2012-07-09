@@ -3,6 +3,7 @@
  */
 package module.protocols.presentationTier.actions;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +53,6 @@ import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Ordering;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -116,7 +116,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 		    }
 		});
 
-	request.setAttribute("protocols", Ordering.from(Protocol.COMPARATOR_BY_SIGNED_DATE).reverse().sortedCopy(protocols));
+	request.setAttribute("protocols", new ArrayList<Protocol>(protocols));
 
 	return forward(request, "/protocols/showProtocols.jsp");
     }
@@ -310,8 +310,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	    Collection<Protocol> filteredProtocols = Collections2.filter(ProtocolManager.getInstance().getProtocols(), bean);
 
-	    request.setAttribute("searchResults",
-		    Ordering.from(Protocol.COMPARATOR_BY_SIGNED_DATE).reverse().sortedCopy(filteredProtocols));
+	    request.setAttribute("searchResults", filteredProtocols);
 
 	} else if (bean == null) {
 	    bean = new ProtocolSearchBean();

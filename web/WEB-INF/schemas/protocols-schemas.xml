@@ -14,8 +14,11 @@
 
 <schema name="show.protocol.toList"	type="module.protocols.domain.Protocol">
 	<slot name="protocolNumber" key="label.protocols.number" bundle="PROTOCOLS_RESOURCES"/>
-	<slot name="currentProtocolHistory" key="label.protocols.actualDates" bundle="PROTOCOLS_RESOURCES" schema="show.protocolHistories.toList" layout="flow">
-		<property name="eachInline" value="false" />
+	<slot name="currentProtocolHistory.beginDate" key="label.protocols.begin" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+		<property name="label" value="-"/>
+	</slot>
+	<slot name="currentProtocolHistory.endDate" key="label.protocols.end" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+		<property name="label" value="-"/>
 	</slot>
 	<slot name="partners" key="label.protocols.partnerUnits" bundle="PROTOCOLS_RESOURCES" />
 	<slot name="allResponsibles" key="label.protocols.responsibles" bundle="PROTOCOLS_RESOURCES"/>
@@ -111,11 +114,10 @@
 	</slot>
 	<slot name="otherProtocolActionTypes" key="label.protocol.otherActionTypes" bundle="PROTOCOLS_RESOURCES"/>
 		
-	<slot name="partnerName" key="label.protocol.partner" layout="autoComplete" bundle="PROTOCOLS_RESOURCES">
+	<slot name="partner" key="label.protocol.partner" layout="autoComplete" bundle="PROTOCOLS_RESOURCES">
 		<property name="size" value="60"/>
-		<property name="labelField" value="unit.name"/>		
-		<property name="rawSlotName" value="partnerNameString"/>		
-		<property name="format" value="${unit.presentationName}"/>
+		<property name="labelField" value="presentationName"/>		
+		<property name="format" value="${presentationName}"/>
 		<property name="indicatorShown" value="true"/>		
 		<property name="args" value="provider=module.protocols.presentationTier.providers.UnitPerModelAutoCompleteProvider,model=external"/>
 		<property name="minChars" value="2"/>

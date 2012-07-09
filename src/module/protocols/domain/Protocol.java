@@ -1,7 +1,6 @@
 package module.protocols.domain;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,30 +47,11 @@ public class Protocol extends Protocol_Base {
 	}
     }
 
-    public static Comparator<Protocol> COMPARATOR_BY_SIGNED_DATE = new Ordering<Protocol>() {
-
-	@Override
-	public int compare(Protocol p1, Protocol p2) {
-
-	    LocalDate one = p1.getSignedDate(), two = p2.getSignedDate();
-
-	    if (one == null ^ two == null) {
-		return (one == null) ? -1 : 1;
-	    }
-
-	    if (one == null && two == null) {
-		return 0;
-	    }
-
-	    return one.compareTo(two);
-	}
-    };
-
     public Protocol() {
 	super();
 	super.setAllowedToRead(new UnionGroup(ProtocolManager.getInstance().getAdministrativeGroup()));
 	setProtocolManager(ProtocolManager.getInstance());
-	super.setProtocolNumber("" + ProtocolManager.getInstance().getNewProtocolNumber());
+	super.setProtocolNumber(new LocalDate().getYear() + "-" + ProtocolManager.getInstance().getNewProtocolNumber());
 	setActive(Boolean.TRUE);
     }
 

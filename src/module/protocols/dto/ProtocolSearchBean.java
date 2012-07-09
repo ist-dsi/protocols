@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import module.geography.domain.Country;
+import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
 import module.protocols.domain.ProtocolHistory;
+import module.protocols.domain.ProtocolResponsible;
 import module.protocols.domain.util.ProtocolActionType;
 import myorg.applicationTier.Authenticate;
 import myorg.util.BundleUtil;
@@ -62,7 +64,7 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 
     private String otherProtocolActionTypes;
 
-    private String partnerNameString;
+    private Unit partner;
 
     private boolean actives;
 
@@ -161,12 +163,12 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 	this.otherProtocolActionTypes = otherProtocolActionTypes;
     }
 
-    public String getPartnerName() {
-	return partnerNameString;
+    public Unit getPartner() {
+	return partner;
     }
 
-    public void setPartnerName(String partnerNameString) {
-	this.partnerNameString = partnerNameString;
+    public void setPartner(Unit partner) {
+	this.partner = partner;
     }
 
     public boolean isActives() {
@@ -290,8 +292,12 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 
     private boolean satisfiedProtocolPartner(Protocol protocol) {
 
-	if (getPartnerName() != null && !getPartnerName().isEmpty()) {
-	    return protocol.hasExternalPartner(getPartnerName());
+	if (getPartner() != null) {
+	    for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
+		if (responsible.getUnit().equals(getPartner()))
+		    return true;
+	    }
+	    return false;
 	}
 
 	return true;

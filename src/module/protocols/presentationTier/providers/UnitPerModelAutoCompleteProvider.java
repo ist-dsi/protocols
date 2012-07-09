@@ -28,10 +28,11 @@ public class UnitPerModelAutoCompleteProvider extends UnitAutoCompleteProvider {
 	try {
 	    String model = argsMap.get("model");
 
-	    if (model.equals("internal")) {
+	    if (model.equals("internal"))
 		return getUnitsFromModel(ProtocolManager.getInstance().getInternalOrganizationalModel());
-	    } else if (model.equals("external"))
-		return getUnitsFromModel(ProtocolManager.getInstance().getExternalOrganizationalModel());
+	    else if (model.equals("external"))
+		// External model only has top-level units, do a direct search
+		return ProtocolManager.getInstance().getExternalOrganizationalModel().getPartiesSet();
 	    else
 		return super.getParties(argsMap, value);
 

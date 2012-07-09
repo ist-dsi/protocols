@@ -5,6 +5,12 @@
 <%@ taglib uri="/WEB-INF/fenix-renderers.tld" prefix="fr"%>
 <html:xhtml />
 
+<style type="text/css">
+.width70 {
+	width: 70px;
+}
+</style>
+
 <h2><bean:message key="label.protocols.search" bundle="PROTOCOLS_RESOURCES" /></h2>
 
 <p></p>
@@ -112,7 +118,7 @@
 	<fr:view name="searchResults" schema="show.protocol.toList" >
 		<fr:layout name="tabular">
 			<fr:property name="classes" value="tstyle2"/>
-			<fr:property name="columnClasses" value="acenter,width165px aleft,acenter,,,aleft"/>
+			<fr:property name="columnClasses" value="acenter,width70,width70,acenter,,,aleft"/>
 			<fr:property name="link(show)" value="/protocols.do?method=viewProtocolDetails" />
 			<fr:property name="key(show)" value="link.protocols.viewDetails" />
 			<fr:property name="param(show)" value="OID" />
