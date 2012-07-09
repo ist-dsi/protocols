@@ -12,6 +12,7 @@ valueType module.protocols.domain.util.ProtocolAction as ProtocolAction {
 }
 
 class ProtocolManager {
+	Long currentSequenceNumber;
 }
 
 class Protocol {

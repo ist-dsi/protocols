@@ -48,6 +48,7 @@
 	 	<fr:slot name="protocolAction.protocolActionTypes" key="label.protocol.actionTypes" layout="list" bundle="PROTOCOLS_RESOURCES"/>
 		<fr:slot name="protocolAction.otherTypes" key="label.protocol.otherActionTypes" bundle="PROTOCOLS_RESOURCES"/>
 		<fr:slot name="observations" key="label.protocols.observations" bundle="PROTOCOLS_RESOURCES"/>
+		<fr:slot name="visibilityDescription" key="label.protocols.visibility" bundle="PROTOCOLS_RESOURCES" />
 	</fr:schema>
 	<fr:layout name="tabular">
 		<fr:property name="classes" value="tstyle2 thlight thright"/>

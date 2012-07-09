@@ -17,32 +17,6 @@
 	</html:messages>
 </div>
 
-<logic:notPresent name="internalOrganizationalModel">
-
-	<div class="error1">
-		<br />
-		<bean:message key="label.organizationalModel.internal.undefined" bundle="PROTOCOLS_RESOURCES"/>
-		<br />
-		<p><html:link href="protocols.do?method=protocolSystemConfiguration"><bean:message key="link.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></html:link></p>
-	</div>
-	
-</logic:notPresent>
-
-
-<logic:notPresent name="externalOrganizationalModel">
-
-	<div class="error1">
-		<br />
-		<bean:message key="label.organizationalModel.external.undefined" bundle="PROTOCOLS_RESOURCES"/>
-		<br />
-		<p><html:link href="protocols.do?method=protocolSystemConfiguration"><bean:message key="link.organizationalModel.define" bundle="PROTOCOLS_RESOURCES"/></html:link></p>
-	</div>
-	
-</logic:notPresent>
-
-<logic:present name="internalOrganizationalModel">
-<logic:present name="externalOrganizationalModel">
-
 <table width="100%">
 
 <tr>
@@ -87,9 +61,6 @@
 </td>
 </tr>
 </table>
-
-</logic:present>
-</logic:present>
 
 <logic:empty name="almostExpiredProtocols">
 <logic:empty name="nullEndDateProtocols">

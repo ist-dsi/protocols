@@ -32,8 +32,8 @@ import myorg.domain.VirtualHost;
 import myorg.domain.contents.ActionNode;
 import myorg.domain.contents.Node;
 import myorg.domain.exceptions.DomainException;
-import myorg.domain.groups.AnyoneGroup;
 import myorg.domain.groups.PersistentGroup;
+import myorg.domain.groups.UserGroup;
 import myorg.presentationTier.actions.ContextBaseAction;
 import myorg.util.InputStreamUtil;
 import myorg.util.VariantBean;
@@ -52,6 +52,7 @@ import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Ordering;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -69,19 +70,19 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 	final Node parentOfNodes = getDomainObject(request, "parentOfNodesToManageId");
 
 	final ActionNode topActionNode = ActionNode.createActionNode(virtualHost, parentOfNodes, "/protocols", "firstPage",
-		"resources.ProtocolsResources", "label.module.protocols", AnyoneGroup.getInstance());
+		"resources.ProtocolsResources", "label.module.protocols", UserGroup.getInstance());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showProtocols", "resources.ProtocolsResources",
-		"label.protocols.show", AnyoneGroup.getInstance());
+		"label.protocols.show", UserGroup.getInstance());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "searchProtocols", "resources.ProtocolsResources",
-		"label.protocols.search", AnyoneGroup.getInstance());
+		"label.protocols.search", UserGroup.getInstance());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareCreateProtocolData",
 		"resources.ProtocolsResources", "label.protocols.create", ProtocolManager.getInstance().getCreatorsGroup());
 
 	ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showAlerts", "resources.ProtocolsResources",
-		"label.protocols.alerts", ProtocolManager.getInstance().getAdministrativeGroup());
+		"label.protocols.alerts", ProtocolManager.getInstance().getCreatorsGroup());
 
 	// System configuration. Should only be accessed by the administrative
 	// group
@@ -115,13 +116,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 		    }
 		});
 
-	request.setAttribute("protocols", protocols);
+	request.setAttribute("protocols", Ordering.from(Protocol.COMPARATOR_BY_SIGNED_DATE).reverse().sortedCopy(protocols));
 
 	return forward(request, "/protocols/showProtocols.jsp");
     }
 
     public ActionForward showAlerts(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
 	    final HttpServletResponse response) {
+
+	final User user = Authenticate.getCurrentUser();
 
 	setOrganizationalModels(request);
 
@@ -131,7 +134,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	    @Override
 	    public boolean apply(Protocol protocol) {
-		if (!protocol.isActive())
+		if (!protocol.isActive() || !protocol.canBeWrittenByUser(user))
 		    return false;
 		LocalDate endDate = protocol.getLastProtocolHistory().getEndDate();
 		return endDate == null ? false : endDate.isBefore(new LocalDate().plusMonths(2).withDayOfMonth(1).minusDays(1));
@@ -142,7 +145,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	    @Override
 	    public boolean apply(Protocol protocol) {
-		return protocol.isActive() && protocol.getCurrentProtocolHistory().getEndDate() == null;
+		return protocol.isActive() && protocol.canBeWrittenByUser(user)
+			&& protocol.getCurrentProtocolHistory().getEndDate() == null;
 	    }
 	});
 
@@ -306,7 +310,8 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	    Collection<Protocol> filteredProtocols = Collections2.filter(ProtocolManager.getInstance().getProtocols(), bean);
 
-	    request.setAttribute("searchResults", filteredProtocols);
+	    request.setAttribute("searchResults",
+		    Ordering.from(Protocol.COMPARATOR_BY_SIGNED_DATE).reverse().sortedCopy(filteredProtocols));
 
 	} else if (bean == null) {
 	    bean = new ProtocolSearchBean();

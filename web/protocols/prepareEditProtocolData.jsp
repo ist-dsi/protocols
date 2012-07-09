@@ -5,7 +5,7 @@
 <%@ taglib uri="/WEB-INF/fenix-renderers.tld" prefix="fr"%>
 <html:xhtml/>
 
-<h2><bean:message key="label.protocols.edit" bundle="PROTOCOLS_RESOURCES"/></h2>
+<h2><bean:message key="label.protocols.edit" bundle="PROTOCOLS_RESOURCES"/> - <bean:write name="protocolBean" property="protocolNumber"/></h2>
 
 <fr:form action="/protocols.do?method=prepareEditInternalResponsibles">
 

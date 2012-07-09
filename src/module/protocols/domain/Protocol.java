@@ -1,7 +1,10 @@
 package module.protocols.domain;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import module.fileManagement.domain.AbstractFileNode;
 import module.fileManagement.domain.DirNode;
@@ -45,10 +48,30 @@ public class Protocol extends Protocol_Base {
 	}
     }
 
+    public static Comparator<Protocol> COMPARATOR_BY_SIGNED_DATE = new Ordering<Protocol>() {
+
+	@Override
+	public int compare(Protocol p1, Protocol p2) {
+
+	    LocalDate one = p1.getSignedDate(), two = p2.getSignedDate();
+
+	    if (one == null ^ two == null) {
+		return (one == null) ? -1 : 1;
+	    }
+
+	    if (one == null && two == null) {
+		return 0;
+	    }
+
+	    return one.compareTo(two);
+	}
+    };
+
     public Protocol() {
 	super();
 	super.setAllowedToRead(new UnionGroup(ProtocolManager.getInstance().getAdministrativeGroup()));
 	setProtocolManager(ProtocolManager.getInstance());
+	super.setProtocolNumber("" + ProtocolManager.getInstance().getNewProtocolNumber());
 	setActive(Boolean.TRUE);
     }
 
@@ -143,17 +166,21 @@ public class Protocol extends Protocol_Base {
 	return protocol;
     }
 
-    @Service
-    public void updateFromBean(ProtocolCreationBean protocolBean) {
-
+    @Override
+    public void setProtocolNumber(String number) {
 	for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
 	    if (protocol.equals(this))
 		continue;
-	    if (protocol.getProtocolNumber().equals(protocolBean.getProtocolNumber()))
-		throw new DomainException("error.protocol.number.already.exists", protocolBean.getProtocolNumber());
+	    if (protocol.getProtocolNumber().equals(number))
+		throw new DomainException("error.protocol.number.already.exists", number);
 	}
 
-	this.setProtocolNumber(protocolBean.getProtocolNumber());
+	super.setProtocolNumber(number);
+    }
+
+    @Service
+    public void updateFromBean(ProtocolCreationBean protocolBean) {
+
 	this.setSignedDate(protocolBean.getSignedDate());
 	this.setScientificAreas(protocolBean.getScientificAreas());
 	this.setProtocolAction(new ProtocolAction(protocolBean.getActionTypes(), protocolBean.getOtherActionTypes()));
@@ -352,4 +379,38 @@ public class Protocol extends Protocol_Base {
 	return false;
     }
 
+    public String getVisibilityDescription() {
+	switch (getVisibilityType()) {
+	case PROTOCOL:
+	    return BundleUtil.getFormattedStringFromResourceBundle("resources/ProtocolsResources",
+		    "label.protocols.visibility.protocol", generateVisibilityString());
+	case RESTRICTED:
+	    return BundleUtil.getFormattedStringFromResourceBundle("resources/ProtocolsResources",
+		    "label.protocols.visibility.restricted", generateVisibilityString());
+	case TOTAL:
+	    return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.protocols.visibility.total");
+	default:
+	    return "";
+	}
+    }
+
+    private String generateVisibilityString() {
+	Set<PersistentGroup> groups = new HashSet<PersistentGroup>();
+
+	groups.add(getWriterGroup().getAuthorizedWriterGroup());
+
+	for (PersistentGroup group : getReaderGroups()) {
+	    groups.add(group);
+	}
+
+	StringBuilder builder = new StringBuilder(groups.size());
+
+	for (PersistentGroup group : groups) {
+	    if (builder.length() > 0)
+		builder.append(", ");
+	    builder.append(group.getName());
+	}
+
+	return builder.toString();
+    }
 }

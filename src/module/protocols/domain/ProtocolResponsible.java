@@ -75,14 +75,6 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 	    return country.getName().getContent();
     }
 
-    @Override
-    public Country getCountry() {
-	if (super.getCountry() == null)
-	    reloadCountry();
-
-	return super.getCountry();
-    }
-
     @Service
     public void reloadCountry() {
 

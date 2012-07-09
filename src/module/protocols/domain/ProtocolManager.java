@@ -38,6 +38,7 @@ public class ProtocolManager extends ProtocolManager_Base {
     private ProtocolManager() {
 	super();
 	setMyOrg(MyOrg.getInstance());
+	setCurrentSequenceNumber(0l);
     }
 
     @ConsistencyPredicate
@@ -54,6 +55,13 @@ public class ProtocolManager extends ProtocolManager_Base {
 	setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
 	setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
 	getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
+    }
+
+    @Service
+    public Long getNewProtocolNumber() {
+	long number = this.getCurrentSequenceNumber();
+	this.setCurrentSequenceNumber(number + 1);
+	return number;
     }
 
 }
