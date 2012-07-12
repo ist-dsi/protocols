@@ -89,6 +89,18 @@ public class Protocol extends Protocol_Base {
 
     }
 
+    public ProtocolHistory getPresentableProtocolHistory() {
+	ProtocolHistory current = null;
+	if (!getActive()) {
+	    current = getLastProtocolHistory();
+	} else {
+	    current = getCurrentProtocolHistory();
+	    if (current == null)
+		current = getLastProtocolHistory();
+	}
+	return current;
+    }
+
     public List<ProtocolHistory> getCurrentAndFutureProtocolHistories() {
 
 	return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(

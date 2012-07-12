@@ -29,6 +29,8 @@
 		<fr:property name="key(remove)" value="link.remove" />
 		<fr:property name="param(remove)" value="OID" />
 		<fr:property name="bundle(remove)" value="MYORG_RESOURCES" />
+		<fr:property name="confirmationKey(remove)" value="label.protocols.authorizationGroup.removalWarning" />
+		<fr:property name="confirmationBundle(remove)" value="PROTOCOLS_RESOURCES" />
 	</fr:layout>
 </fr:view>
 

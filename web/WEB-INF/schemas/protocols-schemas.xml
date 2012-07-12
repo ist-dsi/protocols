@@ -14,10 +14,10 @@
 
 <schema name="show.protocol.toList"	type="module.protocols.domain.Protocol">
 	<slot name="protocolNumber" key="label.protocols.number" bundle="PROTOCOLS_RESOURCES"/>
-	<slot name="currentProtocolHistory.beginDate" key="label.protocols.begin" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+	<slot name="presentableProtocolHistory.beginDate" key="label.protocols.begin" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
 		<property name="label" value="-"/>
 	</slot>
-	<slot name="currentProtocolHistory.endDate" key="label.protocols.end" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
+	<slot name="presentableProtocolHistory.endDate" key="label.protocols.end" bundle="PROTOCOLS_RESOURCES" layout="null-as-label">
 		<property name="label" value="-"/>
 	</slot>
 	<slot name="partners" key="label.protocols.partnerUnits" bundle="PROTOCOLS_RESOURCES" />

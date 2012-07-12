@@ -30,7 +30,7 @@
 			<fr:property name="sortParameter" value="sortBy"/>
        		<fr:property name="sortUrl" value="/protocols.do?method=showProtocols" />
 		    <fr:property name="sortBy" value="<%= request.getParameter("sortBy") == null ? "currentProtocolHistory.beginDate=desc" : request.getParameter("sortBy") %>"/>
-			<fr:property name="sortableSlots" value="protocolNumber, currentProtocolHistory.beginDate, currentProtocolHistory.endDate" />
+			<fr:property name="sortableSlots" value="protocolNumber, presentableProtocolHistory.beginDate, presentableProtocolHistory.endDate" />
 			
 			
 		</fr:layout>
