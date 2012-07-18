@@ -1,2 +1,0 @@
-name=protocols
-depends=core, organization, fileManagement, geography
