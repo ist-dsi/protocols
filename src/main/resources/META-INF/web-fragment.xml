@@ -19,6 +19,7 @@
    <name>bennu-vaadin</name>
    <name>scheduler</name>
    <name>scheduler-plugin</name>
+   <name>web-service-utils</name>
    <name>geography</name>
    <!-- [END OF BENNU GENERATED FRAGMENT] -->
 		</after>
