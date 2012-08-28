@@ -14,15 +14,15 @@ import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
+
+import org.joda.time.LocalDate;
+
 import pt.ist.bennu.core.domain.User;
 import pt.ist.bennu.core.domain.exceptions.DomainException;
 import pt.ist.bennu.core.domain.groups.AnyoneGroup;
 import pt.ist.bennu.core.domain.groups.PersistentGroup;
 import pt.ist.bennu.core.domain.groups.UnionGroup;
 import pt.ist.bennu.core.util.BundleUtil;
-
-import org.joda.time.LocalDate;
-
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
 import pt.ist.fenixWebFramework.services.Service;
 import pt.utl.ist.fenix.tools.util.StringNormalizer;
@@ -234,11 +234,13 @@ public class Protocol extends Protocol_Base {
 
     @Override
     public void addReaderGroups(PersistentGroup group) {
+	super.addReaderGroups(group);
 	getAllowedToRead().addPersistentGroups(group);
     }
 
     @Override
     public void removeReaderGroups(PersistentGroup group) {
+	super.removeReaderGroups(group);
 	getAllowedToRead().removePersistentGroups(group);
     }
 
