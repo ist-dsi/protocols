@@ -31,6 +31,7 @@
 		<fr:property name="bundle(remove)" value="MYORG_RESOURCES" />
 		<fr:property name="confirmationKey(remove)" value="label.protocols.authorizationGroup.removalWarning" />
 		<fr:property name="confirmationBundle(remove)" value="PROTOCOLS_RESOURCES" />
+		<fr:property name="visibleIf(remove)" value="writerProtocols.empty" />
 	</fr:layout>
 </fr:view>
 

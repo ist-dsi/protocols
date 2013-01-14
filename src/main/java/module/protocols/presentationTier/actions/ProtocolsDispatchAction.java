@@ -27,6 +27,14 @@ import module.protocols.dto.ProtocolFileUploadBean;
 import module.protocols.dto.ProtocolHistoryBean;
 import module.protocols.dto.ProtocolSearchBean;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
+
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.joda.time.LocalDate;
+
 import pt.ist.bennu.core.applicationTier.Authenticate;
 import pt.ist.bennu.core.domain.User;
 import pt.ist.bennu.core.domain.VirtualHost;
@@ -38,14 +46,6 @@ import pt.ist.bennu.core.domain.groups.UserGroup;
 import pt.ist.bennu.core.presentationTier.actions.ContextBaseAction;
 import pt.ist.bennu.core.util.InputStreamUtil;
 import pt.ist.bennu.core.util.VariantBean;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.joda.time.LocalDate;
-
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.servlets.functionalities.CreateNodeAction;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
@@ -214,7 +214,11 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
 	ProtocolAuthorizationGroup group = ProtocolAuthorizationGroup.fromExternalId(request.getParameter("OID"));
 
-	group.delete();
+	try {
+	    group.delete();
+	} catch (DomainException e) {
+	    setMessage(request, "errorMessage", new ActionMessage(e.getKey()));
+	}
 
 	return authorizationGroupsConfiguration(mapping, form, request, response);
     }

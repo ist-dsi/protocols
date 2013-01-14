@@ -3,6 +3,7 @@ package module.protocols.domain;
 import java.util.List;
 
 import module.fileManagement.domain.ContextPath;
+import pt.ist.bennu.core.domain.exceptions.DomainException;
 import pt.ist.bennu.core.domain.groups.PersistentGroup;
 import pt.ist.fenixWebFramework.services.Service;
 
@@ -37,6 +38,9 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
     @Service
     public void delete() {
 
+	if (!getWriterProtocols().isEmpty())
+	    throw new DomainException("error.group.has.protocols");
+
 	ProtocolManager.getInstance().getCreatorsGroup().removePersistentGroups(getAuthorizedWriterGroup());
 
 	ProtocolDirNode groupDir = this.getGroupDir();
@@ -47,11 +51,6 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 	this.removeReaders();
 	this.removeProtocolManager();
 	this.removeAuthorizedWriterGroup();
-
-	// TODO What to do if there are protocols with this group?
-
-	for (Protocol protocol : getWriterProtocols())
-	    removeWriterProtocols(protocol);
 
 	this.deleteDomainObject();
     }

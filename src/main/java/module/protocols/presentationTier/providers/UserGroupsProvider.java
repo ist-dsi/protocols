@@ -29,6 +29,9 @@ public class UserGroupsProvider implements DataProvider {
 
 	final User user = Authenticate.getCurrentUser();
 
+	if (ProtocolManager.getInstance().getAdministrativeGroup().isMember(user))
+	    return ProtocolManager.getInstance().getProtocolAuthorizationGroups();
+
 	return Collections2.filter(ProtocolManager.getInstance().getProtocolAuthorizationGroups(),
 		new Predicate<ProtocolAuthorizationGroup>() {
 
