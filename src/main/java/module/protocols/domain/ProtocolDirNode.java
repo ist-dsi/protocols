@@ -14,6 +14,7 @@ public class ProtocolDirNode extends ProtocolDirNode_Base {
 	setWriters(group);
 	setName(name);
 	setReadGroup(readers);
+	setQuota((long) 50 * 1024 * 1024);
 	createTrashFolder();
     }
 
@@ -28,7 +29,6 @@ public class ProtocolDirNode extends ProtocolDirNode_Base {
 	setWriteGroup(UnionGroup.getOrCreateUnionGroup(group.getAuthorizedWriterGroup(), ProtocolManager.getInstance()
 		.getAdministrativeGroup()));
 
-	setQuota((long) 50 * 1024 * 1024);
 	createTrashFolder();
     }
 

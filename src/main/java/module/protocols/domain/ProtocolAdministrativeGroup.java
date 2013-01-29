@@ -5,6 +5,7 @@ import java.util.Set;
 import pt.ist.bennu.core.domain.RoleType;
 import pt.ist.bennu.core.domain.User;
 import pt.ist.bennu.core.domain.groups.Role;
+import pt.ist.bennu.core.util.BundleUtil;
 
 public class ProtocolAdministrativeGroup extends ProtocolAdministrativeGroup_Base {
 
@@ -20,7 +21,8 @@ public class ProtocolAdministrativeGroup extends ProtocolAdministrativeGroup_Bas
 
     @Override
     public String getName() {
-	return this.getClass().getSimpleName() + " delegated to " + getDelegateGroup().getName();
+	return BundleUtil.getFormattedStringFromResourceBundle("resources/ProtocolsResources", "label.administrative.group",
+		getDelegateGroup().getName());
     }
 
     @Override

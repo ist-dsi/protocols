@@ -24,7 +24,7 @@
 <bean:define id="OID" type="java.lang.Long" name="protocol" property="OID"/>
 
 <logic:equal value="true" name="canBeWritten">
-<html:link href="<%="protocols.do?method=prepareEditProtocolData&OID=" + OID %>"><bean:message key="link.edit" bundle="MYORG_RESOURCES"/></html:link>
+<html:link action="protocols.do?method=prepareEditProtocolData" paramId="OID" paramName="OID"><bean:message key="link.edit" bundle="MYORG_RESOURCES"/></html:link>
 </logic:equal>
 
 
