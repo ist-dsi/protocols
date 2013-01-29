@@ -87,74 +87,13 @@ function removePersonFunction(formId, personId) {
 </tr>
 <tr>
 
-<td width="50%" valign="top" align="center">
-
-<div class="infobox" align="center">
-	<p class="dinline"><strong><bean:message key="label.protocols.addResponsible" bundle="PROTOCOLS_RESOURCES"/></strong></p>
-</div>
-
-<div align="left">
-<fr:edit name="protocolBean">
-<fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
-	<fr:slot name="newPerson" layout="autoComplete" key="label.person" bundle="ORGANIZATION_RESOURCES">
-        <fr:property name="labelField" value="presentationName"/>
-		<fr:property name="format" value="${presentationName}"/>
-		<fr:property name="minChars" value="2"/>
-		<fr:property name="args" value="<%="provider=module.protocols.presentationTier.providers.PeoplePerUnitAutoCompleteProvider,unit=" + unitOID %>"/>
-		<fr:property name="size" value="50"/>
-	</fr:slot>
-</fr:schema>	
-	<fr:layout name="tabular">
-		<fr:property name="classes" value="tstyle2"/>
-	</fr:layout>
-</fr:edit>
-<html:submit bundle="PROPERTIES_RESOURCES" property="insertPersonInExternalUnit">
-	<bean:message key="button.insertPerson" bundle="PROTOCOLS_RESOURCES" />
-</html:submit>
-
-</div>
-
-<br />
-
-<div align="center">
-
-<logic:notEmpty name="responsible" property="responsibles">
-
-<table width="100%">
-	<tr>
-		<th colspan="2">
-			<bean:message key="label.protocols.responsiblesInUnit" bundle="PROTOCOLS_RESOURCES"/>
-		</th>
-	</tr>
-	<logic:iterate id="value" name="responsible" property="responsibles">
-	
-		<bean:define id="oid" name="value" property="OID" />
-	
-		<tr>
-			<td style="text-align: left">
-				<bean:write name="value" property="presentationName" bundle="PROTOCOLS_RESOURCES"/> 
-			</td>
-			<td width="16px">
-				<img src="images/delet.png" style="margin-top: 3px" onClick="<%= "removePersonFunction('" + unitOID.toString() + "', '" + oid  +"');"%>"/>
-			</td>
-		</tr>
-	</logic:iterate>
-</table>
-
-</logic:notEmpty>
-
-</div>
-
-
-</td>
-
-<td width="50%" valign="top">
+<td valign="top">
 
 <div class="infobox" align="center">
 	<p class="dinline"><strong><bean:message key="label.protocols.addPosition" bundle="PROTOCOLS_RESOURCES"/></strong></p>
 </div>
 
-<div align="left">
+<div align="center">
 <fr:edit name="protocolBean">
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
 	<fr:slot name="newPosition" key="label.position" bundle="PROTOCOLS_RESOURCES">
