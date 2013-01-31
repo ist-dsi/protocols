@@ -17,14 +17,14 @@ import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
  */
 public class OrganizationalModelProvider implements DataProvider {
 
-    @Override
-    public Converter getConverter() {
-	return new DomainObjectKeyArrayConverter();
-    }
+	@Override
+	public Converter getConverter() {
+		return new DomainObjectKeyArrayConverter();
+	}
 
-    @Override
-    public Object provide(Object source, Object currentValue) {
-	return new ArrayList<OrganizationalModel>(MyOrg.getInstance().getOrganizationalModels());
-    }
+	@Override
+	public Object provide(Object source, Object currentValue) {
+		return new ArrayList<OrganizationalModel>(MyOrg.getInstance().getOrganizationalModels());
+	}
 
 }

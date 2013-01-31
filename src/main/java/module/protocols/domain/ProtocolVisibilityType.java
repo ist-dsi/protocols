@@ -14,26 +14,26 @@ import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
  */
 public enum ProtocolVisibilityType implements IPresentableEnum {
 
-    /**
-     * The protocol meta-data will be publicly accessible, but access to the
-     * protocol files will be conditioned.
-     */
-    PROTOCOL,
+	/**
+	 * The protocol meta-data will be publicly accessible, but access to the
+	 * protocol files will be conditioned.
+	 */
+	PROTOCOL,
 
-    /**
-     * The protocol meta-data and its files will be accessible only to those
-     * specified in the access control list.
-     */
-    RESTRICTED,
+	/**
+	 * The protocol meta-data and its files will be accessible only to those
+	 * specified in the access control list.
+	 */
+	RESTRICTED,
 
-    /**
-     * The whole protocol will be accessible to everyone.
-     */
-    TOTAL;
+	/**
+	 * The whole protocol will be accessible to everyone.
+	 */
+	TOTAL;
 
-    @Override
-    public String getLocalizedName() {
-	return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.protocolVisibilityType." + name());
-    }
+	@Override
+	public String getLocalizedName() {
+		return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.protocolVisibilityType." + name());
+	}
 
 }

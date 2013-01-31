@@ -14,34 +14,34 @@ import module.protocols.domain.ProtocolManager;
  */
 public class OrganizationalModelBean implements Serializable {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 2000558610665541013L;
+	private static final long serialVersionUID = 2000558610665541013L;
 
-    private OrganizationalModel internalOrganizationalModel;
+	private OrganizationalModel internalOrganizationalModel;
 
-    private OrganizationalModel externalOrganizationalModel;
+	private OrganizationalModel externalOrganizationalModel;
 
-    public OrganizationalModelBean() {
-	this.internalOrganizationalModel = ProtocolManager.getInstance().getInternalOrganizationalModel();
-	this.externalOrganizationalModel = ProtocolManager.getInstance().getExternalOrganizationalModel();
-    }
+	public OrganizationalModelBean() {
+		this.internalOrganizationalModel = ProtocolManager.getInstance().getInternalOrganizationalModel();
+		this.externalOrganizationalModel = ProtocolManager.getInstance().getExternalOrganizationalModel();
+	}
 
-    public OrganizationalModel getInternalOrganizationalModel() {
-	return internalOrganizationalModel;
-    }
+	public OrganizationalModel getInternalOrganizationalModel() {
+		return internalOrganizationalModel;
+	}
 
-    public void setInternalOrganizationalModel(OrganizationalModel internalOrganizationalModel) {
-	this.internalOrganizationalModel = internalOrganizationalModel;
-    }
+	public void setInternalOrganizationalModel(OrganizationalModel internalOrganizationalModel) {
+		this.internalOrganizationalModel = internalOrganizationalModel;
+	}
 
-    public OrganizationalModel getExternalOrganizationalModel() {
-	return externalOrganizationalModel;
-    }
+	public OrganizationalModel getExternalOrganizationalModel() {
+		return externalOrganizationalModel;
+	}
 
-    public void setExternalOrganizationalModel(OrganizationalModel externalOrganizationalModel) {
-	this.externalOrganizationalModel = externalOrganizationalModel;
-    }
+	public void setExternalOrganizationalModel(OrganizationalModel externalOrganizationalModel) {
+		this.externalOrganizationalModel = externalOrganizationalModel;
+	}
 
 }

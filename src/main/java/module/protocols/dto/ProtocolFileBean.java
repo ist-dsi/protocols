@@ -16,26 +16,26 @@ import module.fileManagement.presentationTier.DownloadUtil;
  */
 public class ProtocolFileBean implements Serializable {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = -5277452798674241974L;
+	private static final long serialVersionUID = -5277452798674241974L;
 
-    private final FileNode file;
+	private final FileNode file;
 
-    private final String fileURL;
+	private final String fileURL;
 
-    public ProtocolFileBean(FileNode file, HttpServletRequest request) {
-	this.file = file;
-	this.fileURL = DownloadUtil.getDownloadUrl(request, file.getDocument().getLastVersionedFile());
-    }
+	public ProtocolFileBean(FileNode file, HttpServletRequest request) {
+		this.file = file;
+		this.fileURL = DownloadUtil.getDownloadUrl(request, file.getDocument().getLastVersionedFile());
+	}
 
-    public FileNode getFile() {
-	return file;
-    }
+	public FileNode getFile() {
+		return file;
+	}
 
-    public String getFileURL() {
-	return fileURL;
-    }
+	public String getFileURL() {
+		return fileURL;
+	}
 
 }

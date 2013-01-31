@@ -12,27 +12,27 @@ import pt.ist.bennu.core.util.FileUploadBean;
  */
 public class ProtocolFileUploadBean extends FileUploadBean {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = 3510997078215680526L;
+	private static final long serialVersionUID = 3510997078215680526L;
 
-    private final Protocol protocol;
+	private final Protocol protocol;
 
-    private final String protocolNumber;
+	private final String protocolNumber;
 
-    public ProtocolFileUploadBean(Protocol protocol) {
-	super();
-	this.protocol = protocol;
-	this.protocolNumber = protocol.getProtocolNumber();
-    }
+	public ProtocolFileUploadBean(Protocol protocol) {
+		super();
+		this.protocol = protocol;
+		this.protocolNumber = protocol.getProtocolNumber();
+	}
 
-    public Protocol getProtocol() {
-	return protocol;
-    }
+	public Protocol getProtocol() {
+		return protocol;
+	}
 
-    public String getProtocolNumber() {
-	return protocolNumber;
-    }
+	public String getProtocolNumber() {
+		return protocolNumber;
+	}
 
 }

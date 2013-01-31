@@ -16,30 +16,30 @@ import pt.ist.bennu.core.domain.groups.PersistentGroup;
  */
 public class AuthorizationGroupBean implements Serializable {
 
-    /**
+	/**
      * 
      */
-    private static final long serialVersionUID = -8479983429517700272L;
+	private static final long serialVersionUID = -8479983429517700272L;
 
-    private List<PersistentGroup> authorizedGroups;
+	private List<PersistentGroup> authorizedGroups;
 
-    private final ProtocolAuthorizationGroup group;
+	private final ProtocolAuthorizationGroup group;
 
-    public AuthorizationGroupBean(ProtocolAuthorizationGroup group) {
-	authorizedGroups = new ArrayList<PersistentGroup>(group.getAuthorizedReaderGroups());
-	this.group = group;
-    }
+	public AuthorizationGroupBean(ProtocolAuthorizationGroup group) {
+		authorizedGroups = new ArrayList<PersistentGroup>(group.getAuthorizedReaderGroups());
+		this.group = group;
+	}
 
-    public List<PersistentGroup> getAuthorizedGroups() {
-	return authorizedGroups;
-    }
+	public List<PersistentGroup> getAuthorizedGroups() {
+		return authorizedGroups;
+	}
 
-    public void setAuthorizedGroups(List<PersistentGroup> authorizedGroups) {
-	this.authorizedGroups = authorizedGroups;
-    }
+	public void setAuthorizedGroups(List<PersistentGroup> authorizedGroups) {
+		this.authorizedGroups = authorizedGroups;
+	}
 
-    public ProtocolAuthorizationGroup getGroup() {
-	return group;
-    }
+	public ProtocolAuthorizationGroup getGroup() {
+		return group;
+	}
 
 }

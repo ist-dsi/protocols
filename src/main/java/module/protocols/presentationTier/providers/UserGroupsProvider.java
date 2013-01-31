@@ -19,27 +19,28 @@ import com.google.common.collect.Collections2;
  */
 public class UserGroupsProvider implements DataProvider {
 
-    @Override
-    public Converter getConverter() {
-	return null;
-    }
+	@Override
+	public Converter getConverter() {
+		return null;
+	}
 
-    @Override
-    public Object provide(Object arg0, Object arg1) {
+	@Override
+	public Object provide(Object arg0, Object arg1) {
 
-	final User user = Authenticate.getCurrentUser();
+		final User user = Authenticate.getCurrentUser();
 
-	if (ProtocolManager.getInstance().getAdministrativeGroup().isMember(user))
-	    return ProtocolManager.getInstance().getProtocolAuthorizationGroups();
+		if (ProtocolManager.getInstance().getAdministrativeGroup().isMember(user)) {
+			return ProtocolManager.getInstance().getProtocolAuthorizationGroups();
+		}
 
-	return Collections2.filter(ProtocolManager.getInstance().getProtocolAuthorizationGroups(),
-		new Predicate<ProtocolAuthorizationGroup>() {
+		return Collections2.filter(ProtocolManager.getInstance().getProtocolAuthorizationGroups(),
+				new Predicate<ProtocolAuthorizationGroup>() {
 
-		    @Override
-		    public boolean apply(ProtocolAuthorizationGroup group) {
+					@Override
+					public boolean apply(ProtocolAuthorizationGroup group) {
 
-			return group.getAuthorizedWriterGroup().isMember(user);
-		    }
-		});
-    }
+						return group.getAuthorizedWriterGroup().isMember(user);
+					}
+				});
+	}
 }

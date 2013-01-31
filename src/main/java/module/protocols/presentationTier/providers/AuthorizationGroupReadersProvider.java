@@ -13,17 +13,17 @@ import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
  */
 public class AuthorizationGroupReadersProvider implements DataProvider {
 
-    @Override
-    public Converter getConverter() {
-	return null;
-    }
+	@Override
+	public Converter getConverter() {
+		return null;
+	}
 
-    @Override
-    public Object provide(Object source, Object currentValue) {
+	@Override
+	public Object provide(Object source, Object currentValue) {
 
-	ProtocolCreationBean bean = (ProtocolCreationBean) source;
+		ProtocolCreationBean bean = (ProtocolCreationBean) source;
 
-	return bean.getWriters().getAuthorizedReaderGroups();
-    }
+		return bean.getWriters().getAuthorizedReaderGroups();
+	}
 
 }

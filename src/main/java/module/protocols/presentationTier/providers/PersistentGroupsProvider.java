@@ -21,21 +21,21 @@ import com.google.common.collect.Collections2;
  */
 public class PersistentGroupsProvider implements DataProvider {
 
-    @Override
-    public Converter getConverter() {
-	return null;
-    }
+	@Override
+	public Converter getConverter() {
+		return null;
+	}
 
-    @Override
-    public Object provide(Object arg0, Object arg1) {
-	return Collections2.filter(MyOrg.getInstance().getPersistentGroups(), new Predicate<PersistentGroup>() {
+	@Override
+	public Object provide(Object arg0, Object arg1) {
+		return Collections2.filter(MyOrg.getInstance().getPersistentGroups(), new Predicate<PersistentGroup>() {
 
-	    @Override
-	    public boolean apply(PersistentGroup group) {
-		return !(group instanceof ProtocolAdministrativeGroup || group instanceof UnionGroup
-			|| group instanceof IntersectionGroup || group instanceof SingleUserGroup);
-	    }
-	});
-    }
+			@Override
+			public boolean apply(PersistentGroup group) {
+				return !(group instanceof ProtocolAdministrativeGroup || group instanceof UnionGroup
+						|| group instanceof IntersectionGroup || group instanceof SingleUserGroup);
+			}
+		});
+	}
 
 }
