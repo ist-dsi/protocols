@@ -35,462 +35,462 @@ import com.google.common.collect.Collections2;
 
 public class ProtocolCreationBean implements Serializable {
 
-	/**
+    /**
      * 
      */
-	private static final long serialVersionUID = 3819698830239113842L;
+    private static final long serialVersionUID = 3819698830239113842L;
 
-	public static class ProtocolResponsibleBean implements Serializable, Comparable<ProtocolResponsibleBean> {
+    public static class ProtocolResponsibleBean implements Serializable, Comparable<ProtocolResponsibleBean> {
 
-		/**
+        /**
 	 * 
 	 */
-		private static final long serialVersionUID = -1303497805898307379L;
+        private static final long serialVersionUID = -1303497805898307379L;
 
-		private final Unit unit;
+        private final Unit unit;
 
-		private final Set<Person> responsibles;
+        private final Set<Person> responsibles;
 
-		private Strings positions;
+        private Strings positions;
 
-		private final ProtocolResponsible protocolResponsible;
+        private final ProtocolResponsible protocolResponsible;
 
-		public ProtocolResponsibleBean(ProtocolResponsible responsible) {
-			this.protocolResponsible = responsible;
-			this.unit = responsible.getUnit();
-			this.responsibles = new HashSet<Person>(responsible.getPeople());
-			this.positions = responsible.getPositionList() == null ? new Strings(new String[0]) : responsible.getPositionList();
-		}
+        public ProtocolResponsibleBean(ProtocolResponsible responsible) {
+            this.protocolResponsible = responsible;
+            this.unit = responsible.getUnit();
+            this.responsibles = new HashSet<Person>(responsible.getPeople());
+            this.positions = responsible.getPositionList() == null ? new Strings(new String[0]) : responsible.getPositionList();
+        }
 
-		public ProtocolResponsibleBean(Unit unit) {
-			super();
-			this.unit = unit;
-			this.responsibles = new HashSet<Person>();
-			this.protocolResponsible = null;
-			this.positions = new Strings(new String[0]);
-		}
+        public ProtocolResponsibleBean(Unit unit) {
+            super();
+            this.unit = unit;
+            this.responsibles = new HashSet<Person>();
+            this.protocolResponsible = null;
+            this.positions = new Strings(new String[0]);
+        }
 
-		public Unit getUnit() {
-			return unit;
-		}
+        public Unit getUnit() {
+            return unit;
+        }
 
-		public Set<Person> getResponsibles() {
-			return responsibles;
-		}
+        public Set<Person> getResponsibles() {
+            return responsibles;
+        }
 
-		public void addResponsible(Person responsible) {
-			if (responsible != null && !responsibles.contains(responsible)) {
-				responsibles.add(responsible);
-			}
-		}
+        public void addResponsible(Person responsible) {
+            if (responsible != null && !responsibles.contains(responsible)) {
+                responsibles.add(responsible);
+            }
+        }
 
-		public Strings getPositions() {
-			return positions;
-		}
+        public Strings getPositions() {
+            return positions;
+        }
 
-		public void addPosition(String position) {
-			if (positions != null && !positions.contains(position)) {
-				positions = new Strings(positions, position);
-			}
-		}
+        public void addPosition(String position) {
+            if (positions != null && !positions.contains(position)) {
+                positions = new Strings(positions, position);
+            }
+        }
 
-		public boolean check() {
-			return unit != null;
-		}
+        public boolean check() {
+            return unit != null;
+        }
 
-		/**
-		 * @param newPerson
-		 */
-		public void removeResponsible(Person newPerson) {
-			responsibles.remove(newPerson);
-		}
+        /**
+         * @param newPerson
+         */
+        public void removeResponsible(Person newPerson) {
+            responsibles.remove(newPerson);
+        }
 
-		public ProtocolResponsible getProtocolResponsible() {
-			return protocolResponsible;
-		}
+        public ProtocolResponsible getProtocolResponsible() {
+            return protocolResponsible;
+        }
 
-		@Override
-		public int compareTo(ProtocolResponsibleBean o) {
-			return Unit.COMPARATOR_BY_PRESENTATION_NAME.compare(this.unit, o.getUnit());
-		}
+        @Override
+        public int compareTo(ProtocolResponsibleBean o) {
+            return Unit.COMPARATOR_BY_PRESENTATION_NAME.compare(this.unit, o.getUnit());
+        }
 
-		/**
+        /**
 	 * 
 	 */
-		public void removePositions() {
-			positions = new Strings(new String[0]);
-		}
+        public void removePositions() {
+            positions = new Strings(new String[0]);
+        }
 
-		public void removePosition(final String string) {
-			positions = new Strings(Collections2.filter(positions.getUnmodifiableList(), new Predicate<String>() {
+        public void removePosition(final String string) {
+            positions = new Strings(Collections2.filter(positions.getUnmodifiableList(), new Predicate<String>() {
 
-				@Override
-				public boolean apply(String str) {
-					return !str.equals(string);
-				}
+                @Override
+                public boolean apply(String str) {
+                    return !str.equals(string);
+                }
 
-			}));
-		}
-	}
+            }));
+        }
+    }
 
-	private Protocol protocol;
+    private Protocol protocol;
 
-	/*
-	 * Step 1
-	 */
+    /*
+     * Step 1
+     */
 
-	private String protocolNumber;
+    private String protocolNumber;
 
-	private LocalDate signedDate;
+    private LocalDate signedDate;
 
-	private LocalDate beginDate;
+    private LocalDate beginDate;
 
-	private LocalDate endDate;
+    private LocalDate endDate;
 
-	private String scientificAreas;
+    private String scientificAreas;
 
-	private List<ProtocolActionType> actionTypes;
+    private List<ProtocolActionType> actionTypes;
 
-	private String otherActionTypes;
+    private String otherActionTypes;
 
-	private String observations;
+    private String observations;
 
-	/*
-	 * Step 2
-	 */
+    /*
+     * Step 2
+     */
 
-	private SortedSet<ProtocolResponsibleBean> internalResponsibles;
+    private SortedSet<ProtocolResponsibleBean> internalResponsibles;
 
-	private Unit newUnit;
+    private Unit newUnit;
 
-	private Person newPerson;
+    private Person newPerson;
 
-	private String newPosition;
+    private String newPosition;
 
-	/*
-	 * Step 3
-	 */
+    /*
+     * Step 3
+     */
 
-	private SortedSet<ProtocolResponsibleBean> externalResponsibles;
+    private SortedSet<ProtocolResponsibleBean> externalResponsibles;
 
-	/*
-	 * Step 4
-	 */
+    /*
+     * Step 4
+     */
 
-	private ProtocolAuthorizationGroup writers;
+    private ProtocolAuthorizationGroup writers;
 
-	private List<PersistentGroup> readers;
+    private List<PersistentGroup> readers;
 
-	private ProtocolVisibilityType visibilityType = ProtocolVisibilityType.PROTOCOL;
+    private ProtocolVisibilityType visibilityType = ProtocolVisibilityType.PROTOCOL;
 
-	/*
-	 * Extra stuff
-	 */
+    /*
+     * Extra stuff
+     */
 
-	private List<ProtocolResponsible> removedResponsibles;
+    private List<ProtocolResponsible> removedResponsibles;
 
-	public ProtocolCreationBean() {
+    public ProtocolCreationBean() {
 
-	}
+    }
 
-	public ProtocolCreationBean(Protocol protocol) {
+    public ProtocolCreationBean(Protocol protocol) {
 
-		// Step 1
+        // Step 1
 
-		setProtocol(protocol);
+        setProtocol(protocol);
 
-		setProtocolNumber(protocol.getProtocolNumber());
+        setProtocolNumber(protocol.getProtocolNumber());
 
-		setSignedDate(protocol.getSignedDate());
+        setSignedDate(protocol.getSignedDate());
 
-		ProtocolHistory history = protocol.getCurrentProtocolHistory(); // TODO
-		// Check
+        ProtocolHistory history = protocol.getCurrentProtocolHistory(); // TODO
+        // Check
 
-		if (history != null) {
-			setBeginDate(history.getBeginDate());
-			setEndDate(history.getEndDate());
-		}
+        if (history != null) {
+            setBeginDate(history.getBeginDate());
+            setEndDate(history.getEndDate());
+        }
 
-		setScientificAreas(protocol.getScientificAreas());
+        setScientificAreas(protocol.getScientificAreas());
 
-		setActionTypes(new ArrayList<ProtocolActionType>(protocol.getProtocolAction().getProtocolActionTypes()));
+        setActionTypes(new ArrayList<ProtocolActionType>(protocol.getProtocolAction().getProtocolActionTypes()));
 
-		setOtherActionTypes(protocol.getProtocolAction().getOtherTypes());
+        setOtherActionTypes(protocol.getProtocolAction().getOtherTypes());
 
-		setObservations(protocol.getObservations());
+        setObservations(protocol.getObservations());
 
-		// Steps 2 and 3
+        // Steps 2 and 3
 
-		for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
-			ProtocolResponsibleBean bean = new ProtocolResponsibleBean(responsible);
-			if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
-				addInternalResponsible(bean);
-			} else {
-				addExternalResponsible(bean);
-			}
-		}
+        for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
+            ProtocolResponsibleBean bean = new ProtocolResponsibleBean(responsible);
+            if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
+                addInternalResponsible(bean);
+            } else {
+                addExternalResponsible(bean);
+            }
+        }
 
-		setWriters(protocol.getWriterGroup());
+        setWriters(protocol.getWriterGroup());
 
-		setReaders(new ArrayList<PersistentGroup>(protocol.getReaderGroups()));
+        setReaders(new ArrayList<PersistentGroup>(protocol.getReaderGroups()));
 
-		setVisibilityType(protocol.getVisibilityType());
+        setVisibilityType(protocol.getVisibilityType());
 
-	}
+    }
 
-	public Protocol getProtocol() {
-		return protocol;
-	}
+    public Protocol getProtocol() {
+        return protocol;
+    }
 
-	public void setProtocol(Protocol protocol) {
-		this.protocol = protocol;
-	}
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
+    }
 
-	public String getProtocolNumber() {
-		return protocolNumber;
-	}
+    public String getProtocolNumber() {
+        return protocolNumber;
+    }
 
-	public void setProtocolNumber(String protocolNumber) {
-		this.protocolNumber = protocolNumber;
-	}
+    public void setProtocolNumber(String protocolNumber) {
+        this.protocolNumber = protocolNumber;
+    }
 
-	public LocalDate getSignedDate() {
-		return signedDate;
-	}
+    public LocalDate getSignedDate() {
+        return signedDate;
+    }
 
-	public void setSignedDate(LocalDate signedDate) {
-		this.signedDate = signedDate;
-	}
+    public void setSignedDate(LocalDate signedDate) {
+        this.signedDate = signedDate;
+    }
 
-	public LocalDate getBeginDate() {
-		return beginDate;
-	}
+    public LocalDate getBeginDate() {
+        return beginDate;
+    }
 
-	public void setBeginDate(LocalDate beginDate) {
-		this.beginDate = beginDate;
-	}
+    public void setBeginDate(LocalDate beginDate) {
+        this.beginDate = beginDate;
+    }
 
-	public LocalDate getEndDate() {
-		return endDate;
-	}
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
-	public void setEndDate(LocalDate endDate) {
-		this.endDate = endDate;
-	}
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
 
-	public String getScientificAreas() {
-		return scientificAreas;
-	}
+    public String getScientificAreas() {
+        return scientificAreas;
+    }
 
-	public void setScientificAreas(String scientificAreas) {
-		this.scientificAreas = scientificAreas;
-	}
+    public void setScientificAreas(String scientificAreas) {
+        this.scientificAreas = scientificAreas;
+    }
 
-	public List<ProtocolActionType> getActionTypes() {
-		return actionTypes;
-	}
+    public List<ProtocolActionType> getActionTypes() {
+        return actionTypes;
+    }
 
-	public void setActionTypes(List<ProtocolActionType> actionTypes) {
-		this.actionTypes = actionTypes;
-	}
+    public void setActionTypes(List<ProtocolActionType> actionTypes) {
+        this.actionTypes = actionTypes;
+    }
 
-	public String getOtherActionTypes() {
-		return otherActionTypes;
-	}
+    public String getOtherActionTypes() {
+        return otherActionTypes;
+    }
 
-	public void setOtherActionTypes(String otherActionTypes) {
-		this.otherActionTypes = otherActionTypes;
-	}
+    public void setOtherActionTypes(String otherActionTypes) {
+        this.otherActionTypes = otherActionTypes;
+    }
 
-	public String getObservations() {
-		return observations;
-	}
+    public String getObservations() {
+        return observations;
+    }
 
-	public void setObservations(String observations) {
-		this.observations = observations;
-	}
+    public void setObservations(String observations) {
+        this.observations = observations;
+    }
 
-	public Set<ProtocolResponsibleBean> getInternalResponsibles() {
-		return internalResponsibles;
-	}
+    public Set<ProtocolResponsibleBean> getInternalResponsibles() {
+        return internalResponsibles;
+    }
 
-	public void setInternalResponsibles(SortedSet<ProtocolResponsibleBean> internalResponsibles) {
-		this.internalResponsibles = internalResponsibles;
-	}
+    public void setInternalResponsibles(SortedSet<ProtocolResponsibleBean> internalResponsibles) {
+        this.internalResponsibles = internalResponsibles;
+    }
 
-	public SortedSet<ProtocolResponsibleBean> getExternalResponsibles() {
-		return externalResponsibles;
-	}
+    public SortedSet<ProtocolResponsibleBean> getExternalResponsibles() {
+        return externalResponsibles;
+    }
 
-	public void setExternalResponsibles(SortedSet<ProtocolResponsibleBean> externalResponsibles) {
-		this.externalResponsibles = externalResponsibles;
-	}
+    public void setExternalResponsibles(SortedSet<ProtocolResponsibleBean> externalResponsibles) {
+        this.externalResponsibles = externalResponsibles;
+    }
 
-	public ProtocolAuthorizationGroup getWriters() {
-		return writers;
-	}
+    public ProtocolAuthorizationGroup getWriters() {
+        return writers;
+    }
 
-	public void setWriters(ProtocolAuthorizationGroup writers) {
-		this.writers = writers;
-		this.readers = null;
-	}
-
-	public List<PersistentGroup> getReaders() {
-		return readers;
-	}
-
-	public void setReaders(List<PersistentGroup> readers) {
-		this.readers = readers;
-	}
-
-	public ProtocolVisibilityType getVisibilityType() {
-		return visibilityType;
-	}
-
-	public void setVisibilityType(ProtocolVisibilityType visibilityType) {
-		this.visibilityType = visibilityType;
-	}
+    public void setWriters(ProtocolAuthorizationGroup writers) {
+        this.writers = writers;
+        this.readers = null;
+    }
+
+    public List<PersistentGroup> getReaders() {
+        return readers;
+    }
+
+    public void setReaders(List<PersistentGroup> readers) {
+        this.readers = readers;
+    }
+
+    public ProtocolVisibilityType getVisibilityType() {
+        return visibilityType;
+    }
+
+    public void setVisibilityType(ProtocolVisibilityType visibilityType) {
+        this.visibilityType = visibilityType;
+    }
 
-	public void addInternalResponsible(ProtocolResponsibleBean bean) {
-		if (internalResponsibles == null) {
-			internalResponsibles = new TreeSet<ProtocolResponsibleBean>();
-		}
+    public void addInternalResponsible(ProtocolResponsibleBean bean) {
+        if (internalResponsibles == null) {
+            internalResponsibles = new TreeSet<ProtocolResponsibleBean>();
+        }
 
-		internalResponsibles.add(bean);
-	}
+        internalResponsibles.add(bean);
+    }
 
-	public void addExternalResponsible(ProtocolResponsibleBean bean) {
-		if (externalResponsibles == null) {
-			externalResponsibles = new TreeSet<ProtocolResponsibleBean>();
-		}
-
-		externalResponsibles.add(bean);
-	}
-
-	public Unit getNewUnit() {
-		return newUnit;
-	}
-
-	public void setNewUnit(Unit newUnit) {
-		this.newUnit = newUnit;
-	}
-
-	public Person getNewPerson() {
-		return newPerson;
-	}
-
-	public void setNewPerson(Person newPerson) {
-		this.newPerson = newPerson;
-	}
-
-	public String getNewPosition() {
-		return newPosition;
-	}
-
-	public void setNewPosition(String newPosition) {
-		this.newPosition = newPosition;
-	}
-
-	public Person getCreator() {
-		return Authenticate.getCurrentUser().getPerson();
-	}
-
-	public List<ProtocolResponsible> getRemovedResponsibles() {
-		return removedResponsibles;
-	}
-
-	public void removeResponsible(ProtocolResponsibleBean bean) {
-		if (removedResponsibles == null) {
-			removedResponsibles = new ArrayList<ProtocolResponsible>();
-		}
-
-		removedResponsibles.add(bean.getProtocolResponsible());
-	}
-
-	/**
-	 * Verifies whether the internal responsibles are correctly set
-	 * 
-	 * @return
-	 */
-	public boolean internalResponsiblesCorrect() {
-
-		if (internalResponsibles == null || internalResponsibles.size() == 0) {
-			return false;
-		}
-
-		for (ProtocolResponsibleBean bean : internalResponsibles) {
-			if (!bean.check()) {
-				return false;
-			}
-		}
-
-		return true;
-
-	}
-
-	/**
-	 * Verifies whether the external responsibles are correctly set
-	 * 
-	 * @return
-	 */
-	public boolean externalResponsiblesCorrect() {
-
-		if (externalResponsibles == null || externalResponsibles.size() == 0) {
-			return false;
-		}
-
-		for (ProtocolResponsibleBean bean : externalResponsibles) {
-			if (!bean.check()) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public boolean permissionsCorrectlyDefined() {
-
-		return writers != null && visibilityType != null
-				&& (visibilityType == ProtocolVisibilityType.TOTAL || readers != null && readers.size() > 0);
-
-	}
-
-	public boolean isProtocolNumberValid() {
-		for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
-			if (protocol.equals(this.getProtocol())) {
-				continue;
-			}
-			if (protocol.getProtocolNumber().equals(getProtocolNumber())) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public ProtocolResponsibleBean getBeanForUnit(Unit unit) {
-
-		for (ProtocolResponsibleBean bean : getInternalResponsibles()) {
-			if (unit.equals(bean.getUnit())) {
-				return bean;
-			}
-		}
-		for (ProtocolResponsibleBean bean : getExternalResponsibles()) {
-			if (unit.equals(bean.getUnit())) {
-				return bean;
-			}
-		}
-		return null;
-	}
-
-	public void removeUnit(Unit unit) {
-		ProtocolResponsibleBean bean = getBeanForUnit(unit);
-		removeResponsible(bean);
-		if (internalResponsibles != null) {
-			internalResponsibles.remove(bean);
-		}
-		if (externalResponsibles != null) {
-			externalResponsibles.remove(bean);
-		}
-	}
+    public void addExternalResponsible(ProtocolResponsibleBean bean) {
+        if (externalResponsibles == null) {
+            externalResponsibles = new TreeSet<ProtocolResponsibleBean>();
+        }
+
+        externalResponsibles.add(bean);
+    }
+
+    public Unit getNewUnit() {
+        return newUnit;
+    }
+
+    public void setNewUnit(Unit newUnit) {
+        this.newUnit = newUnit;
+    }
+
+    public Person getNewPerson() {
+        return newPerson;
+    }
+
+    public void setNewPerson(Person newPerson) {
+        this.newPerson = newPerson;
+    }
+
+    public String getNewPosition() {
+        return newPosition;
+    }
+
+    public void setNewPosition(String newPosition) {
+        this.newPosition = newPosition;
+    }
+
+    public Person getCreator() {
+        return Authenticate.getCurrentUser().getPerson();
+    }
+
+    public List<ProtocolResponsible> getRemovedResponsibles() {
+        return removedResponsibles;
+    }
+
+    public void removeResponsible(ProtocolResponsibleBean bean) {
+        if (removedResponsibles == null) {
+            removedResponsibles = new ArrayList<ProtocolResponsible>();
+        }
+
+        removedResponsibles.add(bean.getProtocolResponsible());
+    }
+
+    /**
+     * Verifies whether the internal responsibles are correctly set
+     * 
+     * @return
+     */
+    public boolean internalResponsiblesCorrect() {
+
+        if (internalResponsibles == null || internalResponsibles.size() == 0) {
+            return false;
+        }
+
+        for (ProtocolResponsibleBean bean : internalResponsibles) {
+            if (!bean.check()) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Verifies whether the external responsibles are correctly set
+     * 
+     * @return
+     */
+    public boolean externalResponsiblesCorrect() {
+
+        if (externalResponsibles == null || externalResponsibles.size() == 0) {
+            return false;
+        }
+
+        for (ProtocolResponsibleBean bean : externalResponsibles) {
+            if (!bean.check()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean permissionsCorrectlyDefined() {
+
+        return writers != null && visibilityType != null
+                && (visibilityType == ProtocolVisibilityType.TOTAL || readers != null && readers.size() > 0);
+
+    }
+
+    public boolean isProtocolNumberValid() {
+        for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
+            if (protocol.equals(this.getProtocol())) {
+                continue;
+            }
+            if (protocol.getProtocolNumber().equals(getProtocolNumber())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public ProtocolResponsibleBean getBeanForUnit(Unit unit) {
+
+        for (ProtocolResponsibleBean bean : getInternalResponsibles()) {
+            if (unit.equals(bean.getUnit())) {
+                return bean;
+            }
+        }
+        for (ProtocolResponsibleBean bean : getExternalResponsibles()) {
+            if (unit.equals(bean.getUnit())) {
+                return bean;
+            }
+        }
+        return null;
+    }
+
+    public void removeUnit(Unit unit) {
+        ProtocolResponsibleBean bean = getBeanForUnit(unit);
+        removeResponsible(bean);
+        if (internalResponsibles != null) {
+            internalResponsibles.remove(bean);
+        }
+        if (externalResponsibles != null) {
+            externalResponsibles.remove(bean);
+        }
+    }
 
 }

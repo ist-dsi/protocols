@@ -9,17 +9,17 @@ import module.protocols.domain.ProtocolManager;
  */
 public enum ProtocolResponsibleType {
 
-	INTERNAL(ProtocolManager.getInstance().getInternalOrganizationalModel()), EXTERNAL(ProtocolManager.getInstance()
-			.getExternalOrganizationalModel());
+    INTERNAL(ProtocolManager.getInstance().getInternalOrganizationalModel()), EXTERNAL(ProtocolManager.getInstance()
+            .getExternalOrganizationalModel());
 
-	private OrganizationalModel model;
+    private OrganizationalModel model;
 
-	private ProtocolResponsibleType(OrganizationalModel model) {
-		this.model = model;
-	}
+    private ProtocolResponsibleType(OrganizationalModel model) {
+        this.model = model;
+    }
 
-	public OrganizationalModel getOrganizationalModel() {
-		return model;
-	}
+    public OrganizationalModel getOrganizationalModel() {
+        return model;
+    }
 
 }

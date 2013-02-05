@@ -15,49 +15,49 @@ import pt.ist.bennu.core.domain.groups.PersistentGroup;
  */
 public class ProtocolSystemConfigurationBean implements Serializable {
 
-	/**
+    /**
      * 
      */
-	private static final long serialVersionUID = 2000558610665541013L;
+    private static final long serialVersionUID = 2000558610665541013L;
 
-	private OrganizationalModel internalOrganizationalModel;
+    private OrganizationalModel internalOrganizationalModel;
 
-	private OrganizationalModel externalOrganizationalModel;
+    private OrganizationalModel externalOrganizationalModel;
 
-	private PersistentGroup administrativeGroup;
+    private PersistentGroup administrativeGroup;
 
-	public ProtocolSystemConfigurationBean() {
+    public ProtocolSystemConfigurationBean() {
 
-		ProtocolManager manager = ProtocolManager.getInstance();
+        ProtocolManager manager = ProtocolManager.getInstance();
 
-		this.internalOrganizationalModel = manager.getInternalOrganizationalModel();
-		this.externalOrganizationalModel = manager.getExternalOrganizationalModel();
+        this.internalOrganizationalModel = manager.getInternalOrganizationalModel();
+        this.externalOrganizationalModel = manager.getExternalOrganizationalModel();
 
-		this.administrativeGroup = manager.getAdministrativeGroup().getDelegateGroup();
-	}
+        this.administrativeGroup = manager.getAdministrativeGroup().getDelegateGroup();
+    }
 
-	public OrganizationalModel getInternalOrganizationalModel() {
-		return internalOrganizationalModel;
-	}
+    public OrganizationalModel getInternalOrganizationalModel() {
+        return internalOrganizationalModel;
+    }
 
-	public void setInternalOrganizationalModel(OrganizationalModel internalOrganizationalModel) {
-		this.internalOrganizationalModel = internalOrganizationalModel;
-	}
+    public void setInternalOrganizationalModel(OrganizationalModel internalOrganizationalModel) {
+        this.internalOrganizationalModel = internalOrganizationalModel;
+    }
 
-	public OrganizationalModel getExternalOrganizationalModel() {
-		return externalOrganizationalModel;
-	}
+    public OrganizationalModel getExternalOrganizationalModel() {
+        return externalOrganizationalModel;
+    }
 
-	public void setExternalOrganizationalModel(OrganizationalModel externalOrganizationalModel) {
-		this.externalOrganizationalModel = externalOrganizationalModel;
-	}
+    public void setExternalOrganizationalModel(OrganizationalModel externalOrganizationalModel) {
+        this.externalOrganizationalModel = externalOrganizationalModel;
+    }
 
-	public PersistentGroup getAdministrativeGroup() {
-		return administrativeGroup;
-	}
+    public PersistentGroup getAdministrativeGroup() {
+        return administrativeGroup;
+    }
 
-	public void setAdministrativeGroup(PersistentGroup administrativeGroup) {
-		this.administrativeGroup = administrativeGroup;
-	}
+    public void setAdministrativeGroup(PersistentGroup administrativeGroup) {
+        this.administrativeGroup = administrativeGroup;
+    }
 
 }

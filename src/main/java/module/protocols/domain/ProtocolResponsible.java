@@ -24,81 +24,81 @@ import com.google.common.collect.Collections2;
  */
 public class ProtocolResponsible extends ProtocolResponsible_Base {
 
-	private ProtocolResponsible() {
-		super();
-	}
+    private ProtocolResponsible() {
+        super();
+    }
 
-	public ProtocolResponsible(ProtocolResponsibleType type) {
-		this();
-		setType(type);
-	}
+    public ProtocolResponsible(ProtocolResponsibleType type) {
+        this();
+        setType(type);
+    }
 
-	/**
-	 * @param bean
-	 */
-	public void updateFromBean(ProtocolResponsibleBean bean) {
+    /**
+     * @param bean
+     */
+    public void updateFromBean(ProtocolResponsibleBean bean) {
 
-		this.setUnit(bean.getUnit());
+        this.setUnit(bean.getUnit());
 
-		reloadCountry();
+        reloadCountry();
 
-		for (Person person : getPeople()) {
-			removePeople(person);
-		}
+        for (Person person : getPeople()) {
+            removePeople(person);
+        }
 
-		for (Person person : bean.getResponsibles()) {
-			addPeople(person);
-		}
+        for (Person person : bean.getResponsibles()) {
+            addPeople(person);
+        }
 
-		this.setPositionList(bean.getPositions());
-	}
+        this.setPositionList(bean.getPositions());
+    }
 
-	public String getPresentationString() {
+    public String getPresentationString() {
 
-		Collection<String> strings = Collections2.transform(getPeople(), new Function<Person, String>() {
+        Collection<String> strings = Collections2.transform(getPeople(), new Function<Person, String>() {
 
-			@Override
-			public String apply(Person person) {
-				return person.getName();
-			}
+            @Override
+            public String apply(Person person) {
+                return person.getName();
+            }
 
-		});
+        });
 
-		return getPositionList() == null ? new Strings(strings).getPresentationString() : new Strings(getPositionList(),
-				strings.toArray(new String[0])).getPresentationString();
+        return getPositionList() == null ? new Strings(strings).getPresentationString() : new Strings(getPositionList(),
+                strings.toArray(new String[0])).getPresentationString();
 
-	}
+    }
 
-	public String getCountryDescription() {
-		Country country = getCountry();
-		if (country == null) {
-			return "";
-		} else {
-			return country.getName().getContent();
-		}
-	}
+    public String getCountryDescription() {
+        Country country = getCountry();
+        if (country == null) {
+            return "";
+        } else {
+            return country.getName().getContent();
+        }
+    }
 
-	@Service
-	public void reloadCountry() {
+    @Service
+    public void reloadCountry() {
 
-		Collection<Party> geoChildren =
-				getUnit().getChildren(AccountabilityType.readBy(GeographicConstants.GEOGRAPHIC_ACCOUNTABILITY_TYPE_NAME));
+        Collection<Party> geoChildren =
+                getUnit().getChildren(AccountabilityType.readBy(GeographicConstants.GEOGRAPHIC_ACCOUNTABILITY_TYPE_NAME));
 
-		Unit countryUnit = null;
+        Unit countryUnit = null;
 
-		for (Party party : geoChildren) {
-			if (party.isUnit()) {
-				countryUnit = (Unit) party;
-				break;
-			}
-		}
+        for (Party party : geoChildren) {
+            if (party.isUnit()) {
+                countryUnit = (Unit) party;
+                break;
+            }
+        }
 
-		if (countryUnit != null) {
+        if (countryUnit != null) {
 
-			GeographicLocation location = countryUnit.getGeographicLocation();
+            GeographicLocation location = countryUnit.getGeographicLocation();
 
-			setCountry((location instanceof Country) ? (Country) location : null);
-		}
+            setCountry((location instanceof Country) ? (Country) location : null);
+        }
 
-	}
+    }
 }

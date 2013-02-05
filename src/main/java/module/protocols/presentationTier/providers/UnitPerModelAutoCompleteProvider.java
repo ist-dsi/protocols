@@ -22,45 +22,45 @@ import com.google.common.collect.Sets;
  */
 public class UnitPerModelAutoCompleteProvider extends UnitAutoCompleteProvider {
 
-	@Override
-	protected Set<? extends Party> getParties(Map<String, String> argsMap, String value) {
+    @Override
+    protected Set<? extends Party> getParties(Map<String, String> argsMap, String value) {
 
-		try {
-			String model = argsMap.get("model");
+        try {
+            String model = argsMap.get("model");
 
-			if (model.equals("internal")) {
-				return getUnitsFromModel(ProtocolManager.getInstance().getInternalOrganizationalModel());
-			} else if (model.equals("external")) {
-				// External model only has top-level units, do a direct search
-				return ProtocolManager.getInstance().getExternalOrganizationalModel().getPartiesSet();
-			} else {
-				return super.getParties(argsMap, value);
-			}
+            if (model.equals("internal")) {
+                return getUnitsFromModel(ProtocolManager.getInstance().getInternalOrganizationalModel());
+            } else if (model.equals("external")) {
+                // External model only has top-level units, do a direct search
+                return ProtocolManager.getInstance().getExternalOrganizationalModel().getPartiesSet();
+            } else {
+                return super.getParties(argsMap, value);
+            }
 
-		} catch (Exception e) {
-			return super.getParties(argsMap, value);
-		}
+        } catch (Exception e) {
+            return super.getParties(argsMap, value);
+        }
 
-	}
+    }
 
-	private Set<Party> getUnitsFromModel(final OrganizationalModel model) {
+    private Set<Party> getUnitsFromModel(final OrganizationalModel model) {
 
-		if (model == null) {
-			throw new RuntimeException();
-		}
+        if (model == null) {
+            throw new RuntimeException();
+        }
 
-		return Sets.filter(MyOrg.getInstance().getPartiesSet(), new Predicate<Party>() {
+        return Sets.filter(MyOrg.getInstance().getPartiesSet(), new Predicate<Party>() {
 
-			@Override
-			public boolean apply(Party par) {
+            @Override
+            public boolean apply(Party par) {
 
-				if (!(par instanceof Unit)) {
-					return false;
-				}
+                if (!(par instanceof Unit)) {
+                    return false;
+                }
 
-				return model.containsUnit(par);
-			}
+                return model.containsUnit(par);
+            }
 
-		});
-	}
+        });
+    }
 }

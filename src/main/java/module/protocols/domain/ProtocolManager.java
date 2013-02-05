@@ -13,54 +13,54 @@ import pt.ist.fenixWebFramework.services.Service;
  */
 public class ProtocolManager extends ProtocolManager_Base {
 
-	public static ProtocolManager getInstance() {
+    public static ProtocolManager getInstance() {
 
-		ProtocolManager instance = MyOrg.getInstance().getProtocolManager();
+        ProtocolManager instance = MyOrg.getInstance().getProtocolManager();
 
-		// Should only happen once
-		if (instance == null) {
-			instance = createInstance();
-		}
+        // Should only happen once
+        if (instance == null) {
+            instance = createInstance();
+        }
 
-		return instance;
-	}
+        return instance;
+    }
 
-	@Service
-	private static ProtocolManager createInstance() {
+    @Service
+    private static ProtocolManager createInstance() {
 
-		ProtocolManager manager = new ProtocolManager();
-		manager.setAdministrativeGroup(new ProtocolAdministrativeGroup());
-		manager.setCreatorsGroup(new UnionGroup(manager.getAdministrativeGroup()));
+        ProtocolManager manager = new ProtocolManager();
+        manager.setAdministrativeGroup(new ProtocolAdministrativeGroup());
+        manager.setCreatorsGroup(new UnionGroup(manager.getAdministrativeGroup()));
 
-		return manager;
-	}
+        return manager;
+    }
 
-	private ProtocolManager() {
-		super();
-		setMyOrg(MyOrg.getInstance());
-		setCurrentSequenceNumber(0l);
-	}
+    private ProtocolManager() {
+        super();
+        setMyOrg(MyOrg.getInstance());
+        setCurrentSequenceNumber(0l);
+    }
 
-	@ConsistencyPredicate
-	protected final boolean checkForDifferentOrganizationalModels() {
-		return getInternalOrganizationalModel() == null ? true : getInternalOrganizationalModel() != getExternalOrganizationalModel();
-	}
+    @ConsistencyPredicate
+    protected final boolean checkForDifferentOrganizationalModels() {
+        return getInternalOrganizationalModel() == null ? true : getInternalOrganizationalModel() != getExternalOrganizationalModel();
+    }
 
-	/**
-	 * @param bean
-	 */
-	@Service
-	public void updateFromBean(ProtocolSystemConfigurationBean bean) {
-		setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
-		setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
-		getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
-	}
+    /**
+     * @param bean
+     */
+    @Service
+    public void updateFromBean(ProtocolSystemConfigurationBean bean) {
+        setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
+        setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
+        getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
+    }
 
-	@Service
-	public Long getNewProtocolNumber() {
-		long number = this.getCurrentSequenceNumber();
-		this.setCurrentSequenceNumber(number + 1);
-		return number;
-	}
+    @Service
+    public Long getNewProtocolNumber() {
+        long number = this.getCurrentSequenceNumber();
+        this.setCurrentSequenceNumber(number + 1);
+        return number;
+    }
 
 }

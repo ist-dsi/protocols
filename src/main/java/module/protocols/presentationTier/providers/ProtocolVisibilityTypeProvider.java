@@ -14,14 +14,14 @@ import pt.ist.fenixWebFramework.renderers.converters.EnumArrayConverter;
 
 public class ProtocolVisibilityTypeProvider implements DataProvider {
 
-	@Override
-	public Object provide(Object source, Object currentValue) {
-		return Arrays.asList(ProtocolVisibilityType.values());
-	}
+    @Override
+    public Object provide(Object source, Object currentValue) {
+        return Arrays.asList(ProtocolVisibilityType.values());
+    }
 
-	@Override
-	public Converter getConverter() {
-		return new EnumArrayConverter(ProtocolVisibilityType.class);
-	}
+    @Override
+    public Converter getConverter() {
+        return new EnumArrayConverter(ProtocolVisibilityType.class);
+    }
 
 }

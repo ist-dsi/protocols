@@ -16,26 +16,26 @@ import module.organization.presentationTier.renderers.providers.PersonAutoComple
  */
 public class PeoplePerUnitAutoCompleteProvider extends PersonAutoCompleteProvider {
 
-	@Override
-	protected Collection<Person> getPersons(Map<String, String> argsMap, String value) {
+    @Override
+    protected Collection<Person> getPersons(Map<String, String> argsMap, String value) {
 
-		try {
+        try {
 
-			String unitOID = argsMap.get("unit");
+            String unitOID = argsMap.get("unit");
 
-			Unit unit = Unit.fromExternalId(unitOID);
+            Unit unit = Unit.fromExternalId(unitOID);
 
-			Collection<Person> people = unit.getChildPersons();
+            Collection<Person> people = unit.getChildPersons();
 
-			if (people.size() == 0) {
-				return super.getPersons(argsMap, value);
-			} else {
-				return people;
-			}
+            if (people.size() == 0) {
+                return super.getPersons(argsMap, value);
+            } else {
+                return people;
+            }
 
-		} catch (Exception e) {
-			return super.getPersons(argsMap, value);
-		}
-	}
+        } catch (Exception e) {
+            return super.getPersons(argsMap, value);
+        }
+    }
 
 }
