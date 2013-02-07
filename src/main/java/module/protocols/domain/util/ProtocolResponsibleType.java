@@ -9,17 +9,20 @@ import module.protocols.domain.ProtocolManager;
  */
 public enum ProtocolResponsibleType {
 
-    INTERNAL(ProtocolManager.getInstance().getInternalOrganizationalModel()), EXTERNAL(ProtocolManager.getInstance()
-            .getExternalOrganizationalModel());
+    INTERNAL() {
+        @Override
+        public OrganizationalModel getOrganizationalModel() {
+            return ProtocolManager.getInstance().getInternalOrganizationalModel();
+        }
+    },
 
-    private OrganizationalModel model;
+    EXTERNAL() {
+        @Override
+        public OrganizationalModel getOrganizationalModel() {
+            return ProtocolManager.getInstance().getExternalOrganizationalModel();
+        }
+    };
 
-    private ProtocolResponsibleType(OrganizationalModel model) {
-        this.model = model;
-    }
-
-    public OrganizationalModel getOrganizationalModel() {
-        return model;
-    }
+    abstract public OrganizationalModel getOrganizationalModel();
 
 }
