@@ -6,6 +6,7 @@ package module.protocols.presentationTier.providers;
 import module.protocols.domain.ProtocolAdministrativeGroup;
 import pt.ist.bennu.core.domain.MyOrg;
 import pt.ist.bennu.core.domain.groups.IntersectionGroup;
+import pt.ist.bennu.core.domain.groups.NegationGroup;
 import pt.ist.bennu.core.domain.groups.PersistentGroup;
 import pt.ist.bennu.core.domain.groups.SingleUserGroup;
 import pt.ist.bennu.core.domain.groups.UnionGroup;
@@ -32,8 +33,21 @@ public class PersistentGroupsProvider implements DataProvider {
 
             @Override
             public boolean apply(PersistentGroup group) {
-                return !(group instanceof ProtocolAdministrativeGroup || group instanceof UnionGroup
-                        || group instanceof IntersectionGroup || group instanceof SingleUserGroup);
+                /*
+                 * Small hacks so the interface does not get so sluggish.
+                 */
+                if (group instanceof ProtocolAdministrativeGroup || group instanceof UnionGroup
+                        || group instanceof IntersectionGroup || group instanceof SingleUserGroup
+                        || group instanceof NegationGroup) {
+                    return false;
+                }
+
+                String className = group.getClass().getName();
+
+                if (className.startsWith("module.workflow") || className.startsWith("module.siadap")) {
+                    return false;
+                }
+                return true;
             }
         });
     }
