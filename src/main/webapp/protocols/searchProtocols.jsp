@@ -64,27 +64,13 @@
 		<table class="tstyle5 aright mvert05">
 		<tr>
 			<td>
-				<fr:edit name="protocolSearch" id="protocolBeginDate" schema="edit.protocolSearch.protocolBeginDate" layout="flow">
-					<fr:layout name="flow">
-						<fr:property name="classes" value=""/>
-						<fr:property name="labelTerminator" value=""/>
-					</fr:layout>
-				</fr:edit>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fr:edit name="protocolSearch" id="protocolEndDate" schema="edit.protocolSearch.protocolEndDate" layout="flow">
-					<fr:layout name="flow">
-						<fr:property name="classes" value=""/>
-						<fr:property name="labelTerminator" value=""/>
-					</fr:layout>
-				</fr:edit>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<fr:edit name="protocolSearch" id="signedDate" schema="edit.protocolSearch.signedDate" layout="flow">
+				<fr:edit name="protocolSearch" id="protocolDates" layout="flow">
+					<fr:schema bundle="PROTOCOLS_RESOURCES" type="module.protocols.dto.ProtocolSearchBean">
+						<fr:slot name="beginDate" key="label.protocol.active.between" bundle="PROTOCOLS_RESOURCES" layout="picker">
+							<fr:property name="formatText" value=""/>
+						</fr:slot>
+						<fr:slot name="endDate" key="label.protocol.and" bundle="PROTOCOLS_RESOURCES" layout="picker"/>
+					</fr:schema>
 					<fr:layout name="flow">
 						<fr:property name="classes" value=""/>
 						<fr:property name="labelTerminator" value=""/>

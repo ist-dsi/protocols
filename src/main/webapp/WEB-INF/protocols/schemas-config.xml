@@ -128,27 +128,6 @@
 	</slot>
 </schema>
 
-<schema name="edit.protocolSearch.protocolBeginDate" type="module.protocols.dto.ProtocolSearchBean">
-	<slot name="beginProtocolBeginDate" key="label.protocol.beginDate.between" bundle="PROTOCOLS_RESOURCES" layout="picker">
-		<property name="formatText" value=""/>
-	</slot>
-	<slot name="endProtocolBeginDate" key="label.protocol.and" bundle="PROTOCOLS_RESOURCES" layout="picker"/>
-</schema>
-
-<schema name="edit.protocolSearch.protocolEndDate" type="module.protocols.dto.ProtocolSearchBean">
-	<slot name="beginProtocolEndDate" key="label.protocol.endDate.between" bundle="PROTOCOLS_RESOURCES" layout="picker">
-		<property name="formatText" value=""/>
-	</slot>
-	<slot name="endProtocolEndDate" key="label.protocol.and" bundle="PROTOCOLS_RESOURCES" layout="picker"/>
-</schema>
-
-<schema name="edit.protocolSearch.signedDate" type="module.protocols.dto.ProtocolSearchBean">
-	<slot name="beginSignedDate" key="label.protocols.signedDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
-		<property name="formatText" value=""/>
-	</slot>
-	<slot name="endSignedDate" key="label.protocol.and" bundle="PROTOCOLS_RESOURCES" layout="picker"/>
-</schema>
-
 <!-- Protocol Creation -->
 
 <schema name="create.protocol" type="module.protocols.dto.ProtocolCreationBean">

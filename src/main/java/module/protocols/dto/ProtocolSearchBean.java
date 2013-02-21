@@ -48,17 +48,9 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 
     private Integer year;
 
-    private LocalDate beginProtocolBeginDate;
+    private LocalDate beginDate;
 
-    private LocalDate endProtocolBeginDate;
-
-    private LocalDate beginProtocolEndDate;
-
-    private LocalDate endProtocolEndDate;
-
-    private LocalDate beginSignedDate;
-
-    private LocalDate endSignedDate;
+    private LocalDate endDate;
 
     private List<ProtocolActionType> protocolActionTypes;
 
@@ -99,52 +91,20 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
         this.year = year;
     }
 
-    public LocalDate getBeginProtocolBeginDate() {
-        return beginProtocolBeginDate;
+    public LocalDate getBeginDate() {
+        return beginDate;
     }
 
-    public void setBeginProtocolBeginDate(LocalDate beginProtocolBeginDate) {
-        this.beginProtocolBeginDate = beginProtocolBeginDate;
+    public void setBeginDate(LocalDate beginDate) {
+        this.beginDate = beginDate;
     }
 
-    public LocalDate getEndProtocolBeginDate() {
-        return endProtocolBeginDate;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndProtocolBeginDate(LocalDate endProtocolBeginDate) {
-        this.endProtocolBeginDate = endProtocolBeginDate;
-    }
-
-    public LocalDate getBeginProtocolEndDate() {
-        return beginProtocolEndDate;
-    }
-
-    public void setBeginProtocolEndDate(LocalDate beginProtocolEndDate) {
-        this.beginProtocolEndDate = beginProtocolEndDate;
-    }
-
-    public LocalDate getEndProtocolEndDate() {
-        return endProtocolEndDate;
-    }
-
-    public void setEndProtocolEndDate(LocalDate endProtocolEndDate) {
-        this.endProtocolEndDate = endProtocolEndDate;
-    }
-
-    public LocalDate getBeginSignedDate() {
-        return beginSignedDate;
-    }
-
-    public void setBeginSignedDate(LocalDate beginSignedDate) {
-        this.beginSignedDate = beginSignedDate;
-    }
-
-    public LocalDate getEndSignedDate() {
-        return endSignedDate;
-    }
-
-    public void setEndSignedDate(LocalDate endSignedDate) {
-        this.endSignedDate = endSignedDate;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public List<ProtocolActionType> getProtocolActionTypes() {
@@ -223,15 +183,23 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
      * Fun stuff
      */
 
-    private boolean satisfiesAnyProtocolHistoryDate(LocalDate beginProtocolBeginDate, LocalDate endProtocolBeginDate,
-            Protocol protocol) {
-        for (ProtocolHistory protocolHistory : protocol.getProtocolHistories()) {
-            if (satisfiedDates(getBeginProtocolBeginDate(), getEndProtocolBeginDate(), protocolHistory.getBeginDate())
-                    && satisfiedDates(getBeginProtocolEndDate(), getEndProtocolEndDate(), protocolHistory.getBeginDate())) {
-                return true;
-            }
+    private boolean satisfiesAnyProtocolHistoryDate(Protocol protocol) {
+        ProtocolHistory history = protocol.getPresentableProtocolHistory();
+
+        if (history.getBeginDate() != null && history.getEndDate() != null
+                && history.getBeginDate().isAfter(history.getEndDate())) {
+            return false;
         }
-        return false;
+
+        if (beginDate != null && endDate != null && beginDate.isAfter(endDate)) {
+            return false;
+        }
+
+        Interval activeInterval = IntervalTools.getInterval(history.getBeginDate(), history.getEndDate());
+
+        Interval searchInterval = IntervalTools.getInterval(beginDate, endDate);
+
+        return searchInterval.contains(activeInterval);
     }
 
     private boolean satisfiedActiveInYear(Protocol protocol) {
@@ -243,18 +211,6 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
                     return (protocolHistory.getBeginDate() == null || protocolHistory.getBeginDate().getYear() <= getYear())
                             && protocolHistory.getEndDate().getYear() >= getYear();
                 }
-            }
-        }
-        return true;
-    }
-
-    private boolean satisfiedDates(LocalDate beginDate, LocalDate endDate, LocalDate date) {
-        if (beginDate != null && date != null) {
-            if (endDate != null) {
-                Interval interval = IntervalTools.getInterval(beginDate, endDate);
-                return interval.contains(date.toDateMidnight());
-            } else {
-                return !beginDate.isAfter(date);
             }
         }
         return true;
@@ -340,9 +296,7 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
         // ReflectionToStringBuilder.toString(this,
         // ToStringStyle.MULTI_LINE_STYLE));
 
-        return satisfiedProtocolNumber(protocol)
-                && satisfiesAnyProtocolHistoryDate(getBeginProtocolBeginDate(), getEndProtocolBeginDate(), protocol)
-                && satisfiedDates(getBeginSignedDate(), getEndSignedDate(), protocol.getSignedDate())
+        return satisfiedProtocolNumber(protocol) && satisfiesAnyProtocolHistoryDate(protocol)
                 && satisfiedOtherProtocolActionTypes(protocol) && satiefiedProtocolActionTypes(protocol)
                 && satisfiedProtocolPartner(protocol) && satisfiedNationality(protocol) && satisfiedActivity(protocol)
                 && satisfiedActiveInYear(protocol) && protocol.canBeReadByUser(Authenticate.getCurrentUser());
