@@ -93,12 +93,9 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
             }
         }
 
-        if (countryUnit != null) {
+        GeographicLocation location = countryUnit != null ? countryUnit.getGeographicLocation() : Country.getPortugal();
 
-            GeographicLocation location = countryUnit.getGeographicLocation();
-
-            setCountry((location instanceof Country) ? (Country) location : null);
-        }
+        setCountry((location instanceof Country) ? (Country) location : null);
 
     }
 }
