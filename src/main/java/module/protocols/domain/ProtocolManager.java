@@ -1,6 +1,7 @@
 package module.protocols.domain;
 
 import jvstm.cps.ConsistencyPredicate;
+import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
 import pt.ist.bennu.core.domain.MyOrg;
 import pt.ist.bennu.core.domain.groups.UnionGroup;
@@ -61,6 +62,17 @@ public class ProtocolManager extends ProtocolManager_Base {
         long number = this.getCurrentSequenceNumber();
         this.setCurrentSequenceNumber(number + 1);
         return number;
+    }
+
+    @Service
+    public void reloadAllCountries() {
+        for (Protocol protocol : getProtocols()) {
+            for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
+                if (responsible.getType() == ProtocolResponsibleType.EXTERNAL) {
+                    responsible.reloadCountry();
+                }
+            }
+        }
     }
 
 }

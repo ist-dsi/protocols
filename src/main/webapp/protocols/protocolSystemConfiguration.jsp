@@ -4,6 +4,12 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
+<style>
+select {
+	max-width: 700px;
+}
+</style>
+
 <h2>
 <bean:message key="label.protocolSystem.configure" bundle="PROTOCOLS_RESOURCES" />
 </h2>
@@ -111,5 +117,15 @@
 </p>
 
 </fr:form>
+
+<hr />
+
+
+<div class="infobox" align="center">
+	<p class="dinline"><strong><bean:message key="label.countries.reload" bundle="PROTOCOLS_RESOURCES"/></strong></p>
+</div>
+
+<bean:message key="label.countries.reload.message" bundle="PROTOCOLS_RESOURCES" /> - 
+<html:link action="/protocols.do?method=reloadCountries"><bean:message key="label.countries.reload" bundle="PROTOCOLS_RESOURCES"/></html:link>
 
 </logic:present>

@@ -4,6 +4,11 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
+<style>
+select {
+	max-width: 700px;
+}
+</style>
 
 <div align="center">
 

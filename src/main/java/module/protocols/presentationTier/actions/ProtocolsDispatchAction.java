@@ -176,6 +176,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         return forward(request, "/protocols/protocolSystemConfiguration.jsp");
     }
 
+    public ActionForward reloadCountries(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
+            final HttpServletResponse response) {
+        ProtocolManager.getInstance().reloadAllCountries();
+        return protocolSystemConfiguration(mapping, form, request, response);
+    }
+
     public ActionForward authorizationGroupsConfiguration(final ActionMapping mapping, final ActionForm form,
             final HttpServletRequest request, final HttpServletResponse response) {
 
