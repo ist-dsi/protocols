@@ -11,7 +11,7 @@ import module.organization.domain.Person;
 import module.organization.domain.Unit;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.util.Strings;
 
 import com.google.common.base.Function;
@@ -78,7 +78,7 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
         }
     }
 
-    @Service
+    @Atomic
     public void reloadCountry() {
 
         Collection<Party> geoChildren =

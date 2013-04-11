@@ -5,7 +5,7 @@ import java.util.List;
 import module.fileManagement.domain.ContextPath;
 import pt.ist.bennu.core.domain.exceptions.DomainException;
 import pt.ist.bennu.core.domain.groups.PersistentGroup;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 
 public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base {
 
@@ -17,7 +17,7 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
         this.setGroupDir(new ProtocolDirNode(this));
     }
 
-    @Service
+    @Atomic
     public static Boolean createGroupWithWriter(PersistentGroup group) {
         if (containsGroup(group)) {
             return false;
@@ -36,7 +36,7 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
         return false;
     }
 
-    @Service
+    @Atomic
     public void delete() {
 
         if (!getWriterProtocols().isEmpty()) {
@@ -57,7 +57,7 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
         this.deleteDomainObject();
     }
 
-    @Service
+    @Atomic
     public void updateReaders(List<PersistentGroup> authorizedGroups) {
         for (PersistentGroup existing : getAuthorizedReaderGroups()) {
             if (!authorizedGroups.contains(existing)) {
