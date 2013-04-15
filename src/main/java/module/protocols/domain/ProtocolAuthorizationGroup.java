@@ -49,10 +49,10 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
 
         groupDir.trash(new ContextPath(groupDir));
 
-        this.removeGroupDir();
+        this.setGroupDir(null);
         this.removeReaders();
-        this.removeProtocolManager();
-        this.removeAuthorizedWriterGroup();
+        this.setProtocolManager(null);
+        this.setAuthorizedWriterGroup(null);
 
         this.deleteDomainObject();
     }
@@ -75,4 +75,15 @@ public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base 
             removeAuthorizedReaderGroups(group);
         }
     }
+
+    @Deprecated
+    public java.util.Set<pt.ist.bennu.core.domain.groups.PersistentGroup> getAuthorizedReaderGroups() {
+        return getAuthorizedReaderGroupsSet();
+    }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.Protocol> getWriterProtocols() {
+        return getWriterProtocolsSet();
+    }
+
 }

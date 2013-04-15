@@ -60,7 +60,7 @@ public class Protocol extends Protocol_Base {
             history.delete();
         }
 
-        removeProtocolManager();
+        setProtocolManager(null);
         deleteDomainObject();
     }
 
@@ -195,7 +195,7 @@ public class Protocol extends Protocol_Base {
 
         for (ProtocolResponsibleBean bean : protocolBean.getInternalResponsibles()) {
             ProtocolResponsible responsible = bean.getProtocolResponsible();
-            if (this.hasProtocolResponsible(responsible)) {
+            if (this.getProtocolResponsibleSet().contains(responsible)) {
                 responsible.updateFromBean(bean);
             } else {
                 ProtocolResponsible newResponsible = new ProtocolResponsible(ProtocolResponsibleType.INTERNAL);
@@ -207,7 +207,7 @@ public class Protocol extends Protocol_Base {
 
         for (ProtocolResponsibleBean bean : protocolBean.getExternalResponsibles()) {
             ProtocolResponsible responsible = bean.getProtocolResponsible();
-            if (this.hasProtocolResponsible(responsible)) {
+            if (this.getProtocolResponsibleSet().contains(responsible)) {
                 responsible.updateFromBean(bean);
             } else {
                 ProtocolResponsible newResponsible = new ProtocolResponsible(ProtocolResponsibleType.EXTERNAL);
@@ -426,4 +426,20 @@ public class Protocol extends Protocol_Base {
 
         return builder.toString();
     }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.ProtocolHistory> getProtocolHistories() {
+        return getProtocolHistoriesSet();
+    }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.ProtocolResponsible> getProtocolResponsible() {
+        return getProtocolResponsibleSet();
+    }
+
+    @Deprecated
+    public java.util.Set<pt.ist.bennu.core.domain.groups.PersistentGroup> getReaderGroups() {
+        return getReaderGroupsSet();
+    }
+
 }

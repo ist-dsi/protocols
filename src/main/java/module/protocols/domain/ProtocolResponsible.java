@@ -98,4 +98,9 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
         setCountry((location instanceof Country) ? (Country) location : null);
 
     }
+    @Deprecated
+    public java.util.Set<module.organization.domain.Person> getPeople() {
+        return getPeopleSet();
+    }
+
 }

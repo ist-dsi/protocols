@@ -75,4 +75,14 @@ public class ProtocolManager extends ProtocolManager_Base {
         }
     }
 
+    @Deprecated
+    public java.util.Set<module.protocols.domain.ProtocolAuthorizationGroup> getProtocolAuthorizationGroups() {
+        return getProtocolAuthorizationGroupsSet();
+    }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.Protocol> getProtocols() {
+        return getProtocolsSet();
+    }
+
 }

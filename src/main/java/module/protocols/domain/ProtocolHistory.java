@@ -75,7 +75,7 @@ public class ProtocolHistory extends ProtocolHistory_Base {
     }
 
     public void delete() {
-        removeProtocol();
+        setProtocol(null);
         deleteDomainObject();
     }
 
