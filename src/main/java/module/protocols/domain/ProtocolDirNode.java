@@ -39,14 +39,14 @@ public class ProtocolDirNode extends ProtocolDirNode_Base {
     @Override
     @ConsistencyPredicate
     public boolean checkParent() {
-        return super.checkParent() ? true : hasOwnerGroup();
+        return super.checkParent() ? true : getOwnerGroup() != null;
     }
 
     @Override
     public void delete() {
-        removeWriteGroup();
-        removeOwnerGroup();
-        removeTrash();
+        setWriteGroup(null);
+        setOwnerGroup(null);
+        setTrash(null);
         super.delete();
     }
 
