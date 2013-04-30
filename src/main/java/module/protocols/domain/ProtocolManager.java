@@ -5,7 +5,7 @@ import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
 import pt.ist.bennu.core.domain.MyOrg;
 import pt.ist.bennu.core.domain.groups.UnionGroup;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 
 /**
  * 
@@ -26,7 +26,7 @@ public class ProtocolManager extends ProtocolManager_Base {
         return instance;
     }
 
-    @Service
+    @Atomic
     private static ProtocolManager createInstance() {
 
         ProtocolManager manager = new ProtocolManager();
@@ -50,21 +50,21 @@ public class ProtocolManager extends ProtocolManager_Base {
     /**
      * @param bean
      */
-    @Service
+    @Atomic
     public void updateFromBean(ProtocolSystemConfigurationBean bean) {
         setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
         setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
         getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
     }
 
-    @Service
+    @Atomic
     public Long getNewProtocolNumber() {
         long number = this.getCurrentSequenceNumber();
         this.setCurrentSequenceNumber(number + 1);
         return number;
     }
 
-    @Service
+    @Atomic
     public void reloadAllCountries() {
         for (Protocol protocol : getProtocols()) {
             for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
@@ -73,6 +73,16 @@ public class ProtocolManager extends ProtocolManager_Base {
                 }
             }
         }
+    }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.ProtocolAuthorizationGroup> getProtocolAuthorizationGroups() {
+        return getProtocolAuthorizationGroupsSet();
+    }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.Protocol> getProtocols() {
+        return getProtocolsSet();
     }
 
 }

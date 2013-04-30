@@ -24,7 +24,7 @@ import pt.ist.bennu.core.domain.groups.PersistentGroup;
 import pt.ist.bennu.core.domain.groups.UnionGroup;
 import pt.ist.bennu.core.util.BundleUtil;
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.util.StringNormalizer;
 
 import com.google.common.base.Predicate;
@@ -60,7 +60,7 @@ public class Protocol extends Protocol_Base {
             history.delete();
         }
 
-        removeProtocolManager();
+        setProtocolManager(null);
         deleteDomainObject();
     }
 
@@ -139,7 +139,7 @@ public class Protocol extends Protocol_Base {
         });
     }
 
-    @Service
+    @Atomic
     public void renewFor(Integer duration, RenewTime renewTime) {
 
         LocalDate beginDate = getLastProtocolHistory().getEndDate();
@@ -153,7 +153,7 @@ public class Protocol extends Protocol_Base {
         new ProtocolHistory(this, beginDate, endDate);
     }
 
-    @Service
+    @Atomic
     public static Protocol createProtocol(ProtocolCreationBean protocolBean) {
 
         Protocol protocol = new Protocol();
@@ -177,7 +177,7 @@ public class Protocol extends Protocol_Base {
         super.setProtocolNumber(number);
     }
 
-    @Service
+    @Atomic
     public void updateFromBean(ProtocolCreationBean protocolBean) {
 
         this.setSignedDate(protocolBean.getSignedDate());
@@ -195,7 +195,7 @@ public class Protocol extends Protocol_Base {
 
         for (ProtocolResponsibleBean bean : protocolBean.getInternalResponsibles()) {
             ProtocolResponsible responsible = bean.getProtocolResponsible();
-            if (this.hasProtocolResponsible(responsible)) {
+            if (this.getProtocolResponsibleSet().contains(responsible)) {
                 responsible.updateFromBean(bean);
             } else {
                 ProtocolResponsible newResponsible = new ProtocolResponsible(ProtocolResponsibleType.INTERNAL);
@@ -207,7 +207,7 @@ public class Protocol extends Protocol_Base {
 
         for (ProtocolResponsibleBean bean : protocolBean.getExternalResponsibles()) {
             ProtocolResponsible responsible = bean.getProtocolResponsible();
-            if (this.hasProtocolResponsible(responsible)) {
+            if (this.getProtocolResponsibleSet().contains(responsible)) {
                 responsible.updateFromBean(bean);
             } else {
                 ProtocolResponsible newResponsible = new ProtocolResponsible(ProtocolResponsibleType.EXTERNAL);
@@ -339,7 +339,7 @@ public class Protocol extends Protocol_Base {
         return files;
     }
 
-    @Service
+    @Atomic
     public void uploadFile(String filename, byte[] contents) {
 
         Document document = new Document(filename, filename, contents);
@@ -426,4 +426,20 @@ public class Protocol extends Protocol_Base {
 
         return builder.toString();
     }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.ProtocolHistory> getProtocolHistories() {
+        return getProtocolHistoriesSet();
+    }
+
+    @Deprecated
+    public java.util.Set<module.protocols.domain.ProtocolResponsible> getProtocolResponsible() {
+        return getProtocolResponsibleSet();
+    }
+
+    @Deprecated
+    public java.util.Set<pt.ist.bennu.core.domain.groups.PersistentGroup> getReaderGroups() {
+        return getReaderGroupsSet();
+    }
+
 }
