@@ -5,7 +5,6 @@ package module.protocols.presentationTier.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +48,7 @@ import pt.ist.bennu.core.util.VariantBean;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.servlets.functionalities.CreateNodeAction;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
+import pt.ist.fenixframework.FenixFramework;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -129,7 +129,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         setOrganizationalModels(request);
 
-        List<Protocol> allProtocols = ProtocolManager.getInstance().getProtocols();
+        Collection<Protocol> allProtocols = ProtocolManager.getInstance().getProtocols();
 
         Collection<Protocol> almostExpiredProtocols = Collections2.filter(allProtocols, new Predicate<Protocol>() {
 
@@ -223,7 +223,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         checkAdministrative();
 
-        ProtocolAuthorizationGroup group = ProtocolAuthorizationGroup.fromExternalId(request.getParameter("OID"));
+        ProtocolAuthorizationGroup group = getDomainObject(request, "OID");
 
         try {
             group.delete();
@@ -242,7 +242,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         AuthorizationGroupBean bean = getRenderedObject();
 
         if (bean == null) {
-            ProtocolAuthorizationGroup group = ProtocolAuthorizationGroup.fromExternalId(request.getParameter("OID"));
+            ProtocolAuthorizationGroup group = getDomainObject(request, "OID");
             bean = new AuthorizationGroupBean(group);
             request.setAttribute("bean", bean);
             return forward(request, "/protocols/configureAuthorizationGroup.jsp");
@@ -273,7 +273,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         request.setAttribute("protocol", protocol);
 
-        List<ProtocolResponsible> responsibles = protocol.getProtocolResponsible();
+        Collection<ProtocolResponsible> responsibles = protocol.getProtocolResponsible();
 
         Collection<ProtocolResponsible> internalResponsibles =
                 Collections2.filter(responsibles, new Predicate<ProtocolResponsible>() {
@@ -345,7 +345,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     public ActionForward prepareEditProtocolHistory(final ActionMapping mapping, final ActionForm form,
             final HttpServletRequest request, final HttpServletResponse response) {
 
-        Protocol protocol = Protocol.fromExternalId(request.getParameter("OID"));
+        Protocol protocol = getDomainObject(request, "OID");
 
         request.setAttribute("protocolHistory", new ProtocolHistoryBean(protocol.getCurrentProtocolHistory()));
 
@@ -377,7 +377,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         String protocolOID = request.getParameter("protocolOID");
 
-        Protocol protocol = Protocol.fromExternalId(protocolOID);
+        Protocol protocol = FenixFramework.getDomainObject(protocolOID);
 
         ProtocolHistoryBean bean = new ProtocolHistoryBean(protocol);
 

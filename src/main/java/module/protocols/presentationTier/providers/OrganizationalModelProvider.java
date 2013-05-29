@@ -24,7 +24,7 @@ public class OrganizationalModelProvider implements DataProvider {
 
     @Override
     public Object provide(Object source, Object currentValue) {
-        return new ArrayList<OrganizationalModel>(MyOrg.getInstance().getOrganizationalModels());
+        return new ArrayList<OrganizationalModel>(MyOrg.getInstance().getOrganizationalModelsSet());
     }
 
 }

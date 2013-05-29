@@ -8,7 +8,7 @@ import org.joda.time.LocalDate;
 
 import pt.ist.bennu.core.domain.exceptions.DomainException;
 import pt.ist.bennu.core.util.IntervalTools;
-import pt.ist.fenixWebFramework.services.Service;
+import pt.ist.fenixframework.Atomic;
 
 import com.google.common.collect.Ordering;
 
@@ -51,7 +51,7 @@ public class ProtocolHistory extends ProtocolHistory_Base {
         setEndDate(endDate);
     }
 
-    @Service
+    @Atomic
     public void editProtocolHistory(LocalDate beginDate, LocalDate endDate) {
         this.setBeginDate(beginDate);
         this.setEndDate(endDate);
@@ -75,7 +75,7 @@ public class ProtocolHistory extends ProtocolHistory_Base {
     }
 
     public void delete() {
-        removeProtocol();
+        setProtocol(null);
         deleteDomainObject();
     }
 

@@ -32,7 +32,7 @@ public class ProtocolAdministrativeGroup extends ProtocolAdministrativeGroup_Bas
 
     @Override
     public void delete() {
-        removeDelegateGroup();
+        setDelegateGroup(null);
         super.delete();
     }
 
