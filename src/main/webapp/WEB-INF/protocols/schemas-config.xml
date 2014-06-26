@@ -5,8 +5,8 @@
 <!-- ProtocolHistory -->
 <schema name="show.almostExpiredProtocols" type="module.protocols.domain.Protocol">
 	<slot name="protocolNumber" key="label.protocols.number" bundle="PROTOCOLS_RESOURCES"/>
-	<slot name="currentProtocolHistory.beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES"/>
-	<slot name="currentProtocolHistory.endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES"/>
+	<slot name="lastProtocolHistory.beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES"/>
+	<slot name="lastProtocolHistory.endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES"/>
 </schema>
 
 <schema name="show.nullEndDateProtocols" type="module.protocols.domain.Protocol">
