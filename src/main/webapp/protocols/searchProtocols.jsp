@@ -23,7 +23,8 @@
 	
 
 	<html:errors/>
-	<fr:form action="/protocols.do?method=searchProtocols">
+	<fr:form action="/protocols.do">
+		<input type="hidden" name="method" value="searchProtocols"/>
 
 		<div class="mvert15">
 			<p class="mvert0"><span class="error0"><fr:message for="protocolBeginDate"/></span></p>
@@ -81,16 +82,21 @@
 		</table>
 
 		<p class="mbottom15">
-		<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit" property="search">
+		<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit" property="search" onclick="this.form.method.value='searchProtocols';this.form.submit();">
 			<bean:message key="button.search" bundle="PROTOCOLS_RESOURCES"/>
 		</html:submit>
+		<span style="float: right">
+			<logic:present name="searchResults">
+				<html:submit onclick="this.form.method.value='exportSearchResultsToExcel';this.form.submit();">
+					<bean:message key="button.export" bundle="PROTOCOLS_RESOURCES"/>
+				</html:submit>
+			</logic:present>
+		</span>
 		</p>
 	</fr:form>
 
 </div>
 </div>
-
-
 
 <logic:present name="searchResults">
 

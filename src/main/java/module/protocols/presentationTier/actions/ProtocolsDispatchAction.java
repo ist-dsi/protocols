@@ -3,8 +3,13 @@
  */
 package module.protocols.presentationTier.actions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +20,10 @@ import module.organization.domain.Person;
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
 import module.protocols.domain.ProtocolAuthorizationGroup;
+import module.protocols.domain.ProtocolHistory;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
+import module.protocols.domain.util.ProtocolActionType;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.AuthorizationGroupBean;
 import module.protocols.dto.ProtocolCreationBean;
@@ -43,16 +50,21 @@ import pt.ist.bennu.core.domain.exceptions.DomainException;
 import pt.ist.bennu.core.domain.groups.PersistentGroup;
 import pt.ist.bennu.core.domain.groups.UserGroup;
 import pt.ist.bennu.core.presentationTier.actions.ContextBaseAction;
+import pt.ist.bennu.core.util.BundleUtil;
 import pt.ist.bennu.core.util.InputStreamUtil;
 import pt.ist.bennu.core.util.VariantBean;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixWebFramework.servlets.functionalities.CreateNodeAction;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.fenixframework.FenixFramework;
+import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
+import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -336,6 +348,90 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolSearch", bean);
 
         return forward(request, "/protocols/searchProtocols.jsp");
+    }
+
+    public ActionForward exportSearchResultsToExcel(final ActionMapping mapping, final ActionForm form,
+            final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+
+        ProtocolSearchBean bean = getRenderedObject();
+        List<Protocol> filteredProtocols =
+                new ArrayList<>(Collections2.filter(ProtocolManager.getInstance().getProtocolsSet(), bean));
+
+        Spreadsheet spreadsheet = new Spreadsheet("Protocols");
+
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources", "label.protocols.number"));
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
+                "label.protocols.internalResponsibles"));
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
+                "label.protocols.externalResponsibles"));
+        spreadsheet.setHeader(BundleUtil
+                .getStringFromResourceBundle("resources.ProtocolsResources", "label.protocols.signedDate"));
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
+                "label.protocols.actualDates"));
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
+                "label.protocols.scientificAreas"));
+        spreadsheet.setHeader(BundleUtil
+                .getStringFromResourceBundle("resources.ProtocolsResources", "label.protocol.actionTypes"));
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
+                "label.protocol.otherActionTypes"));
+        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
+                "label.protocols.observations"));
+
+        Collections.sort(filteredProtocols, new Comparator<Protocol>() {
+            @Override
+            public int compare(Protocol o1, Protocol o2) {
+                return o1.getProtocolNumber().compareTo(o2.getProtocolNumber());
+            }
+        });
+
+        for (Protocol protocol : filteredProtocols) {
+            Row row = spreadsheet.addRow();
+            row.setCell(protocol.getProtocolNumber());
+            row.setCell(Joiner.on('\n').join(responsibles(protocol, true)));
+            row.setCell(Joiner.on('\n').join(responsibles(protocol, false)));
+            row.setCell(protocol.getSignedDate() == null ? "-" : protocol.getSignedDate().toString("YYYY/MM/dd"));
+            row.setCell(Joiner.on('\n').join(
+                    FluentIterable.from(protocol.getCurrentAndFutureProtocolHistories()).transform(
+                            new Function<ProtocolHistory, String>() {
+                                @Override
+                                public String apply(ProtocolHistory input) {
+                                    return (input.getBeginDate() == null ? "" : input.getBeginDate().toString("YYYY/MM/dd"))
+                                            + " - "
+                                            + (input.getEndDate() == null ? "" : input.getEndDate().toString("YYYY/MM/dd"));
+                                }
+                            })));
+            row.setCell(protocol.getScientificAreas());
+            row.setCell(Joiner.on(" , ").join(
+                    FluentIterable.from(protocol.getProtocolAction().getProtocolActionTypes()).transform(
+                            new Function<ProtocolActionType, String>() {
+                                @Override
+                                public String apply(ProtocolActionType input) {
+                                    return input.getLocalizedName();
+                                }
+                            })));
+            row.setCell(protocol.getProtocolAction().getOtherTypes());
+            row.setCell(protocol.getObservations());
+        }
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        spreadsheet.exportToXLSSheet(outputStream);
+        download(response, "protocols.xls", outputStream.toByteArray(), "application/vnd.ms-excel");
+
+        return null;
+    }
+
+    private Iterable<String> responsibles(Protocol protocol, final boolean internal) {
+        return FluentIterable.from(protocol.getProtocolResponsibleSet()).filter(new Predicate<ProtocolResponsible>() {
+            @Override
+            public boolean apply(ProtocolResponsible resp) {
+                return (resp.getType() == ProtocolResponsibleType.INTERNAL) == internal;
+            }
+        }).transform(new Function<ProtocolResponsible, String>() {
+            @Override
+            public String apply(ProtocolResponsible resp) {
+                return resp.getUnit().getPresentationName() + " - " + resp.getPresentationString();
+            }
+        });
     }
 
     /*
