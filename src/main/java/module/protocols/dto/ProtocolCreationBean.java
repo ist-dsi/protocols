@@ -204,6 +204,10 @@ public class ProtocolCreationBean implements Serializable {
         setSignedDate(protocol.getSignedDate());
 
         ProtocolHistory history = protocol.getCurrentProtocolHistory(); // TODO
+        if (history == null) {
+            // If protocol is inactive, choose the last dates
+            history = protocol.getLastProtocolHistory();
+        }
         // Check
 
         if (history != null) {
