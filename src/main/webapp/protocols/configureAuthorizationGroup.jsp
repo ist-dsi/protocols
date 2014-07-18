@@ -3,43 +3,46 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<div align="center">
 
-<p class="mtop2 mbottom0" align="center">
+<div class="row">
+
 <h2>
-<bean:message key="label.protocolSystem.configureAuthorizationGroup" bundle="PROTOCOLS_RESOURCES" />
+	${fr:message('resources.ProtocolsResources', 'label.protocolSystem.configureAuthorizationGroup')}
+	<small>${group.writerGroup}</small>
 </h2>
 
-<p>
+<div class="col-sm-6">
+	<h4 class="text-center">Reader Groups</h4>
+	<table class="table table-striped">
+	<thead class="text-center">
+		<th>${fr:message('resources.ProtocolsResources', 'label.protocolSystem.authorizationGroups')}</th>
+		<th></th>
+	</thead>
+	<tbody>
+		<c:forEach var="reader" items="${group.authorizedReaderGroupsSet}">
+		<tr>
+			<td>${reader.presentationName}</td>
+			<td>
+				<a href="${pageContext.request.contextPath}/protocolsConfiguration.do?method=revoke&group=${group.externalId}&reader=${reader.externalId}">
+					${fr:message('resources.ProtocolsResources', 'link.remove')}
+				</a>
+			</td>
+		</tr>
+		</c:forEach>
+	</tbody>
+</table>
+</div>
 
-<bean:write name="bean" property="group.authorizedWriterGroup.name"/>
-
-<p>
-
-<fr:form action="/protocols.do?method=configureAuthorizationGroup">
-
-<fr:edit name="bean">
-<fr:schema type="module.protocols.dto.AuthorizationGroupBean" bundle="PROTOCOLS_RESOURCES">
-	<fr:slot name="authorizedGroups" key="label.user.groups" layout="option-select" bundle="MYORG_RESOURCES">
-		<fr:property name="providerClass" value="module.protocols.presentationTier.providers.PersistentGroupsProvider" />
-		<fr:property name="eachSchema" value="show.persistentGroup.name"/>
-		<fr:property name="eachLayout" value="values"/>
-		<fr:property name="classes" value="no-bullets"/>
-	</fr:slot>
-	</fr:schema>
-	<fr:layout name="tabular">
-		<fr:property name="classes" value="tstyle1"/>
-	</fr:layout>
-</fr:edit>
-
-
-<p>
-	<html:submit bundle="PROTOCOLS_RESOURCES" altKey="submit.submit">
-		<bean:message key="submit.submit" bundle="PROTOCOLS_RESOURCES" />
-	</html:submit>
-</p>
-
-</fr:form>
+<div class="col-sm-6 text-center">
+	<h4>${fr:message('resources.ProtocolsResources', 'label.protocolSystem.addAuthorizationGroup')}</h4>
+	<form action="${pageContext.request.contextPath}/protocolsConfiguration.do?method=addReaderToGroup&group=${group.externalId}" class="form-inline" method="POST">
+		<div class="form-group">
+			<input class="form-control" type="text" name="expression" required placeholder="Expression" />
+		</div>
+		<input type="submit" value="${fr:message('resources.ProtocolsResources', 'submit.submit')}" class="btn btn-default" />
+	</form>
+</div>
 
 </div>

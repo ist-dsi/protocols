@@ -48,7 +48,7 @@
 </schema>
 
 <schema name="edit.protocolHistory" type="module.protocols.domain.ProtocolHistory">
-	<slot name="beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
+	<slot name="beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES">
 		<property name="size" value="10"/>
 		<property name="maxLength" value="10"/>
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.DateValidator">
@@ -56,7 +56,7 @@
 		</validator>
 		<property name="formatText" value=""/>
 	</slot>
-	<slot name="endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
+	<slot name="endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES">
 		<property name="size" value="10"/>
 		<property name="maxLength" value="10"/>
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.DateValidator">
@@ -131,7 +131,7 @@
 <!-- Protocol Creation -->
 
 <schema name="create.protocol" type="module.protocols.dto.ProtocolCreationBean">
-	<slot name="beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
+	<slot name="beginDate" key="label.protocols.beginDate" bundle="PROTOCOLS_RESOURCES">
 		<property name="size" value="10"/>
 		<property name="maxLength" value="10"/>
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.DateValidator">
@@ -139,14 +139,14 @@
 		</validator>
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
 	</slot>
-	<slot name="endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
+	<slot name="endDate" key="label.protocols.endDate" bundle="PROTOCOLS_RESOURCES">
 		<property name="size" value="10"/>
 		<property name="maxLength" value="10"/>
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.DateValidator">
 			<property name="dateFormat" value="dd/MM/yyyy"/>
 		</validator>
 	</slot>
-	<slot name="signedDate" key="label.protocols.signedDate" bundle="PROTOCOLS_RESOURCES" layout="picker">
+	<slot name="signedDate" key="label.protocols.signedDate" bundle="PROTOCOLS_RESOURCES">
 		<property name="size" value="10"/>
 		<property name="maxLength" value="10"/>
 		<validator class="pt.ist.fenixWebFramework.renderers.validators.DateValidator">
@@ -179,7 +179,8 @@
 	</slot>
 </schema>
 
-<schema name="show.persistentGroup.name" type="pt.ist.bennu.core.domain.groups.PersistentGroup">
-	<slot name="name"/>
+<schema name="show.persistentGroup.name" type="org.fenixedu.bennu.core.domain.groups.PersistentGroup">
+	<slot name="presentationName"/>
 </schema>
+
 </schemas>

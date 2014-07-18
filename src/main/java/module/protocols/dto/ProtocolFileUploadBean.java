@@ -4,7 +4,8 @@
 package module.protocols.dto;
 
 import module.protocols.domain.Protocol;
-import pt.ist.bennu.core.util.FileUploadBean;
+
+import org.fenixedu.bennu.core.util.FileUploadBean;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -12,9 +13,6 @@ import pt.ist.bennu.core.util.FileUploadBean;
  */
 public class ProtocolFileUploadBean extends FileUploadBean {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3510997078215680526L;
 
     private final Protocol protocol;

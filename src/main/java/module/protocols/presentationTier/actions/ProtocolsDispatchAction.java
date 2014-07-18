@@ -3,266 +3,73 @@
  */
 package module.protocols.presentationTier.actions;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import module.fileManagement.domain.ContextPath;
-import module.fileManagement.domain.FileNode;
 import module.organization.domain.Person;
 import module.organization.domain.Unit;
 import module.protocols.domain.Protocol;
-import module.protocols.domain.ProtocolAuthorizationGroup;
-import module.protocols.domain.ProtocolHistory;
+import module.protocols.domain.ProtocolCreatorsGroup;
+import module.protocols.domain.ProtocolFile;
 import module.protocols.domain.ProtocolManager;
 import module.protocols.domain.ProtocolResponsible;
-import module.protocols.domain.util.ProtocolActionType;
+import module.protocols.domain.ProtocolsDomainException;
 import module.protocols.domain.util.ProtocolResponsibleType;
-import module.protocols.dto.AuthorizationGroupBean;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
-import module.protocols.dto.ProtocolFileBean;
 import module.protocols.dto.ProtocolFileUploadBean;
-import module.protocols.dto.ProtocolHistoryBean;
-import module.protocols.dto.ProtocolSearchBean;
-import module.protocols.dto.ProtocolSystemConfigurationBean;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.exceptions.DomainException;
+import org.fenixedu.bennu.core.presentationTier.actions.BaseAction;
+import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.portal.EntryPoint;
+import org.fenixedu.bennu.portal.StrutsApplication;
+import org.fenixedu.bennu.portal.StrutsFunctionality;
 import org.joda.time.LocalDate;
 
-import pt.ist.bennu.core.applicationTier.Authenticate;
-import pt.ist.bennu.core.domain.User;
-import pt.ist.bennu.core.domain.VirtualHost;
-import pt.ist.bennu.core.domain.contents.ActionNode;
-import pt.ist.bennu.core.domain.contents.Node;
-import pt.ist.bennu.core.domain.exceptions.DomainException;
-import pt.ist.bennu.core.domain.groups.PersistentGroup;
-import pt.ist.bennu.core.domain.groups.UserGroup;
-import pt.ist.bennu.core.presentationTier.actions.ContextBaseAction;
-import pt.ist.bennu.core.util.BundleUtil;
-import pt.ist.bennu.core.util.InputStreamUtil;
-import pt.ist.bennu.core.util.VariantBean;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
-import pt.ist.fenixWebFramework.servlets.functionalities.CreateNodeAction;
 import pt.ist.fenixWebFramework.struts.annotations.Mapping;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.FluentIterable;
+import com.google.common.io.ByteStreams;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
  * 
  */
+@StrutsApplication(bundle = "ProtocolsResources", path = "protocols", titleKey = "label.module.protocols", accessGroup = "logged")
+@StrutsFunctionality(app = ProtocolsDispatchAction.class, path = "list", titleKey = "label.protocols.show")
 @Mapping(path = "/protocols")
-public class ProtocolsDispatchAction extends ContextBaseAction {
+public class ProtocolsDispatchAction extends BaseAction {
 
-    @CreateNodeAction(bundle = "PROTOCOLS_RESOURCES", key = "add.node.manage.protocols", groupKey = "label.module.protocols")
-    public final ActionForward createProtocolsNode(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) throws Exception {
-
-        final VirtualHost virtualHost = getDomainObject(request, "virtualHostToManageId");
-
-        final Node parentOfNodes = getDomainObject(request, "parentOfNodesToManageId");
-
-        final ActionNode topActionNode =
-                ActionNode.createActionNode(virtualHost, parentOfNodes, "/protocols", "firstPage",
-                        "resources.ProtocolsResources", "label.module.protocols", UserGroup.getInstance());
-
-        ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showProtocols", "resources.ProtocolsResources",
-                "label.protocols.show", UserGroup.getInstance());
-
-        ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "searchProtocols", "resources.ProtocolsResources",
-                "label.protocols.search", UserGroup.getInstance());
-
-        ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "prepareCreateProtocolData",
-                "resources.ProtocolsResources", "label.protocols.create", ProtocolManager.getInstance().getCreatorsGroup());
-
-        ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "showAlerts", "resources.ProtocolsResources",
-                "label.protocols.alerts", ProtocolManager.getInstance().getCreatorsGroup());
-
-        // System configuration. Should only be accessed by the administrative
-        // group
-        ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "protocolSystemConfiguration",
-                "resources.ProtocolsResources", "label.protocolSystem.configure", ProtocolManager.getInstance()
-                        .getAdministrativeGroup());
-
-        ActionNode.createActionNode(virtualHost, topActionNode, "/protocols", "authorizationGroupsConfiguration",
-                "resources.ProtocolsResources", "label.protocolSystem.configureAuthorizationGroups", ProtocolManager
-                        .getInstance().getAdministrativeGroup());
-
-        return forwardToMuneConfiguration(request, virtualHost, topActionNode);
-    }
-
-    public ActionForward firstPage(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
-            final HttpServletResponse response) {
-        return forward(request, "/protocols/firstPage.jsp");
-    }
-
+    @EntryPoint
     public ActionForward showProtocols(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
             final HttpServletResponse response) {
 
-        final User currentUser = Authenticate.getCurrentUser();
+        final User currentUser = Authenticate.getUser();
 
-        Collection<Protocol> protocols =
-                Collections2.filter(ProtocolManager.getInstance().getProtocols(), new Predicate<Protocol>() {
+        List<Protocol> protocols =
+                ProtocolManager.getInstance().getProtocolsSet().stream()
+                        .filter((protocol) -> protocol.canBeReadByUser(currentUser)).filter(Protocol::isActive)
+                        .collect(Collectors.toList());
 
-                    @Override
-                    public boolean apply(Protocol protocol) {
-                        return protocol.canBeReadByUser(currentUser) && protocol.isActive();
-                    }
-                });
+        request.setAttribute("protocols", protocols);
+        request.setAttribute("creator", ProtocolCreatorsGroup.get().isMember(currentUser));
 
-        request.setAttribute("protocols", new ArrayList<Protocol>(protocols));
-
-        return forward(request, "/protocols/showProtocols.jsp");
-    }
-
-    public ActionForward showAlerts(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
-            final HttpServletResponse response) {
-
-        final User user = Authenticate.getCurrentUser();
-
-        setOrganizationalModels(request);
-
-        Collection<Protocol> allProtocols = ProtocolManager.getInstance().getProtocols();
-
-        Collection<Protocol> almostExpiredProtocols = Collections2.filter(allProtocols, new Predicate<Protocol>() {
-
-            @Override
-            public boolean apply(Protocol protocol) {
-                if (!protocol.isActive() || !protocol.canBeWrittenByUser(user)) {
-                    return false;
-                }
-                LocalDate endDate = protocol.getLastProtocolHistory().getEndDate();
-                return endDate == null ? false : endDate.isBefore(new LocalDate().plusMonths(2).withDayOfMonth(1).minusDays(1));
-            }
-        });
-
-        Collection<Protocol> nullEndDateProtocols = Collections2.filter(allProtocols, new Predicate<Protocol>() {
-
-            @Override
-            public boolean apply(Protocol protocol) {
-                return protocol.isActive() && protocol.canBeWrittenByUser(user)
-                        && protocol.getCurrentProtocolHistory().getEndDate() == null;
-            }
-        });
-
-        request.setAttribute("almostExpiredProtocols", almostExpiredProtocols);
-        request.setAttribute("nullEndDateProtocols", nullEndDateProtocols);
-
-        return forward(request, "/protocols/showAlerts.jsp");
-    }
-
-    public ActionForward protocolSystemConfiguration(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        checkAdministrative();
-
-        ProtocolSystemConfigurationBean bean = getRenderedObject();
-
-        if (bean == null) {
-            bean = new ProtocolSystemConfigurationBean();
-        } else {
-            ProtocolManager.getInstance().updateFromBean(bean);
-        }
-
-        request.setAttribute("configurationBean", bean);
-
-        return forward(request, "/protocols/protocolSystemConfiguration.jsp");
-    }
-
-    public ActionForward reloadCountries(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
-            final HttpServletResponse response) {
-        ProtocolManager.getInstance().reloadAllCountries();
-        return protocolSystemConfiguration(mapping, form, request, response);
-    }
-
-    public ActionForward authorizationGroupsConfiguration(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        checkAdministrative();
-
-        Collection<ProtocolAuthorizationGroup> groups = ProtocolManager.getInstance().getProtocolAuthorizationGroups();
-
-        request.setAttribute("authorizationGroups", groups);
-
-        VariantBean newGroupBean = new VariantBean();
-
-        request.setAttribute("newGroupBean", newGroupBean);
-
-        return forward(request, "/protocols/authorizationGroupsConfiguration.jsp");
-
-    }
-
-    public ActionForward createNewAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        VariantBean bean = getRenderedObject();
-
-        PersistentGroup group = bean.getDomainObject();
-
-        if (group != null) {
-            if (!ProtocolAuthorizationGroup.createGroupWithWriter(group)) {
-                setMessage(request, "errorMessage", new ActionMessage("label.protocolSystem.group.alredy.exists"));
-            }
-        }
-
-        bean.setDomainObject(null);
-        RenderUtils.invalidateViewState();
-
-        return authorizationGroupsConfiguration(mapping, form, request, response);
-    }
-
-    public ActionForward removeAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        checkAdministrative();
-
-        ProtocolAuthorizationGroup group = getDomainObject(request, "OID");
-
-        try {
-            group.delete();
-        } catch (DomainException e) {
-            setMessage(request, "errorMessage", new ActionMessage(e.getKey()));
-        }
-
-        return authorizationGroupsConfiguration(mapping, form, request, response);
-    }
-
-    public ActionForward configureAuthorizationGroup(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        checkAdministrative();
-
-        AuthorizationGroupBean bean = getRenderedObject();
-
-        if (bean == null) {
-            ProtocolAuthorizationGroup group = getDomainObject(request, "OID");
-            bean = new AuthorizationGroupBean(group);
-            request.setAttribute("bean", bean);
-            return forward(request, "/protocols/configureAuthorizationGroup.jsp");
-        } else {
-            bean.getGroup().updateReaders(bean.getAuthorizedGroups());
-            return authorizationGroupsConfiguration(mapping, form, request, response);
-        }
-
+        return forward("/protocols/showProtocols.jsp");
     }
 
     public ActionForward viewProtocolDetails(final ActionMapping mapping, final ActionForm form,
@@ -275,9 +82,9 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
     private ActionForward viewProtocolDetailsFromOID(final HttpServletRequest request, String OID) {
 
-        User currentUser = Authenticate.getCurrentUser();
+        User currentUser = Authenticate.getUser();
 
-        Protocol protocol = getDomainObject(OID);
+        Protocol protocol = FenixFramework.getDomainObject(OID);
 
         if (!protocol.canBeReadByUser(currentUser)) {
             return showProtocols(null, null, request, null);
@@ -285,7 +92,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         request.setAttribute("protocol", protocol);
 
-        Collection<ProtocolResponsible> responsibles = protocol.getProtocolResponsible();
+        Collection<ProtocolResponsible> responsibles = protocol.getProtocolResponsibleSet();
 
         Collection<ProtocolResponsible> internalResponsibles =
                 Collections2.filter(responsibles, new Predicate<ProtocolResponsible>() {
@@ -311,195 +118,16 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("externalResponsibles", externalResponsibles);
 
         if (protocol.canFilesBeReadByUser(currentUser)) {
-            request.setAttribute("protocolFiles",
-                    Collections2.transform(protocol.getFiles(), new Function<FileNode, ProtocolFileBean>() {
-
-                        @Override
-                        public ProtocolFileBean apply(FileNode file) {
-                            return new ProtocolFileBean(file, request);
-                        }
-                    }));
+            request.setAttribute("protocolFiles", protocol.getProtocolFileSet());
         }
 
         request.setAttribute("canBeWritten", protocol.canBeWrittenByUser(currentUser));
 
-        return forward(request, "/protocols/viewProtocolDetails.jsp");
+        return forward("/protocols/viewProtocolDetails.jsp");
     }
-
-    /*
-     * Searching
-     */
-
-    public ActionForward searchProtocols(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
-            final HttpServletResponse response) {
-
-        ProtocolSearchBean bean = getRenderedObject();
-
-        if (bean != null && request.getParameter("search") != null) {
-
-            Collection<Protocol> filteredProtocols = Collections2.filter(ProtocolManager.getInstance().getProtocols(), bean);
-
-            request.setAttribute("searchResults", filteredProtocols);
-
-        } else if (bean == null) {
-            bean = new ProtocolSearchBean();
-        }
-
-        request.setAttribute("protocolSearch", bean);
-
-        return forward(request, "/protocols/searchProtocols.jsp");
-    }
-
-    public ActionForward exportSearchResultsToExcel(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-
-        ProtocolSearchBean bean = getRenderedObject();
-        List<Protocol> filteredProtocols =
-                new ArrayList<>(Collections2.filter(ProtocolManager.getInstance().getProtocolsSet(), bean));
-
-        Spreadsheet spreadsheet = new Spreadsheet("Protocols");
-
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources", "label.protocols.number"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
-                "label.protocols.internalResponsibles"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
-                "label.protocols.externalResponsibles"));
-        spreadsheet.setHeader(BundleUtil
-                .getStringFromResourceBundle("resources.ProtocolsResources", "label.protocols.signedDate"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
-                "label.protocols.actualDates"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
-                "label.protocols.scientificAreas"));
-        spreadsheet.setHeader(BundleUtil
-                .getStringFromResourceBundle("resources.ProtocolsResources", "label.protocol.actionTypes"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
-                "label.protocol.otherActionTypes"));
-        spreadsheet.setHeader(BundleUtil.getStringFromResourceBundle("resources.ProtocolsResources",
-                "label.protocols.observations"));
-
-        Collections.sort(filteredProtocols, new Comparator<Protocol>() {
-            @Override
-            public int compare(Protocol o1, Protocol o2) {
-                return o1.getProtocolNumber().compareTo(o2.getProtocolNumber());
-            }
-        });
-
-        for (Protocol protocol : filteredProtocols) {
-            Row row = spreadsheet.addRow();
-            row.setCell(protocol.getProtocolNumber());
-            row.setCell(Joiner.on('\n').join(responsibles(protocol, true)));
-            row.setCell(Joiner.on('\n').join(responsibles(protocol, false)));
-            row.setCell(protocol.getSignedDate() == null ? "-" : protocol.getSignedDate().toString("YYYY/MM/dd"));
-            row.setCell(Joiner.on('\n').join(
-                    FluentIterable.from(protocol.getCurrentAndFutureProtocolHistories()).transform(
-                            new Function<ProtocolHistory, String>() {
-                                @Override
-                                public String apply(ProtocolHistory input) {
-                                    return (input.getBeginDate() == null ? "" : input.getBeginDate().toString("YYYY/MM/dd"))
-                                            + " - "
-                                            + (input.getEndDate() == null ? "" : input.getEndDate().toString("YYYY/MM/dd"));
-                                }
-                            })));
-            row.setCell(protocol.getScientificAreas());
-            row.setCell(Joiner.on(" , ").join(
-                    FluentIterable.from(protocol.getProtocolAction().getProtocolActionTypes()).transform(
-                            new Function<ProtocolActionType, String>() {
-                                @Override
-                                public String apply(ProtocolActionType input) {
-                                    return input.getLocalizedName();
-                                }
-                            })));
-            row.setCell(protocol.getProtocolAction().getOtherTypes());
-            row.setCell(protocol.getObservations());
-        }
-
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        spreadsheet.exportToXLSSheet(outputStream);
-        download(response, "protocols.xls", outputStream.toByteArray(), "application/vnd.ms-excel");
-
-        return null;
-    }
-
-    private Iterable<String> responsibles(Protocol protocol, final boolean internal) {
-        return FluentIterable.from(protocol.getProtocolResponsibleSet()).filter(new Predicate<ProtocolResponsible>() {
-            @Override
-            public boolean apply(ProtocolResponsible resp) {
-                return (resp.getType() == ProtocolResponsibleType.INTERNAL) == internal;
-            }
-        }).transform(new Function<ProtocolResponsible, String>() {
-            @Override
-            public String apply(ProtocolResponsible resp) {
-                return resp.getUnit().getPresentationName() + " - " + resp.getPresentationString();
-            }
-        });
-    }
-
-    /*
-     * Protocol History edition
-     */
-
-    public ActionForward prepareEditProtocolHistory(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        Protocol protocol = getDomainObject(request, "OID");
-
-        request.setAttribute("protocolHistory", new ProtocolHistoryBean(protocol.getCurrentProtocolHistory()));
-
-        return forward(request, "/protocols/editProtocolHistory.jsp");
-    }
-
-    public ActionForward editProtocolHistory(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        ProtocolHistoryBean bean = getRenderedObject();
-
-        if (!validateDates(bean.getBeginDate(), bean.getEndDate(), request)) {
-            return forward(request, "/protocols/editProtocolHistory.jsp");
-        }
-
-        bean.getProtocolHistory().editProtocolHistory(bean.getBeginDate(), bean.getEndDate());
-
-        setMessage(request, "success", new ActionMessage("label.protocolHistory.editSuccessful"));
-
-        return showAlerts(mapping, form, request, response);
-    }
-
-    /*
-     * Renewal Process
-     */
-
-    public ActionForward prepareRenewProtocol(final ActionMapping mapping, final ActionForm form,
-            final HttpServletRequest request, final HttpServletResponse response) {
-
-        String protocolOID = request.getParameter("protocolOID");
-
-        Protocol protocol = FenixFramework.getDomainObject(protocolOID);
-
-        ProtocolHistoryBean bean = new ProtocolHistoryBean(protocol);
-
-        request.setAttribute("protocol", bean);
-
-        return forward(request, "/protocols/renewProtocol.jsp");
-    }
-
-    public ActionForward renewProtocol(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
-            final HttpServletResponse response) {
-
-        ProtocolHistoryBean bean = getRenderedObject();
-
-        bean.getProtocol().renewFor(bean.getDuration(), bean.getRenewTime());
-
-        setMessage(request, "success", new ActionMessage("label.procotols.renew.success"));
-
-        return showAlerts(mapping, form, request, response);
-    }
-
-    /*
-     * Protocol Edition
-     */
 
     public ActionForward uploadProtocolFile(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request,
-            final HttpServletResponse response) {
+            final HttpServletResponse response) throws IOException {
 
         ProtocolFileUploadBean bean = getRenderedObject();
 
@@ -507,19 +135,19 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
             Protocol protocol = getDomainObject(request, "OID");
 
-            if (!protocol.canBeWrittenByUser(Authenticate.getCurrentUser())) {
-                throw new DomainException("error.unauthorized");
+            if (!protocol.canBeWrittenByUser(Authenticate.getUser())) {
+                throw ProtocolsDomainException.unauthorized();
             }
 
             bean = new ProtocolFileUploadBean(protocol);
 
             request.setAttribute("file", bean);
 
-            return forward(request, "/protocols/uploadProtocolFile.jsp");
+            return forward("/protocols/uploadProtocolFile.jsp");
 
         } else {
             if (bean.getInputStream() != null) {
-                bean.getProtocol().uploadFile(bean.getFilename(), InputStreamUtil.consumeInputStream(bean.getInputStream()));
+                bean.getProtocol().uploadFile(bean.getFilename(), ByteStreams.toByteArray(bean.getInputStream()));
                 setMessage(request, "success", new ActionMessage("label.protocols.fileUpload.success"));
             }
             return viewProtocolDetailsFromOID(request, bean.getProtocol().getExternalId());
@@ -532,13 +160,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         Protocol protocol = getDomainObject(request, "protocol");
 
-        if (!protocol.canBeWrittenByUser(Authenticate.getCurrentUser())) {
-            throw new DomainException("error.unauthorized");
+        if (!protocol.canBeWrittenByUser(Authenticate.getUser())) {
+            throw ProtocolsDomainException.unauthorized();
         }
 
-        FileNode file = getDomainObject(request, "file");
-
-        file.trash(new ContextPath(file.getParent()));
+        ProtocolFile file = getDomainObject(request, "file");
+        file.delete();
 
         setMessage(request, "success", new ActionMessage("label.protocols.fileRemoval.success"));
 
@@ -551,13 +178,13 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         Protocol protocol = getDomainObject(request, "OID");
 
-        if (!protocol.canBeWrittenByUser(Authenticate.getCurrentUser())) {
-            throw new DomainException("error.unauthorized");
+        if (!protocol.canBeWrittenByUser(Authenticate.getUser())) {
+            throw ProtocolsDomainException.unauthorized();
         }
 
         request.setAttribute("protocolBean", new ProtocolCreationBean(protocol));
 
-        return forward(request, "/protocols/prepareEditProtocolData.jsp");
+        return forward("/protocols/prepareEditProtocolData.jsp");
     }
 
     public ActionForward prepareEditInternalResponsibles(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -570,14 +197,14 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         if (protocolBean.isProtocolNumberValid()) {
             if (validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request)) {
-                return forward(request, "/protocols/prepareEditInternalResponsibles.jsp");
+                return forward("/protocols/prepareEditInternalResponsibles.jsp");
             } else {
-                return forward(request, "/protocols/prepareEditProtocolData.jsp");
+                return forward("/protocols/prepareEditProtocolData.jsp");
             }
         } else {
             validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request);
             setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
-            return forward(request, "/protocols/prepareEditProtocolData.jsp");
+            return forward("/protocols/prepareEditProtocolData.jsp");
         }
     }
 
@@ -590,15 +217,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolBean", protocolBean);
 
         if (request.getParameter("back") != null) {
-            return forward(request, "/protocols/prepareEditProtocolData.jsp");
+            return forward("/protocols/prepareEditProtocolData.jsp");
         }
 
         if (!protocolBean.internalResponsiblesCorrect()) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidInternalResponsibles"));
-            return forward(request, "/protocols/prepareEditInternalResponsibles.jsp");
+            return forward("/protocols/prepareEditInternalResponsibles.jsp");
         }
 
-        return forward(request, "/protocols/prepareEditExternalResponsibles.jsp");
+        return forward("/protocols/prepareEditExternalResponsibles.jsp");
     }
 
     public ActionForward prepareEditProtocolPermissions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -610,15 +237,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolBean", protocolBean);
 
         if (request.getParameter("back") != null) {
-            return forward(request, "/protocols/prepareEditInternalResponsibles.jsp");
+            return forward("/protocols/prepareEditInternalResponsibles.jsp");
         }
 
         if (!protocolBean.externalResponsiblesCorrect()) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidExternalResponsibles"));
-            return forward(request, "/protocols/prepareEditExternalResponsibles.jsp");
+            return forward("/protocols/prepareEditExternalResponsibles.jsp");
         }
 
-        return forward(request, "/protocols/prepareEditProtocolPermissions.jsp");
+        return forward("/protocols/prepareEditProtocolPermissions.jsp");
     }
 
     public ActionForward editProtocol(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -630,12 +257,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolBean", protocolBean);
 
         if (request.getParameter("back") != null) {
-            return forward(request, "/protocols/prepareEditExternalResponsibles.jsp");
+            return forward("/protocols/prepareEditExternalResponsibles.jsp");
         }
 
         if (!protocolBean.permissionsCorrectlyDefined()) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidProtocolPermissions"));
-            return forward(request, "/protocols/prepareEditProtocolPermissions.jsp");
+            return forward("/protocols/prepareEditProtocolPermissions.jsp");
         }
 
         try {
@@ -646,7 +273,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
             return viewProtocolDetailsFromOID(request, protocolBean.getProtocol().getExternalId());
         } catch (DomainException e) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
-            return forward(request, "/protocols/prepareEditProtocolPermissions.jsp");
+            return forward("/protocols/prepareEditProtocolPermissions.jsp");
         }
     }
 
@@ -659,8 +286,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         boolean internal = beanUpdateLogic(request, protocolBean);
 
-        return forward(request,
-                internal ? "/protocols/prepareEditInternalResponsibles.jsp" : "/protocols/prepareEditExternalResponsibles.jsp");
+        return forward(internal ? "/protocols/prepareEditInternalResponsibles.jsp" : "/protocols/prepareEditExternalResponsibles.jsp");
     }
 
     /*
@@ -670,13 +296,9 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
     public ActionForward prepareCreateProtocolData(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-        if (!ProtocolManager.getInstance().getCreatorsGroup().isMember(Authenticate.getCurrentUser())) {
-            throw new DomainException("error.unauthorized");
-        }
-
         request.setAttribute("protocolBean", new ProtocolCreationBean());
 
-        return forward(request, "/protocols/prepareCreateProtocolData.jsp");
+        return forward("/protocols/prepareCreateProtocolData.jsp");
     }
 
     // Protocol data inserted, proceed to create internal responsibles
@@ -694,14 +316,14 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         if (protocolBean.isProtocolNumberValid()) {
             if (validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request)) {
-                return forward(request, "/protocols/prepareCreateInternalResponsibles.jsp");
+                return forward("/protocols/prepareCreateInternalResponsibles.jsp");
             } else {
-                return forward(request, "/protocols/prepareCreateProtocolData.jsp");
+                return forward("/protocols/prepareCreateProtocolData.jsp");
             }
         } else {
             validateDates(protocolBean.getBeginDate(), protocolBean.getEndDate(), request);
             setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
-            return forward(request, "/protocols/prepareCreateProtocolData.jsp");
+            return forward("/protocols/prepareCreateProtocolData.jsp");
         }
     }
 
@@ -715,15 +337,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolBean", protocolBean);
 
         if (request.getParameter("back") != null) {
-            return forward(request, "/protocols/prepareCreateProtocolData.jsp");
+            return forward("/protocols/prepareCreateProtocolData.jsp");
         }
 
         if (!protocolBean.internalResponsiblesCorrect()) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidInternalResponsibles"));
-            return forward(request, "/protocols/prepareCreateInternalResponsibles.jsp");
+            return forward("/protocols/prepareCreateInternalResponsibles.jsp");
         }
 
-        return forward(request, "/protocols/prepareCreateExternalResponsibles.jsp");
+        return forward("/protocols/prepareCreateExternalResponsibles.jsp");
     }
 
     // External data inserted, proceed to permission setting
@@ -736,15 +358,15 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolBean", protocolBean);
 
         if (request.getParameter("back") != null) {
-            return forward(request, "/protocols/prepareCreateInternalResponsibles.jsp");
+            return forward("/protocols/prepareCreateInternalResponsibles.jsp");
         }
 
         if (!protocolBean.externalResponsiblesCorrect()) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidExternalResponsibles"));
-            return forward(request, "/protocols/prepareCreateExternalResponsibles.jsp");
+            return forward("/protocols/prepareCreateExternalResponsibles.jsp");
         }
 
-        return forward(request, "/protocols/prepareDefineProtocolPermissions.jsp");
+        return forward("/protocols/prepareDefineProtocolPermissions.jsp");
     }
 
     // All data inserted, create protocol
@@ -757,12 +379,12 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         request.setAttribute("protocolBean", protocolBean);
 
         if (request.getParameter("back") != null) {
-            return forward(request, "/protocols/prepareCreateExternalResponsibles.jsp");
+            return forward("/protocols/prepareCreateExternalResponsibles.jsp");
         }
 
         if (!protocolBean.permissionsCorrectlyDefined()) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocols.invalidProtocolPermissions"));
-            return forward(request, "/protocols/prepareDefineProtocolPermissions.jsp");
+            return forward("/protocols/prepareDefineProtocolPermissions.jsp");
         }
 
         try {
@@ -773,7 +395,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
             return viewProtocolDetailsFromOID(request, protocol.getExternalId());
         } catch (DomainException e) {
             setMessage(request, "errorMessage", new ActionMessage("error.protocol.number.alreadyExists"));
-            return forward(request, "/protocols/prepareDefineProtocolPermissions.jsp");
+            return forward("/protocols/prepareDefineProtocolPermissions.jsp");
         }
     }
 
@@ -786,9 +408,7 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
 
         boolean internal = beanUpdateLogic(request, protocolBean);
 
-        return forward(
-                request,
-                internal ? "/protocols/prepareCreateInternalResponsibles.jsp" : "/protocols/prepareCreateExternalResponsibles.jsp");
+        return forward(internal ? "/protocols/prepareCreateInternalResponsibles.jsp" : "/protocols/prepareCreateExternalResponsibles.jsp");
     }
 
     /*
@@ -869,17 +489,6 @@ public class ProtocolsDispatchAction extends ContextBaseAction {
         ActionMessages actionMessages = getMessages(request);
         actionMessages.add(error, actionMessage);
         saveMessages(request, actionMessages);
-    }
-
-    private void setOrganizationalModels(HttpServletRequest request) {
-        request.setAttribute("internalOrganizationalModel", ProtocolManager.getInstance().getInternalOrganizationalModel());
-        request.setAttribute("externalOrganizationalModel", ProtocolManager.getInstance().getExternalOrganizationalModel());
-    }
-
-    private void checkAdministrative() {
-        if (!ProtocolManager.getInstance().getAdministrativeGroup().isMember(Authenticate.getCurrentUser())) {
-            throw new DomainException("error.unauthorized");
-        }
     }
 
 }

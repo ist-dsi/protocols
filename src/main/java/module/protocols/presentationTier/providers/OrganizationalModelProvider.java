@@ -6,7 +6,9 @@ package module.protocols.presentationTier.providers;
 import java.util.ArrayList;
 
 import module.organization.domain.OrganizationalModel;
-import pt.ist.bennu.core.domain.MyOrg;
+
+import org.fenixedu.bennu.core.domain.Bennu;
+
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -24,7 +26,7 @@ public class OrganizationalModelProvider implements DataProvider {
 
     @Override
     public Object provide(Object source, Object currentValue) {
-        return new ArrayList<OrganizationalModel>(MyOrg.getInstance().getOrganizationalModelsSet());
+        return new ArrayList<OrganizationalModel>(Bennu.getInstance().getOrganizationalModelsSet());
     }
 
 }

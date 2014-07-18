@@ -1,31 +1,25 @@
 package module.protocols.domain;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import module.fileManagement.domain.AbstractFileNode;
-import module.fileManagement.domain.DirNode;
-import module.fileManagement.domain.Document;
-import module.fileManagement.domain.FileNode;
 import module.geography.domain.Country;
 import module.protocols.domain.util.ProtocolAction;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.LocalDate;
 
-import pt.ist.bennu.core.domain.User;
-import pt.ist.bennu.core.domain.exceptions.DomainException;
-import pt.ist.bennu.core.domain.groups.AnyoneGroup;
-import pt.ist.bennu.core.domain.groups.PersistentGroup;
-import pt.ist.bennu.core.domain.groups.UnionGroup;
-import pt.ist.bennu.core.util.BundleUtil;
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.StringNormalizer;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -43,72 +37,47 @@ public class Protocol extends Protocol_Base {
 
         @Override
         public String getLocalizedName() {
-            return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.renewTime." + name());
+            return BundleUtil.getString("resources/ProtocolsResources", "label.renewTime." + name());
         }
     }
 
     public Protocol() {
         super();
-        super.setAllowedToRead(new UnionGroup(ProtocolManager.getInstance().getAdministrativeGroup()));
         setProtocolManager(ProtocolManager.getInstance());
         super.setProtocolNumber(new LocalDate().getYear() + "-" + ProtocolManager.getInstance().getNewProtocolNumber());
-        setActive(Boolean.TRUE);
     }
 
     public void delete() {
-        for (ProtocolHistory history : getProtocolHistories()) {
+        for (ProtocolHistory history : getProtocolHistoriesSet()) {
             history.delete();
         }
-
         setProtocolManager(null);
         deleteDomainObject();
     }
 
-    @Override
-    public void setAllowedToRead(UnionGroup group) {
-        throw new RuntimeException("Groups should not be set directly!");
-    }
-
     public boolean isActive() {
-        if (!getActive()) {
-            return false;
-        } else {
-            return getCurrentProtocolHistory() != null;
-        }
+        return getCurrentProtocolHistory() != null;
     }
 
     public ProtocolHistory getCurrentProtocolHistory() {
-        for (ProtocolHistory protocolHistory : getProtocolHistories()) {
-            if (protocolHistory.isActive()) {
-                return protocolHistory;
-            }
-        }
-        return null;
+        return getProtocolHistoriesSet().stream().filter(ProtocolHistory::isActive).findAny().orElse(null);
     }
 
     public ProtocolHistory getLastProtocolHistory() {
-
-        return Ordering.from(ProtocolHistory.COMPARATOR_BY_END_DATE).max(getProtocolHistories());
-
+        return getProtocolHistoriesSet().stream().max(ProtocolHistory.COMPARATOR_BY_END_DATE).orElse(null);
     }
 
     public ProtocolHistory getPresentableProtocolHistory() {
-        ProtocolHistory current = null;
-        if (!getActive()) {
+        ProtocolHistory current = getCurrentProtocolHistory();
+        if (current == null) {
             current = getLastProtocolHistory();
-        } else {
-            current = getCurrentProtocolHistory();
-            if (current == null) {
-                current = getLastProtocolHistory();
-            }
         }
         return current;
     }
 
     public List<ProtocolHistory> getCurrentAndFutureProtocolHistories() {
-
         return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(
-                Iterables.filter(getProtocolHistories(), new Predicate<ProtocolHistory>() {
+                Iterables.filter(getProtocolHistoriesSet(), new Predicate<ProtocolHistory>() {
 
                     @Override
                     public boolean apply(ProtocolHistory history) {
@@ -123,7 +92,7 @@ public class Protocol extends Protocol_Base {
 
         final String name = StringNormalizer.normalize(partnerName);
 
-        return Iterables.any(getProtocolResponsible(), new Predicate<ProtocolResponsible>() {
+        return Iterables.any(getProtocolResponsibleSet(), new Predicate<ProtocolResponsible>() {
 
             @Override
             public boolean apply(ProtocolResponsible responsible) {
@@ -161,20 +130,6 @@ public class Protocol extends Protocol_Base {
         protocol.updateFromBean(protocolBean);
 
         return protocol;
-    }
-
-    @Override
-    public void setProtocolNumber(String number) {
-        for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
-            if (protocol.equals(this)) {
-                continue;
-            }
-            if (protocol.getProtocolNumber().equals(number)) {
-                throw new DomainException("error.protocol.number.already.exists", number);
-            }
-        }
-
-        super.setProtocolNumber(number);
     }
 
     @Atomic
@@ -217,12 +172,12 @@ public class Protocol extends Protocol_Base {
             }
         }
 
-        for (PersistentGroup group : getReaderGroups()) {
+        for (PersistentGroup group : getReaderGroupsSet()) {
             removeReaderGroups(group);
         }
 
-        for (PersistentGroup group : protocolBean.getReaders()) {
-            addReaderGroups(group);
+        for (Group group : protocolBean.getReaders()) {
+            addReaderGroups(group.toPersistentGroup());
         }
 
         this.setWriterGroup(protocolBean.getWriters());
@@ -238,57 +193,29 @@ public class Protocol extends Protocol_Base {
             new ProtocolHistory(this, protocolBean.getBeginDate(), protocolBean.getEndDate());
         }
 
-        generateProtocolDir();
-
-    }
-
-    @Override
-    public void addReaderGroups(PersistentGroup group) {
-        super.addReaderGroups(group);
-        getAllowedToRead().addPersistentGroups(group);
-    }
-
-    @Override
-    public void removeReaderGroups(PersistentGroup group) {
-        super.removeReaderGroups(group);
-        getAllowedToRead().removePersistentGroups(group);
-    }
-
-    public void generateProtocolDir() {
-        PersistentGroup fileReaderGroup =
-                this.getVisibilityType() == ProtocolVisibilityType.TOTAL ? AnyoneGroup.getInstance() : this.getAllowedToRead();
-
-        ProtocolDirNode dir = this.getProtocolDir();
-
-        if (dir != null) {
-            dir.setName(this.getProtocolNumber());
-            dir.setReadGroup(fileReaderGroup);
-            dir.setWriters(this.getWriterGroup());
-        } else {
-            this.setProtocolDir(new ProtocolDirNode(this.getWriterGroup(), this.getProtocolNumber(), fileReaderGroup));
-        }
     }
 
     public boolean canBeReadByUser(final User user) {
-        return getVisibilityType() != ProtocolVisibilityType.RESTRICTED || getAllowedToRead().isMember(user)
+        return getVisibilityType() != ProtocolVisibilityType.RESTRICTED || belongsToReadersGroup(user)
                 || canBeWrittenByUser(user);
     }
 
     public boolean canFilesBeReadByUser(User user) {
-
-        return getVisibilityType() == ProtocolVisibilityType.TOTAL || getAllowedToRead().isMember(user)
-                || canBeWrittenByUser(user);
+        return getVisibilityType() == ProtocolVisibilityType.TOTAL || belongsToReadersGroup(user) || canBeWrittenByUser(user);
     }
 
     public boolean canBeWrittenByUser(final User user) {
-        return getWriterGroup().getAuthorizedWriterGroup().isMember(user)
-                || ProtocolManager.getInstance().getAdministrativeGroup().isMember(user);
+        return getWriterGroup().getAuthorizedWriterGroup().isMember(user) || ProtocolManager.managers().isMember(user);
+    }
+
+    private boolean belongsToReadersGroup(User user) {
+        return getReaderGroupsSet().stream().filter((group) -> group.isMember(user)).findAny().isPresent();
     }
 
     public String getPartners() {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
-        for (ProtocolResponsible responsible : getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
             if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
                 continue;
             }
@@ -306,7 +233,7 @@ public class Protocol extends Protocol_Base {
 
     public String getAllResponsibles() {
         StringBuilder builder = new StringBuilder();
-        for (ProtocolResponsible responsible : getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
 
             String responsibleStr = responsible.getPresentationString();
 
@@ -320,36 +247,13 @@ public class Protocol extends Protocol_Base {
         return builder.toString();
     }
 
-    public List<FileNode> getFiles() {
-        return getFilesFromDir(getProtocolDir());
-    }
-
-    private List<FileNode> getFilesFromDir(DirNode node) {
-        List<FileNode> files = new ArrayList<FileNode>();
-
-        for (AbstractFileNode file : node.getChild()) {
-            if (file instanceof FileNode) {
-                FileNode fileNode = (FileNode) file;
-                files.add(fileNode);
-            } else if (file instanceof DirNode) {
-                files.addAll(getFilesFromDir((DirNode) file));
-            }
-        }
-
-        return files;
-    }
-
     @Atomic
     public void uploadFile(String filename, byte[] contents) {
-
-        Document document = new Document(filename, filename, contents);
-
-        new FileNode(getProtocolDir(), document);
-
+        new ProtocolFile(this, filename, contents);
     }
 
     public boolean isNational() {
-        for (ProtocolResponsible responsible : getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
             if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && responsible.getCountry() != null
                     && responsible.getCountry().equals(Country.getPortugal())) {
                 return true;
@@ -359,7 +263,7 @@ public class Protocol extends Protocol_Base {
     }
 
     public boolean isInternational() {
-        for (ProtocolResponsible responsible : getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
             if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && responsible.getCountry() != null
                     && !responsible.getCountry().equals(Country.getPortugal())) {
                 return true;
@@ -369,7 +273,7 @@ public class Protocol extends Protocol_Base {
     }
 
     public boolean hasNationality() {
-        for (ProtocolResponsible responsible : getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
             if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && responsible.getCountry() != null) {
                 return true;
             }
@@ -383,7 +287,7 @@ public class Protocol extends Protocol_Base {
             return true;
         }
 
-        for (ProtocolResponsible responsible : getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
             if (responsible.getType() == ProtocolResponsibleType.EXTERNAL && country.equals(responsible.getCountry())) {
                 return true;
             }
@@ -394,13 +298,13 @@ public class Protocol extends Protocol_Base {
     public String getVisibilityDescription() {
         switch (getVisibilityType()) {
         case PROTOCOL:
-            return BundleUtil.getFormattedStringFromResourceBundle("resources/ProtocolsResources",
-                    "label.protocols.visibility.protocol", generateVisibilityString());
+            return BundleUtil.getString("resources/ProtocolsResources", "label.protocols.visibility.protocol",
+                    generateVisibilityString());
         case RESTRICTED:
-            return BundleUtil.getFormattedStringFromResourceBundle("resources/ProtocolsResources",
-                    "label.protocols.visibility.restricted", generateVisibilityString());
+            return BundleUtil.getString("resources/ProtocolsResources", "label.protocols.visibility.restricted",
+                    generateVisibilityString());
         case TOTAL:
-            return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.protocols.visibility.total");
+            return BundleUtil.getString("resources/ProtocolsResources", "label.protocols.visibility.total");
         default:
             return "";
         }
@@ -411,7 +315,7 @@ public class Protocol extends Protocol_Base {
 
         groups.add(getWriterGroup().getAuthorizedWriterGroup());
 
-        for (PersistentGroup group : getReaderGroups()) {
+        for (PersistentGroup group : getReaderGroupsSet()) {
             groups.add(group);
         }
 
@@ -421,25 +325,19 @@ public class Protocol extends Protocol_Base {
             if (builder.length() > 0) {
                 builder.append(", ");
             }
-            builder.append(group.getName());
+            builder.append(group.getPresentationName());
         }
 
         return builder.toString();
     }
 
-    @Deprecated
-    public java.util.Set<module.protocols.domain.ProtocolHistory> getProtocolHistories() {
-        return getProtocolHistoriesSet();
+    @Override
+    public String getProtocolNumber() {
+        return super.getProtocolNumber();
     }
 
-    @Deprecated
-    public java.util.Set<module.protocols.domain.ProtocolResponsible> getProtocolResponsible() {
-        return getProtocolResponsibleSet();
-    }
-
-    @Deprecated
-    public java.util.Set<pt.ist.bennu.core.domain.groups.PersistentGroup> getReaderGroups() {
-        return getReaderGroupsSet();
+    public Stream<Group> getProtocolReaders() {
+        return getReaderGroupsSet().stream().map(PersistentGroup::toGroup);
     }
 
 }

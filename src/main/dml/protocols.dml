@@ -11,15 +11,21 @@ valueType module.protocols.domain.util.ProtocolAction as ProtocolAction {
     internalizeWith fromString();
 }
 
+valueType pt.utl.ist.fenix.tools.util.Strings as ProtocolsStrings {
+    externalizeWith {
+        String exportAsString();
+    }
+    internalizeWith pt.utl.ist.fenix.tools.util.Strings.importFromString();
+}
+
 class ProtocolManager {
 	Long currentSequenceNumber;
 }
 
 class Protocol {
-    Boolean active;
     String observations;
     ProtocolAction protocolAction;
-    String protocolNumber;
+    protected String protocolNumber;
     Boolean renewable;
     String scientificAreas;
     LocalDate signedDate;
@@ -27,30 +33,30 @@ class Protocol {
     ProtocolVisibilityType visibilityType;
 }
 
+public class ProtocolFile extends .org.fenixedu.bennu.io.domain.GenericFile {
+}
+
+public class PersistentProtocolCreatorsGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup {
+}
+
 class ProtocolHistory {
-	DateTime timestamp;
+	protected DateTime timestamp;
 	LocalDate beginDate;
 	LocalDate endDate;
 }
 
 class ProtocolResponsible {
 	ProtocolResponsibleType type;
-	Strings positionList;
+	ProtocolsStrings positionList;
 }
 
 class ProtocolAuthorizationGroup {
 }
 
-class ProtocolAdministrativeGroup extends .pt.ist.bennu.core.domain.groups.PersistentGroup {
-}
-
-class ProtocolDirNode extends .module.fileManagement.domain.DirNode {
-}
-
 /* Relations */
 
-relation ProtocolManagerMyOrg {
-	.pt.ist.bennu.core.domain.MyOrg playsRole myOrg;
+relation ProtocolManagerBennu {
+	.org.fenixedu.bennu.core.domain.Bennu playsRole bennu;
 	ProtocolManager playsRole protocolManager;
 }
 
@@ -73,23 +79,13 @@ relation ProtocolManagerExternalOrganizationModel {
 	.module.organization.domain.OrganizationalModel playsRole externalOrganizationalModel;
 }
 
-relation ProtocolManagerAdministrativeGroup {
-	ProtocolManager playsRole protocolManager {
-		multiplicity 1..1;
-	}
-	ProtocolAdministrativeGroup playsRole administrativeGroup {
-		multiplicity 1..1;
-	}
-}
-
 relation ProtocolManagerCreatorsGroup {
-	ProtocolManager playsRole protocolManager;
-	.pt.ist.bennu.core.domain.groups.UnionGroup playsRole creatorsGroup;
-}
-
-relation ProtocolAdministrativeGroupPersistentGroup {
-	ProtocolAdministrativeGroup playsRole administrativeGroup;
-	.pt.ist.bennu.core.domain.groups.PersistentGroup playsRole delegateGroup;
+    protected ProtocolManager playsRole protocolManager {
+        multiplicity 1..1;
+    }
+    protected PersistentProtocolCreatorsGroup playsRole creatorsGroup {
+        multiplicity 1..1;
+    }
 }
 
 // Protocols
@@ -137,12 +133,7 @@ relation ProtocolHistoryProtocol {
 	}
 }
 
-// Access control
-
-relation ProtocolAllowedToReadGroups {
-	Protocol playsRole allowedToReadProtocol;
-	.pt.ist.bennu.core.domain.groups.UnionGroup playsRole allowedToRead;
-}
+/* Protocol-specific */
 
 relation ProtocolAuthorizationGroupProtocol {
 	Protocol playsRole writerProtocols {
@@ -155,10 +146,12 @@ relation ProtocolReaders {
 	Protocol playsRole readerProtocols {
 		multiplicity *;
 	}
-	.pt.ist.bennu.core.domain.groups.PersistentGroup playsRole readerGroups {
+	protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole readerGroups {
 		multiplicity *;
 	}
 }
+
+/* Authorization Groups */
 
 relation ProtocolAuthorizationGroupProtocolManager {
 	ProtocolManager playsRole protocolManager {
@@ -171,24 +164,25 @@ relation ProtocolAuthorizationGroupProtocolManager {
 
 relation ProtocolAuthorizationGroupWriterGroups {
 	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroupAllowedToWrite;
-	.pt.ist.bennu.core.domain.groups.PersistentGroup playsRole authorizedWriterGroup;
+	protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole authorizedWriterGroup;
 }
 
 relation ProtocolAuthorizationGroupReaderGroups {
 	ProtocolAuthorizationGroup playsRole protocolAuthorizationGroupAllowedToRead {
 		multiplicity *;
 	}
-	.pt.ist.bennu.core.domain.groups.PersistentGroup playsRole authorizedReaderGroups {
+	protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole authorizedReaderGroups {
 		multiplicity *;
 	}
 }
 
-relation ProtocolAuthorizationGroupDirNode {
-	ProtocolAuthorizationGroup playsRole ownerGroup;
-	ProtocolDirNode playsRole groupDir;
-}
+/* Files */
 
 relation ProtocolFilesNode {
-	Protocol playsRole protocol;
-	ProtocolDirNode playsRole protocolDir;
+	Protocol playsRole protocol {
+	    multiplicity 1..1;
+	}
+	ProtocolFile playsRole protocolFile {
+		multiplicity *;
+	}
 }

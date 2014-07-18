@@ -3,15 +3,15 @@
  */
 package module.protocols.presentationTier.providers;
 
+import java.util.stream.Collectors;
+
 import module.protocols.domain.ProtocolAuthorizationGroup;
 import module.protocols.domain.ProtocolManager;
-import pt.ist.bennu.core.applicationTier.Authenticate;
-import pt.ist.bennu.core.domain.User;
+
+import org.fenixedu.bennu.core.security.Authenticate;
+
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -26,21 +26,11 @@ public class UserGroupsProvider implements DataProvider {
 
     @Override
     public Object provide(Object arg0, Object arg1) {
-
-        final User user = Authenticate.getCurrentUser();
-
-        if (ProtocolManager.getInstance().getAdministrativeGroup().isMember(user)) {
-            return ProtocolManager.getInstance().getProtocolAuthorizationGroups();
+        if (ProtocolManager.managers().isMember(Authenticate.getUser())) {
+            return ProtocolManager.getInstance().getProtocolAuthorizationGroupsSet();
         }
 
-        return Collections2.filter(ProtocolManager.getInstance().getProtocolAuthorizationGroups(),
-                new Predicate<ProtocolAuthorizationGroup>() {
-
-                    @Override
-                    public boolean apply(ProtocolAuthorizationGroup group) {
-
-                        return group.getAuthorizedWriterGroup().isMember(user);
-                    }
-                });
+        return ProtocolManager.getInstance().getProtocolAuthorizationGroupsSet().stream()
+                .filter(ProtocolAuthorizationGroup::isAccessible).collect(Collectors.toList());
     }
 }

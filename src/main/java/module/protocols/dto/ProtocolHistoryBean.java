@@ -97,9 +97,7 @@ public class ProtocolHistoryBean implements Serializable {
     }
 
     public List<ProtocolHistory> getProtocolHistories() {
-
-        return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(protocol.getProtocolHistories());
-
+        return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(protocol.getProtocolHistoriesSet());
     }
 
 }

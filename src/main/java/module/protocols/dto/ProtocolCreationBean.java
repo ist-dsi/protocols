@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import module.organization.domain.Person;
 import module.organization.domain.Unit;
@@ -24,10 +25,10 @@ import module.protocols.domain.ProtocolVisibilityType;
 import module.protocols.domain.util.ProtocolActionType;
 import module.protocols.domain.util.ProtocolResponsibleType;
 
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.LocalDate;
 
-import pt.ist.bennu.core.applicationTier.Authenticate;
-import pt.ist.bennu.core.domain.groups.PersistentGroup;
 import pt.utl.ist.fenix.tools.util.Strings;
 
 import com.google.common.base.Predicate;
@@ -58,7 +59,7 @@ public class ProtocolCreationBean implements Serializable {
         public ProtocolResponsibleBean(ProtocolResponsible responsible) {
             this.protocolResponsible = responsible;
             this.unit = responsible.getUnit();
-            this.responsibles = new HashSet<Person>(responsible.getPeople());
+            this.responsibles = new HashSet<Person>(responsible.getPeopleSet());
             this.positions = responsible.getPositionList() == null ? new Strings(new String[0]) : responsible.getPositionList();
         }
 
@@ -179,7 +180,7 @@ public class ProtocolCreationBean implements Serializable {
 
     private ProtocolAuthorizationGroup writers;
 
-    private List<PersistentGroup> readers;
+    private List<Group> readers;
 
     private ProtocolVisibilityType visibilityType = ProtocolVisibilityType.PROTOCOL;
 
@@ -225,7 +226,7 @@ public class ProtocolCreationBean implements Serializable {
 
         // Steps 2 and 3
 
-        for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
+        for (ProtocolResponsible responsible : protocol.getProtocolResponsibleSet()) {
             ProtocolResponsibleBean bean = new ProtocolResponsibleBean(responsible);
             if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
                 addInternalResponsible(bean);
@@ -236,7 +237,7 @@ public class ProtocolCreationBean implements Serializable {
 
         setWriters(protocol.getWriterGroup());
 
-        setReaders(new ArrayList<PersistentGroup>(protocol.getReaderGroups()));
+        setReaders(protocol.getProtocolReaders().collect(Collectors.toList()));
 
         setVisibilityType(protocol.getVisibilityType());
 
@@ -339,11 +340,11 @@ public class ProtocolCreationBean implements Serializable {
         this.readers = null;
     }
 
-    public List<PersistentGroup> getReaders() {
+    public List<Group> getReaders() {
         return readers;
     }
 
-    public void setReaders(List<PersistentGroup> readers) {
+    public void setReaders(List<Group> readers) {
         this.readers = readers;
     }
 
@@ -396,7 +397,7 @@ public class ProtocolCreationBean implements Serializable {
     }
 
     public Person getCreator() {
-        return Authenticate.getCurrentUser().getPerson();
+        return Authenticate.getUser().getPerson();
     }
 
     public List<ProtocolResponsible> getRemovedResponsibles() {
@@ -460,7 +461,7 @@ public class ProtocolCreationBean implements Serializable {
     }
 
     public boolean isProtocolNumberValid() {
-        for (Protocol protocol : ProtocolManager.getInstance().getProtocols()) {
+        for (Protocol protocol : ProtocolManager.getInstance().getProtocolsSet()) {
             if (protocol.equals(this.getProtocol())) {
                 continue;
             }

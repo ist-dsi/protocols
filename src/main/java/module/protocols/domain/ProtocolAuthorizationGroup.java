@@ -1,89 +1,68 @@
 package module.protocols.domain;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
-import module.fileManagement.domain.ContextPath;
-import pt.ist.bennu.core.domain.exceptions.DomainException;
-import pt.ist.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.security.Authenticate;
+
 import pt.ist.fenixframework.Atomic;
 
 public class ProtocolAuthorizationGroup extends ProtocolAuthorizationGroup_Base {
 
-    public ProtocolAuthorizationGroup(PersistentGroup writerGroup) {
+    private ProtocolAuthorizationGroup(Group writerGroup) {
         super();
-        this.setAuthorizedWriterGroup(writerGroup);
+        Objects.requireNonNull(writerGroup);
+        this.setAuthorizedWriterGroup(writerGroup.toPersistentGroup());
         this.setProtocolManager(ProtocolManager.getInstance());
-        ProtocolManager.getInstance().getCreatorsGroup().addPersistentGroups(writerGroup);
-        this.setGroupDir(new ProtocolDirNode(this));
     }
 
     @Atomic
-    public static Boolean createGroupWithWriter(PersistentGroup group) {
-        if (containsGroup(group)) {
+    public static Boolean createGroupWithWriter(Group group) {
+        PersistentGroup persistent = group.toPersistentGroup();
+        if (persistent.getProtocolAuthorizationGroupAllowedToWrite() != null) {
             return false;
-        } else {
-            new ProtocolAuthorizationGroup(group);
-            return true;
         }
-    }
-
-    public static boolean containsGroup(PersistentGroup group) {
-        for (ProtocolAuthorizationGroup authGroup : ProtocolManager.getInstance().getProtocolAuthorizationGroups()) {
-            if (authGroup.getAuthorizedWriterGroup().equals(group)) {
-                return true;
-            }
-        }
-        return false;
+        new ProtocolAuthorizationGroup(group);
+        return true;
     }
 
     @Atomic
     public void delete() {
-
-        if (!getWriterProtocols().isEmpty()) {
-            throw new DomainException("error.group.has.protocols");
+        if (!getWriterProtocolsSet().isEmpty()) {
+            throw ProtocolsDomainException.groupHasProtocols();
         }
 
-        ProtocolManager.getInstance().getCreatorsGroup().removePersistentGroups(getAuthorizedWriterGroup());
-
-        ProtocolDirNode groupDir = this.getGroupDir();
-
-        groupDir.trash(new ContextPath(groupDir));
-
-        this.setGroupDir(null);
-        this.removeReaders();
-        this.setProtocolManager(null);
+        for (PersistentGroup group : getAuthorizedReaderGroupsSet()) {
+            removeAuthorizedReaderGroups(group);
+        }
         this.setAuthorizedWriterGroup(null);
 
+        this.setProtocolManager(null);
         this.deleteDomainObject();
     }
 
+    public Stream<Group> getAuthorizedReaders() {
+        return getAuthorizedReaderGroupsSet().stream().map(PersistentGroup::toGroup);
+    }
+
+    public boolean isAccessible() {
+        return getAuthorizedWriterGroup().isMember(Authenticate.getUser());
+    }
+
+    public Group getWriterGroup() {
+        return getAuthorizedWriterGroup().toGroup();
+    }
+
     @Atomic
-    public void updateReaders(List<PersistentGroup> authorizedGroups) {
-        for (PersistentGroup existing : getAuthorizedReaderGroups()) {
-            if (!authorizedGroups.contains(existing)) {
-                removeAuthorizedReaderGroups(existing);
-            }
-        }
-
-        for (PersistentGroup newGroup : authorizedGroups) {
-            addAuthorizedReaderGroups(newGroup);
-        }
+    public void grant(Group readerGroup) {
+        addAuthorizedReaderGroups(readerGroup.toPersistentGroup());
     }
 
-    private void removeReaders() {
-        for (PersistentGroup group : getAuthorizedReaderGroups()) {
-            removeAuthorizedReaderGroups(group);
-        }
-    }
-
-    @Deprecated
-    public java.util.Set<pt.ist.bennu.core.domain.groups.PersistentGroup> getAuthorizedReaderGroups() {
-        return getAuthorizedReaderGroupsSet();
-    }
-
-    @Deprecated
-    public java.util.Set<module.protocols.domain.Protocol> getWriterProtocols() {
-        return getWriterProtocolsSet();
+    @Atomic
+    public void revoke(PersistentGroup group) {
+        removeAuthorizedReaderGroups(group);
     }
 
 }

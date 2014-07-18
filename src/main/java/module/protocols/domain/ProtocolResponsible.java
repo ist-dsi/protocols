@@ -42,7 +42,7 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 
         reloadCountry();
 
-        for (Person person : getPeople()) {
+        for (Person person : getPeopleSet()) {
             removePeople(person);
         }
 
@@ -55,7 +55,7 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 
     public String getPresentationString() {
 
-        Collection<String> strings = Collections2.transform(getPeople(), new Function<Person, String>() {
+        Collection<String> strings = Collections2.transform(getPeopleSet(), new Function<Person, String>() {
 
             @Override
             public String apply(Person person) {
@@ -80,7 +80,6 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 
     @Atomic
     public void reloadCountry() {
-
         Collection<Party> geoChildren =
                 getUnit().getChildren(AccountabilityType.readBy(GeographicConstants.GEOGRAPHIC_ACCOUNTABILITY_TYPE_NAME));
 
@@ -96,11 +95,6 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
         GeographicLocation location = countryUnit != null ? countryUnit.getGeographicLocation() : Country.getPortugal();
 
         setCountry((location instanceof Country) ? (Country) location : null);
-
-    }
-    @Deprecated
-    public java.util.Set<module.organization.domain.Person> getPeople() {
-        return getPeopleSet();
     }
 
 }
