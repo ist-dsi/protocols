@@ -205,7 +205,8 @@ public class Protocol extends Protocol_Base {
     }
 
     public boolean canBeWrittenByUser(final User user) {
-        return getWriterGroup().getAuthorizedWriterGroup().isMember(user) || ProtocolManager.managers().isMember(user);
+        final PersistentGroup pg = getWriterGroup().getAuthorizedWriterGroup();
+        return (pg != null && pg.isMember(user)) || ProtocolManager.managers().isMember(user);
     }
 
     private boolean belongsToReadersGroup(User user) {

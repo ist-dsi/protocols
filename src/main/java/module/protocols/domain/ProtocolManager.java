@@ -35,7 +35,7 @@ public class ProtocolManager extends ProtocolManager_Base {
     private ProtocolManager() {
         super();
         setBennu(Bennu.getInstance());
-        setCreatorsGroup(new PersistentProtocolCreatorsGroup());
+        setCreatorsGroup(ProtocolCreatorsGroup.get().toPersistentGroup());
         setCurrentSequenceNumber(0l);
     }
 

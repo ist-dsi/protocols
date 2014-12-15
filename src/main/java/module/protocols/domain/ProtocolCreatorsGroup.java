@@ -5,22 +5,16 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
-import org.fenixedu.bennu.core.groups.CustomGroup;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.groups.GroupStrategy;
 import org.joda.time.DateTime;
 
 @GroupOperator("protocolCreators")
-public class ProtocolCreatorsGroup extends CustomGroup {
+public class ProtocolCreatorsGroup extends GroupStrategy {
 
     private static final long serialVersionUID = -8554541083518764360L;
 
     private static final Group INSTANCE = new ProtocolCreatorsGroup();
-
-    @Override
-    public boolean equals(Object other) {
-        return other != null && other.getClass().equals(ProtocolCreatorsGroup.class);
-    }
 
     @Override
     public Set<User> getMembers() {
@@ -39,11 +33,6 @@ public class ProtocolCreatorsGroup extends CustomGroup {
     }
 
     @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    @Override
     public boolean isMember(User user) {
         return ProtocolManager.getInstance().getProtocolAuthorizationGroupsSet().stream()
                 .filter(ProtocolAuthorizationGroup::isAccessible).findAny().isPresent();
@@ -52,11 +41,6 @@ public class ProtocolCreatorsGroup extends CustomGroup {
     @Override
     public boolean isMember(User user, DateTime when) {
         return isMember(user);
-    }
-
-    @Override
-    public PersistentGroup toPersistentGroup() {
-        return ProtocolManager.getInstance().getCreatorsGroup();
     }
 
     public static Group get() {
