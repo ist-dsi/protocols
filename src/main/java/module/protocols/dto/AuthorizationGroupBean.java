@@ -4,11 +4,12 @@
 package module.protocols.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import module.protocols.domain.ProtocolAuthorizationGroup;
-import pt.ist.bennu.core.domain.groups.PersistentGroup;
+
+import org.fenixedu.bennu.core.groups.Group;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -21,20 +22,20 @@ public class AuthorizationGroupBean implements Serializable {
      */
     private static final long serialVersionUID = -8479983429517700272L;
 
-    private List<PersistentGroup> authorizedGroups;
+    private List<Group> authorizedGroups;
 
     private final ProtocolAuthorizationGroup group;
 
     public AuthorizationGroupBean(ProtocolAuthorizationGroup group) {
-        authorizedGroups = new ArrayList<PersistentGroup>(group.getAuthorizedReaderGroups());
+        authorizedGroups = group.getAuthorizedReaders().collect(Collectors.toList());
         this.group = group;
     }
 
-    public List<PersistentGroup> getAuthorizedGroups() {
+    public List<Group> getAuthorizedGroups() {
         return authorizedGroups;
     }
 
-    public void setAuthorizedGroups(List<PersistentGroup> authorizedGroups) {
+    public void setAuthorizedGroups(List<Group> authorizedGroups) {
         this.authorizedGroups = authorizedGroups;
     }
 

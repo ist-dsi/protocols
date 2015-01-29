@@ -2,6 +2,7 @@ package module.protocols.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.function.Predicate;
 
 import module.geography.domain.Country;
 import module.organization.domain.Unit;
@@ -11,16 +12,13 @@ import module.protocols.domain.ProtocolResponsible;
 import module.protocols.domain.util.ProtocolActionType;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import pt.ist.bennu.core.applicationTier.Authenticate;
-import pt.ist.bennu.core.util.BundleUtil;
-import pt.ist.bennu.core.util.IntervalTools;
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
-import pt.utl.ist.fenix.tools.util.StringNormalizer;
-
-import com.google.common.base.Predicate;
 
 /**
  * @author Joao Carvalho (joao.pedro.carvalho@ist.utl.pt)
@@ -35,8 +33,7 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
 
         @Override
         public String getLocalizedName() {
-            return BundleUtil
-                    .getStringFromResourceBundle("resources/ProtocolsResources", "label.searchNationalityType." + name());
+            return BundleUtil.getString("resources/ProtocolsResources", "label.searchNationalityType." + name());
         }
     }
 
@@ -195,16 +192,25 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
             return false;
         }
 
-        Interval activeInterval = IntervalTools.getInterval(history.getBeginDate(), history.getEndDate());
+        Interval activeInterval = getInterval(history.getBeginDate(), history.getEndDate());
 
-        Interval searchInterval = IntervalTools.getInterval(beginDate, endDate);
+        Interval searchInterval = getInterval(beginDate, endDate);
 
         return searchInterval.contains(activeInterval);
     }
 
+    private static Interval getInterval(LocalDate startDate, LocalDate endDate) {
+        long start = startDate == null ? Long.MIN_VALUE : startDate.toDateTimeAtStartOfDay().getMillis();
+        long end =
+                endDate == null ? Long.MAX_VALUE : endDate.toDateTimeAtStartOfDay().toDateTime().withTime(23, 59, 59, 999)
+                        .getMillis();
+
+        return new Interval(start, end);
+    }
+
     private boolean satisfiedActiveInYear(Protocol protocol) {
         if (getYear() != null) {
-            for (ProtocolHistory protocolHistory : protocol.getProtocolHistories()) {
+            for (ProtocolHistory protocolHistory : protocol.getProtocolHistoriesSet()) {
                 if (protocolHistory.getEndDate() == null) {
                     return protocolHistory.getBeginDate() == null || protocolHistory.getBeginDate().getYear() <= getYear();
                 } else {
@@ -248,16 +254,14 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
     }
 
     private boolean satisfiedProtocolPartner(Protocol protocol) {
-
         if (getPartner() != null) {
-            for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
+            for (ProtocolResponsible responsible : protocol.getProtocolResponsibleSet()) {
                 if (responsible.getUnit().equals(getPartner())) {
                     return true;
                 }
             }
             return false;
         }
-
         return true;
     }
 
@@ -272,34 +276,11 @@ public class ProtocolSearchBean implements Serializable, Predicate<Protocol> {
     }
 
     @Override
-    public boolean apply(Protocol protocol) {
-
-        // System.out.println("Number: " + satisfiedProtocolNumber(protocol));
-        // System.out.println("History dates: "
-        // + satisfiesAnyProtocolHistoryDate(getBeginProtocolBeginDate(),
-        // getEndProtocolBeginDate(), protocol));
-        // System.out.println("Signed: " + satisfiedDates(getBeginSignedDate(),
-        // getEndSignedDate(), protocol.getSignedDate()));
-        // System.out.println("Action types: "
-        // + (satisfiedOtherProtocolActionTypes(protocol) &&
-        // satiefiedProtocolActionTypes(protocol)));
-        // System.out.println("Partner: " + satisfiedProtocolPartner(protocol));
-        // System.out.println("Nacionalidade: " +
-        // satisfiedNationality(protocol));
-        // System.out.println("Actividade: " + satisfiedActivity(protocol));
-        // System.out.println("Activo no ano: " +
-        // satisfiedActiveInYear(protocol));
-        // System.out.println("Visivel: " +
-        // protocol.canBeReadByUser(Authenticate.getCurrentUser()));
-
-        // System.out.println("valores: " +
-        // ReflectionToStringBuilder.toString(this,
-        // ToStringStyle.MULTI_LINE_STYLE));
-
+    public boolean test(Protocol protocol) {
         return satisfiedProtocolNumber(protocol) && satisfiesAnyProtocolHistoryDate(protocol)
                 && satisfiedOtherProtocolActionTypes(protocol) && satiefiedProtocolActionTypes(protocol)
                 && satisfiedProtocolPartner(protocol) && satisfiedNationality(protocol) && satisfiedActivity(protocol)
-                && satisfiedActiveInYear(protocol) && protocol.canBeReadByUser(Authenticate.getCurrentUser());
+                && satisfiedActiveInYear(protocol) && protocol.canBeReadByUser(Authenticate.getUser());
     }
 
 }

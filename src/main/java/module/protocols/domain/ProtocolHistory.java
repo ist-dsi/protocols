@@ -6,8 +6,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import pt.ist.bennu.core.domain.exceptions.DomainException;
-import pt.ist.bennu.core.util.IntervalTools;
 import pt.ist.fenixframework.Atomic;
 
 import com.google.common.collect.Ordering;
@@ -57,21 +55,23 @@ public class ProtocolHistory extends ProtocolHistory_Base {
         this.setEndDate(endDate);
     }
 
-    @Override
-    public void setTimestamp(DateTime dateTime) {
-        throw new DomainException("protocolHistory.changeTimestamp.notAllowed");
-    }
-
     public boolean isActive() {
         return getInterval().containsNow();
     }
 
     public boolean isPast() {
-        return getEndDate() != null && getEndDate().toDateMidnight().isBeforeNow();
+        return getEndDate() != null && getEndDate().toDateTimeAtStartOfDay().isBeforeNow();
     }
 
     public Interval getInterval() {
-        return IntervalTools.getInterval(getBeginDate(), getEndDate());
+        LocalDate startDate = getBeginDate();
+        LocalDate endDate = getEndDate();
+        long start = startDate == null ? Long.MIN_VALUE : startDate.toDateTimeAtStartOfDay().getMillis();
+        long end =
+                endDate == null ? Long.MAX_VALUE : endDate.toDateTimeAtStartOfDay().toDateTime().withTime(23, 59, 59, 999)
+                        .getMillis();
+
+        return new Interval(start, end);
     }
 
     public void delete() {

@@ -1,5 +1,3 @@
-<%@page import="pt.ist.vaadinframework.fragment.FragmentQuery"%>
-<%@page import="module.fileManagement.presentationTier.pages.DocumentBrowse"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-html" prefix="html" %>
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-bean" prefix="bean" %>
@@ -69,14 +67,12 @@
 <logic:iterate id="file" name="protocolFiles">
 	<tr>
 	<td width="70%" style="padding-left:20px">
-	<bean:define id="url" type="java.lang.String" name="file" property="fileURL"/>
-	<a href="<%= url %>"><bean:write name="file" property="file.document.lastVersionedFile.filename"/></a>
+	<a href="${file.downloadUrl}">${file.filename}</a>
 	<br />
 	</td>
 	<td>
 	<logic:equal value="true" name="canBeWritten">
-		<bean:define id="fileOID" type="java.lang.Long" name="file" property="file.OID"/>
-		<html:link page="<%= "/protocols.do?method=removeProtocolFile&protocol=" + OID + "&file=" + fileOID %>">
+		<html:link page="/protocols.do?method=removeProtocolFile&protocol=${OID}&file=${file.externalId}">
 		<bean:message key="label.remove" bundle="MYORG_RESOURCES" />
 		</html:link>
 	</logic:equal>
@@ -97,22 +93,12 @@
 <hr />
 <br />
 
-<html:link page="<%= "/protocols.do?method=uploadProtocolFile&OID=" + OID %>">
+<html:link page="/protocols.do?method=uploadProtocolFile&OID=${OID}">
 <bean:message key="link.protocols.uploadFile" bundle="PROTOCOLS_RESOURCES"/>
 </html:link>
 
 <br />
 <br />
-
-<bean:define id="dirOID" name="protocol" property="protocolDir.OID"/>
-<html:link page="<%="/vaadinContext.do?method=forwardToVaadin#" + 
-	new pt.ist.vaadinframework.fragment.FragmentQuery(DocumentBrowse.class).getQueryString() + "?contextPath=" + dirOID + "&now=" + (new java.util.Date()).getTime() %>" target="_blank">
-<bean:message key="link.protocols.manageFiles" bundle="PROTOCOLS_RESOURCES"/>
-</html:link>
-
-
-
-
 
 </logic:equal>
 

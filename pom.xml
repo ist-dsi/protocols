@@ -2,14 +2,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>pt.ist</groupId>
-        <artifactId>bennu-project</artifactId>
-        <version>1.1.0</version>
+        <groupId>org.fenixedu</groupId>
+        <artifactId>fenix-framework-project</artifactId>
+        <version>2.2.0</version>
     </parent>
 
-    <groupId>pt.ist</groupId>
     <artifactId>protocols</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
     <name>protocols</name>
 
@@ -17,43 +16,59 @@
         <connection>scm:git:git@github.com:ist-dsi/protocols.git</connection>
         <developerConnection>scm:git:git@github.com:ist-dsi/protocols.git</developerConnection>
         <url>http://ist-dsi.github.io/protocols/</url>
-        <tag>v1.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
-        <version.pt.ist.bennu.core>1.1.0</version.pt.ist.bennu.core>
-        <version.pt.ist.organization>1.1.0</version.pt.ist.organization>
-        <version.pt.ist.file.management>1.1.0</version.pt.ist.file.management>
-        <version.pt.ist.geography>1.1.0</version.pt.ist.geography>
+        <version.org.fenixedu.bennu.core>3.4.1</version.org.fenixedu.bennu.core>
+        <version.org.fenixedu.bennu.renderers>5.0.2</version.org.fenixedu.bennu.renderers>
+        <version.org.fenixedu.organization>2.0.0</version.org.fenixedu.organization>
+        <version.org.fenixedu.geography>2.0.0</version.org.fenixedu.geography>
+        <version.pt.ist.fenix-legacy-tools>2.0.0</version.pt.ist.fenix-legacy-tools>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>pt.ist</groupId>
+            <groupId>org.fenixedu</groupId>
             <artifactId>bennu-core</artifactId>
-            <version>${version.pt.ist.bennu.core}</version>
+            <version>${version.org.fenixedu.bennu.core}</version>
+        </dependency>
+	<dependency>
+	    <groupId>org.fenixedu</groupId>
+	    <artifactId>bennu-renderers</artifactId>
+	    <version>${version.org.fenixedu.bennu.renderers}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.fenixedu</groupId>
+	    <artifactId>bennu-struts</artifactId>
+	    <version>${version.org.fenixedu.bennu.renderers}</version>
+	</dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-io</artifactId>
+            <version>${version.org.fenixedu.bennu.core}</version>
         </dependency>
         <dependency>
-            <groupId>pt.ist</groupId>
+            <groupId>org.fenixedu</groupId>
             <artifactId>organization</artifactId>
-            <version>${version.pt.ist.organization}</version>
+            <version>${version.org.fenixedu.organization}</version>
         </dependency>
         <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>file-management</artifactId>
-            <version>${version.pt.ist.file.management}</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
+            <groupId>org.fenixedu</groupId>
             <artifactId>geography</artifactId>
-            <version>${version.pt.ist.geography}</version>
+            <version>${version.org.fenixedu.geography}</version>
+        </dependency>
+	<dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenix-legacy-tools</artifactId>
+            <version>${version.pt.ist.fenix-legacy-tools}</version>
         </dependency>
     </dependencies>
 
     <repositories>
-        <repository>
-            <id>fenix-ashes-maven-repository</id>
-            <url>https://fenix-ashes.ist.utl.pt/nexus/content/groups/fenix-ashes-maven-repository</url>
-        </repository>
+	<repository>
+		<id>fenixedu-maven-repository</id>
+		<url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
+	</repository>
     </repositories>
 </project>

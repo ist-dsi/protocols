@@ -12,7 +12,7 @@
 	</html:messages>
 </span>
 
-<fr:form action="/protocols.do?method=renewProtocol">
+<fr:form action="/protocolAlerts.do?method=renewProtocol">
 
 <fr:view name="protocol" property="protocolHistories" schema="show.protocolHistories.toList">
 	<fr:layout name="tabular">

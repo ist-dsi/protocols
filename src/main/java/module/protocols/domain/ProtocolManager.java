@@ -3,8 +3,11 @@ package module.protocols.domain;
 import jvstm.cps.ConsistencyPredicate;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
-import pt.ist.bennu.core.domain.MyOrg;
-import pt.ist.bennu.core.domain.groups.UnionGroup;
+
+import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
+
 import pt.ist.fenixframework.Atomic;
 
 /**
@@ -15,30 +18,24 @@ import pt.ist.fenixframework.Atomic;
 public class ProtocolManager extends ProtocolManager_Base {
 
     public static ProtocolManager getInstance() {
-
-        ProtocolManager instance = MyOrg.getInstance().getProtocolManager();
-
-        // Should only happen once
-        if (instance == null) {
-            instance = createInstance();
+        if (Bennu.getInstance().getProtocolManager() == null) {
+            return initialize();
         }
-
-        return instance;
+        return Bennu.getInstance().getProtocolManager();
     }
 
     @Atomic
-    private static ProtocolManager createInstance() {
-
-        ProtocolManager manager = new ProtocolManager();
-        manager.setAdministrativeGroup(new ProtocolAdministrativeGroup());
-        manager.setCreatorsGroup(new UnionGroup(manager.getAdministrativeGroup()));
-
-        return manager;
+    private static ProtocolManager initialize() {
+        if (Bennu.getInstance().getProtocolManager() == null) {
+            return new ProtocolManager();
+        }
+        return Bennu.getInstance().getProtocolManager();
     }
 
     private ProtocolManager() {
         super();
-        setMyOrg(MyOrg.getInstance());
+        setBennu(Bennu.getInstance());
+        setCreatorsGroup(ProtocolCreatorsGroup.get().toPersistentGroup());
         setCurrentSequenceNumber(0l);
     }
 
@@ -54,7 +51,6 @@ public class ProtocolManager extends ProtocolManager_Base {
     public void updateFromBean(ProtocolSystemConfigurationBean bean) {
         setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
         setExternalOrganizationalModel(bean.getExternalOrganizationalModel());
-        getAdministrativeGroup().setDelegateGroup(bean.getAdministrativeGroup());
     }
 
     @Atomic
@@ -66,23 +62,16 @@ public class ProtocolManager extends ProtocolManager_Base {
 
     @Atomic
     public void reloadAllCountries() {
-        for (Protocol protocol : getProtocols()) {
-            for (ProtocolResponsible responsible : protocol.getProtocolResponsible()) {
-                if (responsible.getType() == ProtocolResponsibleType.EXTERNAL) {
-                    responsible.reloadCountry();
-                }
-            }
-        }
+        getProtocolsSet().forEach(
+                (protocol) -> {
+                    protocol.getProtocolResponsibleSet().stream()
+                            .filter((responsible) -> responsible.getType() == ProtocolResponsibleType.EXTERNAL)
+                            .forEach(ProtocolResponsible::reloadCountry);
+                });
     }
 
-    @Deprecated
-    public java.util.Set<module.protocols.domain.ProtocolAuthorizationGroup> getProtocolAuthorizationGroups() {
-        return getProtocolAuthorizationGroupsSet();
-    }
-
-    @Deprecated
-    public java.util.Set<module.protocols.domain.Protocol> getProtocols() {
-        return getProtocolsSet();
+    public static Group managers() {
+        return DynamicGroup.get("managers");
     }
 
 }

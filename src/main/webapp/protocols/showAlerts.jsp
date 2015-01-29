@@ -31,7 +31,7 @@
 		<fr:layout name="tabular">
 			<fr:property name="classes" value="tstyle2 thlight"/>
 			<fr:property name="columnClasses" value="acenter,acenter,acenter,"/>
-			<fr:property name="link(renew)" value="/protocols.do?method=prepareRenewProtocol" />
+			<fr:property name="link(renew)" value="/protocolAlerts.do?method=prepareRenewProtocol" />
 			<fr:property name="key(renew)" value="link.protocols.renew" />
 			<fr:property name="param(renew)" value="OID/protocolOID" />
 			<fr:property name="bundle(renew)" value="PROTOCOLS_RESOURCES" />
@@ -50,7 +50,7 @@
 		<fr:layout name="tabular">
 			<fr:property name="classes" value="tstyle2 thlight"/>
 			<fr:property name="columnClasses" value="acenter,acenter,acenter,"/>
-			<fr:property name="link(editDates)" value="/protocols.do?method=prepareEditProtocolHistory" />
+			<fr:property name="link(editDates)" value="/protocolAlerts.do?method=prepareEditProtocolHistory" />
 			<fr:property name="key(editDates)" value="link.protocols.editDates" />
 			<fr:property name="param(editDates)" value="OID/OID" />
 			<fr:property name="bundle(editDates)" value="PROTOCOLS_RESOURCES" />

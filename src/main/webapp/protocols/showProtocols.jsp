@@ -3,6 +3,7 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <style type="text/css">
 .width70 {
@@ -10,7 +11,14 @@
 }
 </style>
 
-<h2><bean:message key="label.protocols.show" bundle="PROTOCOLS_RESOURCES"/></h2>
+<h2>
+	<bean:message key="label.protocols.show" bundle="PROTOCOLS_RESOURCES"/>
+	<c:if test="${creator}">
+		<small class="pull-right">
+			<a href="${pageContext.request.contextPath}/protocols.do?method=prepareCreateProtocolData">${fr:message('resources.ProtocolsResources', 'label.protocols.create')}</a>
+		</small>
+	</c:if>
+</h2>
 
 <p>
 <p>
@@ -19,7 +27,7 @@
 
 	<fr:view name="protocols" schema="show.protocol.toList" >
 		<fr:layout name="tabular-sortable">
-			<fr:property name="classes" value="tstyle2"/>
+			<fr:property name="classes" value="table tstyle2"/>
 			<fr:property name="columnClasses" value="acenter,width70, width70, acenter,,,aleft"/>
 			<fr:property name="link(show)" value="/protocols.do?method=viewProtocolDetails" />
 			<fr:property name="key(show)" value="link.protocols.viewDetails" />
@@ -29,7 +37,7 @@
 			
 			<fr:property name="sortParameter" value="sortBy"/>
        		<fr:property name="sortUrl" value="/protocols.do?method=showProtocols" />
-		    <fr:property name="sortBy" value="<%= request.getParameter("sortBy") == null ? "currentProtocolHistory.beginDate=desc" : request.getParameter("sortBy") %>"/>
+		    <fr:property name="sortBy" value="${sortBy ? 'currentProtocolHistory.beginDate=desc': sortBy}"/>
 			<fr:property name="sortableSlots" value="protocolNumber, presentableProtocolHistory.beginDate, presentableProtocolHistory.endDate" />
 			
 			

@@ -98,9 +98,9 @@ function removePersonFunction(formId, personId) {
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
 	<fr:slot name="newPerson" layout="autoComplete" key="label.person" bundle="ORGANIZATION_RESOURCES">
         <fr:property name="labelField" value="presentationName"/>
-		<fr:property name="format" value="${presentationName}"/>
+		<fr:property name="format" value="\${presentationName}"/>
 		<fr:property name="minChars" value="2"/>
-		<fr:property name="args" value="<%="provider=module.protocols.presentationTier.providers.PeoplePerUnitAutoCompleteProvider,unit=" + unitOID %>"/>
+		<fr:property name="args" value="provider=module.protocols.presentationTier.providers.PeoplePerUnitAutoCompleteProvider,unit=${unitOID}"/>
 		<fr:property name="size" value="50"/>
 	</fr:slot>
 </fr:schema>	
@@ -236,7 +236,7 @@ function removePersonFunction(formId, personId) {
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
 	<fr:slot name="newUnit" layout="autoComplete" key="label.unit" bundle="ORGANIZATION_RESOURCES">
         <fr:property name="labelField" value="presentationName"/>
-		<fr:property name="format" value="${presentationName}"/>
+		<fr:property name="format" value="\${presentationName}"/>
 		<fr:property name="minChars" value="2"/>
 		<fr:property name="args" value="provider=module.protocols.presentationTier.providers.UnitPerModelAutoCompleteProvider,model=internal"/>
 		<fr:property name="size" value="40"/>

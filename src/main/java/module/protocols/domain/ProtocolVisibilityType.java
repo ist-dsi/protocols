@@ -3,7 +3,8 @@
  */
 package module.protocols.domain;
 
-import pt.ist.bennu.core.util.BundleUtil;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
 
 /**
@@ -33,7 +34,7 @@ public enum ProtocolVisibilityType implements IPresentableEnum {
 
     @Override
     public String getLocalizedName() {
-        return BundleUtil.getStringFromResourceBundle("resources/ProtocolsResources", "label.protocolVisibilityType." + name());
+        return BundleUtil.getString("resources/ProtocolsResources", "label.protocolVisibilityType." + name());
     }
 
 }

@@ -11,7 +11,8 @@ import module.organization.domain.Party;
 import module.organization.domain.Unit;
 import module.organization.presentationTier.renderers.providers.UnitAutoCompleteProvider;
 import module.protocols.domain.ProtocolManager;
-import pt.ist.bennu.core.domain.MyOrg;
+
+import org.fenixedu.bennu.core.domain.Bennu;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
@@ -49,7 +50,7 @@ public class UnitPerModelAutoCompleteProvider extends UnitAutoCompleteProvider {
             throw new RuntimeException();
         }
 
-        return Sets.filter(MyOrg.getInstance().getPartiesSet(), new Predicate<Party>() {
+        return Sets.filter(Bennu.getInstance().getPartiesSet(), new Predicate<Party>() {
 
             @Override
             public boolean apply(Party par) {

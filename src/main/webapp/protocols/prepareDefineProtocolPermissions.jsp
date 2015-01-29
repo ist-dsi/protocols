@@ -50,7 +50,7 @@
 <fr:schema type="module.protocols.dto.ProtocolCreationBean" bundle="PROTOCOLS_RESOURCES">
 	<fr:slot name="writers" layout="menu-select-postback" key="label.user.groups" bundle="MYORG_RESOURCES">
 			<fr:property name="providerClass" value="module.protocols.presentationTier.providers.UserGroupsProvider"/>
-			<fr:property name="format" value="${authorizedWriterGroup.name}" />
+			<fr:property name="format" value="\${writerGroup.presentationName}" />
 	</fr:slot>
 	</fr:schema>
 	<fr:layout name="tabular">
