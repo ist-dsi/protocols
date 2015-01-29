@@ -20,10 +20,11 @@
     </scm>
 
     <properties>
-        <version.org.fenixedu.bennu.core>3.4.0</version.org.fenixedu.bennu.core>
-        <version.org.fenixedu.bennu.renderers>5.0.0</version.org.fenixedu.bennu.renderers>
-        <version.org.fenixedu.organization>2.0.0-rc1</version.org.fenixedu.organization>
-        <version.org.fenixedu.geography>2.0.0-rc1</version.org.fenixedu.geography>
+        <version.org.fenixedu.bennu.core>3.4.1</version.org.fenixedu.bennu.core>
+        <version.org.fenixedu.bennu.renderers>5.0.2</version.org.fenixedu.bennu.renderers>
+        <version.org.fenixedu.organization>2.0.0</version.org.fenixedu.organization>
+        <version.org.fenixedu.geography>2.0.0</version.org.fenixedu.geography>
+        <version.pt.ist.fenix-legacy-tools>2.0.0</version.pt.ist.fenix-legacy-tools>
     </properties>
 
     <dependencies>
@@ -60,7 +61,7 @@
 	<dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenix-legacy-tools</artifactId>
-            <version>2.0.0</version>
+            <version>${version.pt.ist.fenix-legacy-tools}</version>
         </dependency>
     </dependencies>
 
