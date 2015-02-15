@@ -51,7 +51,7 @@ a {
 							<fr:schema type="module.protocols.dto.ProtocolSearchBean" bundle="PROTOCOLS_RESOURCES">
 								<fr:slot name="country" key="label.protocols.country" bundle="PROTOCOLS_RESOURCES" layout="menu-select">
 									<fr:property name="providerClass" value="module.geography.presentationTier.provider.CountryProvider"/>
-									<fr:property name="format" value="${name.content}" />
+									<fr:property name="format" value="\${name.content}" />
 								</fr:slot>
 							</fr:schema>
 							<fr:layout name="tabular">
