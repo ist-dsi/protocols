@@ -5,6 +5,7 @@ package module.protocols.presentationTier.providers;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import module.organization.domain.Person;
 import module.organization.domain.Unit;
@@ -26,7 +27,8 @@ public class PeoplePerUnitAutoCompleteProvider extends PersonAutoCompleteProvide
 
             Unit unit = FenixFramework.getDomainObject(unitOID);
 
-            Collection<Person> people = unit.getChildPersons();
+            Collection<Person> people = unit.getChildAccountabilityStream().map(a -> a.getChild()).filter(p -> p.isPerson())
+                    .map(p -> (Person) p).collect(Collectors.toList());
 
             if (people.size() == 0) {
                 return super.getPersons(argsMap, value);

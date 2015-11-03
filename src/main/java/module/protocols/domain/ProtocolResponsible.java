@@ -2,20 +2,19 @@ package module.protocols.domain;
 
 import java.util.Collection;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+
 import module.geography.domain.Country;
 import module.geography.domain.GeographicConstants;
 import module.geography.domain.GeographicLocation;
 import module.organization.domain.AccountabilityType;
-import module.organization.domain.Party;
 import module.organization.domain.Person;
 import module.organization.domain.Unit;
 import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
 import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.util.Strings;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 
 /**
  * 
@@ -64,8 +63,8 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 
         });
 
-        return getPositionList() == null ? new Strings(strings).getPresentationString() : new Strings(getPositionList(),
-                strings.toArray(new String[0])).getPresentationString();
+        return getPositionList() == null ? new Strings(strings)
+                .getPresentationString() : new Strings(getPositionList(), strings.toArray(new String[0])).getPresentationString();
 
     }
 
@@ -80,17 +79,9 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
 
     @Atomic
     public void reloadCountry() {
-        Collection<Party> geoChildren =
-                getUnit().getChildren(AccountabilityType.readBy(GeographicConstants.GEOGRAPHIC_ACCOUNTABILITY_TYPE_NAME));
-
-        Unit countryUnit = null;
-
-        for (Party party : geoChildren) {
-            if (party.isUnit()) {
-                countryUnit = (Unit) party;
-                break;
-            }
-        }
+        final AccountabilityType type = AccountabilityType.readBy(GeographicConstants.GEOGRAPHIC_ACCOUNTABILITY_TYPE_NAME);
+        final Unit countryUnit = getUnit().getChildAccountabilityStream().filter(a -> a.getAccountabilityType() == type)
+                .map(a -> a.getChild()).filter(p -> p.isUnit()).map(p -> (Unit) p).findAny().orElse(null);;
 
         GeographicLocation location = countryUnit != null ? countryUnit.getGeographicLocation() : Country.getPortugal();
 
