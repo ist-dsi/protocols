@@ -69,6 +69,7 @@ public class SearchProtocolsAction extends BaseAction {
         spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocols.internalResponsibles"));
         spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocols.externalResponsibles"));
         spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocols.signedDate"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocols.country"));
         spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocols.actualDates"));
         spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocols.scientificAreas"));
         spreadsheet.setHeader(BundleUtil.getString("resources.ProtocolsResources", "label.protocol.actionTypes"));
@@ -81,6 +82,7 @@ public class SearchProtocolsAction extends BaseAction {
             row.setCell(Joiner.on('\n').join(responsibles(protocol, true)));
             row.setCell(Joiner.on('\n').join(responsibles(protocol, false)));
             row.setCell(protocol.getSignedDate() == null ? "-" : protocol.getSignedDate().toString("YYYY/MM/dd"));
+            row.setCell(protocol.getCountry());
             row.setCell(Joiner.on('\n').join(
                     FluentIterable.from(protocol.getCurrentAndFutureProtocolHistories()).transform(
                             new Function<ProtocolHistory, String>() {

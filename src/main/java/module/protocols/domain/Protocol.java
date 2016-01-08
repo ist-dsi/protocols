@@ -248,6 +248,27 @@ public class Protocol extends Protocol_Base {
         return builder.toString();
     }
 
+    public String getCountry() {
+        StringBuilder builder = new StringBuilder();
+        Set<String> str = new HashSet<>();
+        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
+            if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
+                continue;
+            }
+
+            String responsibleStr = responsible.getCountryDescription();
+            if (!str.contains(responsibleStr)) {
+                str.add(responsibleStr);
+                if (builder.length() > 0 && !responsibleStr.isEmpty()) {
+                    builder.append(", ");
+                }
+
+                builder.append(responsibleStr);
+            }
+        }
+        return builder.toString();
+    }
+
     @Atomic
     public void uploadFile(String filename, byte[] contents) {
         new ProtocolFile(this, filename, contents);
@@ -340,5 +361,4 @@ public class Protocol extends Protocol_Base {
     public Stream<Group> getProtocolReaders() {
         return getReaderGroupsSet().stream().map(PersistentGroup::toGroup);
     }
-
 }
