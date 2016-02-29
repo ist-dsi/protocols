@@ -5,12 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import module.geography.domain.Country;
-import module.protocols.domain.util.ProtocolAction;
-import module.protocols.domain.util.ProtocolResponsibleType;
-import module.protocols.dto.ProtocolCreationBean;
-import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
-
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.groups.Group;
@@ -18,12 +12,17 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.LocalDate;
 
-import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
-import pt.ist.fenixframework.Atomic;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+
+import module.geography.domain.Country;
+import module.protocols.domain.util.ProtocolAction;
+import module.protocols.domain.util.ProtocolResponsibleType;
+import module.protocols.dto.ProtocolCreationBean;
+import module.protocols.dto.ProtocolCreationBean.ProtocolResponsibleBean;
+import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
+import pt.ist.fenixframework.Atomic;
 
 /**
  * 
@@ -76,8 +75,8 @@ public class Protocol extends Protocol_Base {
     }
 
     public List<ProtocolHistory> getCurrentAndFutureProtocolHistories() {
-        return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE).sortedCopy(
-                Iterables.filter(getProtocolHistoriesSet(), new Predicate<ProtocolHistory>() {
+        return Ordering.from(ProtocolHistory.COMPARATOR_BY_BEGIN_DATE)
+                .sortedCopy(Iterables.filter(getProtocolHistoriesSet(), new Predicate<ProtocolHistory>() {
 
                     @Override
                     public boolean apply(ProtocolHistory history) {
@@ -214,59 +213,20 @@ public class Protocol extends Protocol_Base {
     }
 
     public String getPartners() {
-        StringBuilder builder = new StringBuilder();
-        boolean first = true;
-        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
-            if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
-                continue;
-            }
-
-            if (first) {
-                first = false;
-            } else {
-                builder.append(", ");
-            }
-
-            builder.append(responsible.getUnit().getPartyName().getContent());
-        }
-        return builder.toString();
+        final Stream<ProtocolResponsible> stream = getProtocolResponsibleSet().stream();
+        return stream.filter(pr -> pr.getType() != ProtocolResponsibleType.INTERNAL)
+                .map(pr -> pr.getUnit().getPartyName().getContent()).reduce((s1, s2) -> s1.concat(", ").concat(s2)).orElse("");
     }
 
     public String getAllResponsibles() {
-        StringBuilder builder = new StringBuilder();
-        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
-
-            String responsibleStr = responsible.getPresentationString();
-
-            if (builder.length() > 0 && !responsibleStr.isEmpty()) {
-                builder.append(", ");
-            }
-
-            builder.append(responsible.getPresentationString());
-
-        }
-        return builder.toString();
+        return getProtocolResponsibleSet().stream().map(pr -> pr.getPresentationString()).filter(ps -> !ps.isEmpty())
+                .reduce((s1, s2) -> s1.concat(", ").concat(s2)).orElse("");
     }
 
     public String getCountry() {
-        StringBuilder builder = new StringBuilder();
-        Set<String> str = new HashSet<>();
-        for (ProtocolResponsible responsible : getProtocolResponsibleSet()) {
-            if (responsible.getType() == ProtocolResponsibleType.INTERNAL) {
-                continue;
-            }
-
-            String responsibleStr = responsible.getCountryDescription();
-            if (!str.contains(responsibleStr)) {
-                str.add(responsibleStr);
-                if (builder.length() > 0 && !responsibleStr.isEmpty()) {
-                    builder.append(", ");
-                }
-
-                builder.append(responsibleStr);
-            }
-        }
-        return builder.toString();
+        final Stream<ProtocolResponsible> stream = getProtocolResponsibleSet().stream();
+        return stream.filter(pr -> pr.getType() != ProtocolResponsibleType.INTERNAL).map(pr -> pr.getCountryDescription())
+                .filter(cd -> !cd.isEmpty()).distinct().reduce((s1, s2) -> s1.concat(", ").concat(s2)).orElse("");
     }
 
     @Atomic
