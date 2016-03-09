@@ -1,7 +1,6 @@
 package module.protocols.domain;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
@@ -17,13 +16,13 @@ public class ProtocolCreatorsGroup extends GroupStrategy {
     private static final Group INSTANCE = new ProtocolCreatorsGroup();
 
     @Override
-    public Set<User> getMembers() {
-        return ProtocolManager.getInstance().getProtocolAuthorizationGroupsSet().stream()
-                .flatMap((group) -> group.getAuthorizedWriterGroup().getMembers().stream()).collect(Collectors.toSet());
+    public Stream<User> getMembers() {
+        final Stream<ProtocolAuthorizationGroup> stream = ProtocolManager.getInstance().getProtocolAuthorizationGroupsSet().stream();
+        return stream.flatMap((group) -> group.getAuthorizedWriterGroup().getMembers());
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 
