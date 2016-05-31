@@ -5,7 +5,6 @@ import module.protocols.domain.util.ProtocolResponsibleType;
 import module.protocols.dto.ProtocolSystemConfigurationBean;
 
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
 
 import pt.ist.fenixframework.Atomic;
@@ -71,7 +70,7 @@ public class ProtocolManager extends ProtocolManager_Base {
     }
 
     public static Group managers() {
-        return DynamicGroup.get("managers");
+        return Group.dynamic("managers");
     }
 
 }
