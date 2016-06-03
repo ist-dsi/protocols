@@ -76,13 +76,6 @@ relation ProtocolManagerExternalOrganizationModel {
 	.module.organization.domain.OrganizationalModel playsRole externalOrganizationalModel;
 }
 
-relation ProtocolManagerCreatorsGroup {
-    protected ProtocolManager playsRole protocolManager;
-    protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole creatorsGroup {
-        multiplicity 1..1;
-    }
-}
-
 // Protocols
 
 relation ProtocolResponsibleProtocol {
