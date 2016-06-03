@@ -32,9 +32,6 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
         setType(type);
     }
 
-    /**
-     * @param bean
-     */
     public void updateFromBean(ProtocolResponsibleBean bean) {
 
         this.setUnit(bean.getUnit());

@@ -42,9 +42,6 @@ public class ProtocolManager extends ProtocolManager_Base {
         return getInternalOrganizationalModel() == null ? true : getInternalOrganizationalModel() != getExternalOrganizationalModel();
     }
 
-    /**
-     * @param bean
-     */
     @Atomic
     public void updateFromBean(ProtocolSystemConfigurationBean bean) {
         setInternalOrganizationalModel(bean.getInternalOrganizationalModel());
