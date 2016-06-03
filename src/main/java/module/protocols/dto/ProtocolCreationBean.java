@@ -99,9 +99,6 @@ public class ProtocolCreationBean implements Serializable {
             return unit != null;
         }
 
-        /**
-         * @param newPerson
-         */
         public void removeResponsible(Person newPerson) {
             responsibles.remove(newPerson);
         }
@@ -415,7 +412,6 @@ public class ProtocolCreationBean implements Serializable {
     /**
      * Verifies whether the internal responsibles are correctly set
      * 
-     * @return
      */
     public boolean internalResponsiblesCorrect() {
 
@@ -436,7 +432,6 @@ public class ProtocolCreationBean implements Serializable {
     /**
      * Verifies whether the external responsibles are correctly set
      * 
-     * @return
      */
     public boolean externalResponsiblesCorrect() {
 
