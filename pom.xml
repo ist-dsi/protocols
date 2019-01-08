@@ -19,6 +19,11 @@
         <tag>HEAD</tag>
     </scm>
 
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://jira.fenixedu.org/browse/DPROT</url>
+    </issueManagement>
+
     <properties>
         <version.org.fenixedu.bennu.core>5.0.0</version.org.fenixedu.bennu.core>
         <version.org.fenixedu.bennu.renderers>5.3.0</version.org.fenixedu.bennu.renderers>
