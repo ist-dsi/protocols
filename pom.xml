@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>DEV-SNAPSHOT</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
     <name>protocols</name>
 
@@ -16,7 +16,7 @@
         <connection>scm:git:git@github.com:ist-dsi/protocols.git</connection>
         <developerConnection>scm:git:git@github.com:ist-dsi/protocols.git</developerConnection>
         <url>http://ist-dsi.github.io/protocols/</url>
-        <tag>HEAD</tag>
+        <tag>v4.0.0</tag>
     </scm>
 
     <issueManagement>
