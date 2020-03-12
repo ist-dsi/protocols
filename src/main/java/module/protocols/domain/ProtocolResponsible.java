@@ -77,7 +77,8 @@ public class ProtocolResponsible extends ProtocolResponsible_Base {
     @Atomic
     public void reloadCountry() {
         final AccountabilityType type = AccountabilityType.readBy(GeographicConstants.GEOGRAPHIC_ACCOUNTABILITY_TYPE_NAME);
-        final Unit countryUnit = getUnit().getChildAccountabilityStream().filter(a -> a.getAccountabilityType() == type)
+        final Unit countryUnit = getUnit().getChildAccountabilityStream().filter(a -> a.getAccountabilityType() == type
+                && a.isActiveNow())
                 .map(a -> a.getChild()).filter(p -> p.isUnit()).map(p -> (Unit) p).findAny().orElse(null);;
 
         GeographicLocation location = countryUnit != null ? countryUnit.getGeographicLocation() : Country.getPortugal();
