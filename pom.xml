@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>protocols</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.0.2</version>
     <packaging>jar</packaging>
     <name>protocols</name>
 
@@ -16,7 +16,7 @@
         <connection>scm:git:git@repo.dsi.tecnico.ulisboa.pt:software/tecnicolisboa/protocols.git</connection>
         <developerConnection>scm:git:git@repo.dsi.tecnico.ulisboa.pt:software/tecnicolisboa/protocols</developerConnection>
         <url>https://repo.dsi.tecnico.ulisboa.pt/software/tecnicolisboa/protocols</url>
-        <tag>HEAD</tag>
+        <tag>v4.0.2</tag>
     </scm>
 
     <properties>
